@@ -44,7 +44,7 @@ export default function Banner() {
           </Link>
         </div>
         <Image
-          src="/banner.jpeg"
+          src="/banner.jpg"
           alt="Marine Serre"
           width="2000"
           height="2500"
@@ -52,7 +52,7 @@ export default function Banner() {
         />
       </div>
       <div className="hidden md:h-auto md:relative md:flex md:justify-center">
-        <div className="md:absolute md:inset-0 md:flex md:flex-col md:justify-center md:items-center md:text-background md:text-4xl font-bold z-[2] bg-[rgba(0,0,0,0.3)]">
+        <div className="md:absolute md:inset-0 md:flex md:flex-col md:justify-center md:items-center md:text-background md:text-4xl font-bold z-2 bg-[rgba(0,0,0,0.3)]">
           <div className="md:mb-6">
             Ultimate Platform for your designer clothing
           </div>

@@ -11,12 +11,21 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+import {userSelector, toggleRegisterForm} from '../redux/userSlice'
+import {useSelector, useDispatch} from 'react-redux'
+
+
 export default function RegisterForm() {
+	const dispatch = useDispatch()
+	const registerFormStatus = useSelector(userSelector).isRegisterFormActive
+
+	const onToggleRegisterForm = () => dispatch(toggleRegisterForm())
+
   return (
-    <div className="hidden">
+    <div >
       <Tabs
         defaultValue="login"
-        className="fixed z-20 inset-0 m-auto w-9/12 h-4/6 max-w-max max-h-max min-w-fit"
+        className={"fixed z-30 inset-0 m-auto w-9/12 h-4/6 max-w-max max-h-max min-w-fit opacity-1 visible transition-opacity duration-1000 " + (!registerFormStatus&&"opacity-0 invisible")}
       >
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="login">Login</TabsTrigger>
@@ -80,7 +89,7 @@ export default function RegisterForm() {
           </Card>
         </TabsContent>
       </Tabs>
-      <div className="fixed z-[15] w-screen h-screen bg-[rgba(0,0,0,0.6)]"></div>
+      <div className={"fixed z-20 w-screen h-screen bg-[rgba(0,0,0,0.7)] opacity-1 visible transition-opacity duration-700 " + (!registerFormStatus&&"opacity-0 invisible")} onClick={onToggleRegisterForm}></div>
     </div>
   );
 }
