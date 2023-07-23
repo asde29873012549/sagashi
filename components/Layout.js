@@ -1,14 +1,14 @@
 import {Fragment} from 'react'
 import Header from './Header'
 import NavBar from './NavBar'
-import Banner from './Banner'
+import RegisterForm from './RegisterForm'
 
 export default function Layout({children}) {
 	return (
 		<Fragment>
+			<RegisterForm/>
 			<Header/>
 			<NavBar/>
-			<Banner/>
 			<main>
 				{children}
 			</main>

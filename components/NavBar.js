@@ -17,7 +17,7 @@ export default function NavBar() {
 					<NavigationMenuItem>
 						<NavigationMenuTrigger className="md:text-lg font-light">DESIGNERS</NavigationMenuTrigger>
 						<NavigationMenuContent className="flex h-96 items-center py-7 px-9 w-screen">
-							<div className="md:w-60">Designers A-Z</div>
+							<div className="md:w-60 text-lg font-bold">Designers A-Z</div>
 							<div className="flex flex-col flex-wrap mx-auto my-0 w-10/12 h-5/6 text-lg">
 								<div className="w-fit mx-5 my-2">Kiko Kosdadinov</div>
 								<div className="w-fit mx-5 my-2">Kiko Kosdadinov</div>

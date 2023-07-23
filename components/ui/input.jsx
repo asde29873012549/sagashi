@@ -1,5 +1,5 @@
 import * as React from "react"
-import {MagnifyingGlassIcon} from '@heroicons/react/24/outline'
+
 
 import { cn } from "@/lib/utils"
 
@@ -14,7 +14,6 @@ const Input = React.forwardRef(({ className, type, ...props }, ref) => {
       )}
       ref={ref}
       {...props} />
-	  <MagnifyingGlassIcon className="absolute w-6 h-6"/>
 	</React.Fragment>
   );
 })
