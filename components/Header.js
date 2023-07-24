@@ -1,13 +1,14 @@
 import { Input as SearchInput } from "./ui/input";
 import Image from "next/image";
 import Link from 'next/link'
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { LuShoppingCart } from "react-icons/lu";
 import MenuBar from "./MenuBar";
 import { LuSearch } from "react-icons/lu";
 
 import {toggleRegisterForm} from '../redux/userSlice'
 import {useDispatch} from 'react-redux'
+
 
 export default function Header() {
   const dispatch = useDispatch()
@@ -40,7 +41,8 @@ export default function Header() {
             <div className="md:hidden inline-block hover:cursor-pointer">
               SEARCH
             </div>
-            <Link className="inline-block hover:cursor-pointer" href="/sell/mobilepreinfo">SELL</Link>
+            <Link className="inline-block hover:cursor-pointer md:hidden" href="/sell/mobilepreinfo">SELL</Link>
+			<Link className="hidden md:inline-block hover:cursor-pointer" href="/sell">SELL</Link>
             <div className="inline-block hover:cursor-pointerk">SHOP</div>
             <LuShoppingCart className="w-6 h-6 hover:cursor-pointer" />
           </div>

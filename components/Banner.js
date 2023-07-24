@@ -48,7 +48,7 @@ export default function Banner() {
           alt="Marine Serre"
           width="2000"
           height="2500"
-          className="h-auto object-cover sm:hidden"
+          className="h-auto object-cover md:hidden"
         />
       </div>
       <div className="hidden md:h-auto md:relative md:flex md:justify-center">
