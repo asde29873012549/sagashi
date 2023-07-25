@@ -2,7 +2,8 @@ import { Fragment } from "react";
 import Header from "./Header";
 import NavBar from "./NavBar";
 import RegisterForm from "./RegisterForm";
-import Footer from "./footer"
+import Footer from "./footer";
+import { Toaster } from "@/components/ui/toaster"
 
 export default function Layout({ children }) {
   return (
@@ -11,7 +12,8 @@ export default function Layout({ children }) {
       <Header />
       <NavBar />
       <main>{children}</main>
-	  <Footer/>
+      <Footer />
+	  <Toaster/>
     </Fragment>
   );
 }
