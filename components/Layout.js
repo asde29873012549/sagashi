@@ -3,7 +3,7 @@ import Header from "./Header";
 import NavBar from "./NavBar";
 import RegisterForm from "./RegisterForm";
 import Footer from "./footer";
-import { Toaster } from "@/components/ui/toaster"
+import { Toaster } from "@/components/ui/toaster";
 
 export default function Layout({ children }) {
   return (
@@ -13,7 +13,9 @@ export default function Layout({ children }) {
       <NavBar />
       <main>{children}</main>
       <Footer />
-	  <Toaster/>
+      <Toaster />
     </Fragment>
   );
 }
+
+//
