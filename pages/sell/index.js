@@ -28,6 +28,8 @@ export default function Sell() {
   const { toast } = useToast();
   const imageInputRef = useRef();
   const imageCardRef = useRef();
+  const cameraIconRef = useRef()
+  const cancelIconRef = useRef()
   const croppedImageUrlRef = useRef();
   const clickedRefKey = useRef()
 
@@ -88,8 +90,14 @@ export default function Sell() {
   const onFinishCrop = () => {
 	const imageCardMap = getMap(imageCardRef)
 	const imageCardNode = imageCardMap.get(clickedRefKey.current)
+	const cameraIconMap = getMap(cameraIconRef)
+	const cameraIconNode = cameraIconMap.get(clickedRefKey.current)
+	const cancelIconMap = getMap(cancelIconRef)
+	const cancelIconNode = cancelIconMap.get(clickedRefKey.current)
     imageCardNode.style.backgroundImage = `url(${croppedImageUrlRef.current})`;
     imageCardNode.style.backgroundSize = "contain";
+	cameraIconNode.style.display = "none"
+	cancelIconNode.style.display = "block"
 	console.log(croppedImageUrlRef.current)
     setImgSrc(null);
   };
@@ -100,6 +108,20 @@ export default function Sell() {
 	}
     setImgSrc(null);
   };
+
+  const onCancelIconClick = () => {
+	const cancelIconMap = getMap(cancelIconRef)
+	const cancelIconNode = cancelIconMap.get(clickedRefKey.current)
+	const imageCardMap = getMap(imageCardRef)
+	const imageCardNode = imageCardMap.get(clickedRefKey.current)
+	const cameraIconMap = getMap(cameraIconRef)
+	const cameraIconNode = cameraIconMap.get(clickedRefKey.current)
+    imageCardNode.style.backgroundImage = "";
+	cancelIconNode.style.display = "none"
+	cameraIconNode.style.display = "inline-block"
+	setImgSrc(null);
+
+  }
 
   const getMap = (ref) => {
 	if (!ref.current) {
@@ -223,20 +245,19 @@ const getNode = (node, key, ref) => {
         />
       </div>
       <section className="grid grid-cols-3 gap-10 mt-20">
-        <ImageUploadCard
-          onSelectFile={onSelectFile}
-          imageCardRef={imageCardRef}
-		  getNode={getNode}
-		  id= {1}
-		  clickedRefKey={clickedRefKey}
-        />
-		<ImageUploadCard
-          onSelectFile={onSelectFile}
-          imageCardRef={imageCardRef}
-		  getNode={getNode}
-		  id= {2}
-		  clickedRefKey={clickedRefKey}
-        />
+		{
+			[1,2,3,4,5,6].map(id => <ImageUploadCard
+				key={id}
+				onSelectFile={onSelectFile}
+				imageCardRef={imageCardRef}
+				getNode={getNode}
+				id= {id}
+				clickedRefKey={clickedRefKey}
+				cameraIconRef={cameraIconRef}
+				cancelIconRef={cancelIconRef}
+				onCancelIconClick={onCancelIconClick}
+			  />)
+		} 
       </section>
       <div className="flex justify-end items-center mt-10">
         <Button

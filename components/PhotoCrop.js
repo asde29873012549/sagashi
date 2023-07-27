@@ -31,7 +31,7 @@ export default function PhotoCrop({
                 alt="Crop me"
                 src={imgSrc}
                 onLoad={onImageLoad}
-                className="h-[70vh]"
+                className="md:h-[70vh] w-[90vw]"
               />
             </ReactCrop>
 			<div>

@@ -1,5 +1,6 @@
 import { Fragment } from "react";
 import { Button } from "@/components/ui/button";
+import Link from 'next/link'
 import { LuShirt, LuWallet } from "react-icons/lu";
 import { PiPants, PiShirtFoldedBold } from "react-icons/pi";
 import { TbJacket, TbShoe } from "react-icons/tb";
@@ -86,6 +87,9 @@ export default function MobilePreInfo() {
           Accessories
         </Button>
       </div>
+	  <Link href="/sell/mobilemidinfo">
+		<Button className="flex justify-content items-center bg-blue-800 w-full mt-10 bottom-0">NEXT</Button>
+	</Link>
     </main>
   );
 }
