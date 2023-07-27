@@ -11,22 +11,41 @@ import { Button } from "@/components/ui/button";
 import { GiCancel } from "react-icons/gi";
 import { useToast } from "@/components/ui/use-toast";
 import PhotoCrop from "../../components/PhotoCrop";
-import { centerAspectCrop } from "../../lib/utils";
-import ImageUploadCard from '../../components/ui/image-upload-card'
+import { centerAspectCrop, getCroppedImage, useDebounceEffect } from "../../lib/utils";
+import ImageUploadCard from "../../components/ui/image-upload-card";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { v4 as uuid } from "uuid";
+
+const cropAspet = 4/5
 
 export default function Sell() {
   const [tags, setTags] = useState([]);
   const [tagInputValue, setTagInputValue] = useState("");
-  const [imgSrc, setImgSrc] = useState(null);
-  const [completedCrop, setCompletedCrop] = useState();
+  const [imgSrc, setImgSrc] = useState();
   const [crop, setCrop] = useState();
+  const [completeCrop, setCompletedCrop] = useState()
   const { toast } = useToast();
-  const imageInputRef = useRef()
-  const imageCardRef = useRef()
-  const croppedImageUrlRef = useRef()
+  const imageInputRef = useRef();
+  const imageCardRef = useRef();
+  const croppedImageUrlRef = useRef();
+  const clickedRefKey = useRef()
+
+  useDebounceEffect(() => {
+	const getCroppedImageUrl = async () => {
+		if (imageInputRef.current && crop.width && crop.height) {
+			const url = await getCroppedImage(
+			  imageInputRef.current,
+			  crop,
+			  `${uuid()}.jpg`,
+			  croppedImageUrlRef
+			);
+			console.log('executed')
+			croppedImageUrlRef.current = url;
+		  }
+	}
+	getCroppedImageUrl()
+  }, 200, [completeCrop, crop])
 
   const onTagInputKeyDown = (e, id) => {
     if (e.keyCode === 32 || e.keyCode === 13) {
@@ -41,81 +60,59 @@ export default function Sell() {
     }
   };
 
-  const onInput = (e) => {
+  const onInput = e => {
     setTagInputValue(e.target.value);
   };
 
-  const onCancelTag = (tagId) => {
+  const onCancelTag = tagId => {
     setTags(tags.filter((tag) => tag.id !== tagId));
   };
 
-  const onSelectFile = (e) => {
+  const onSelectFile = e => {
     if (e.target.files && e.target.files.length > 0) {
-      setCrop(undefined);
       const reader = new FileReader();
+	  reader.readAsDataURL(e.target.files[0]);
       reader.addEventListener("load", () =>
         setImgSrc(reader.result ? reader.result.toString() : ""),
       );
-      reader.readAsDataURL(e.target.files[0]);
     }
   };
 
-  const onImageLoad = (e) => {
+  const onImageLoad = e => {
     const { width, height } = e.currentTarget;
-    setCrop(centerAspectCrop(width, height, 4 / 5));
+	console.log(width, height, 'omimageload')
+    setCrop(centerAspectCrop(width, height, cropAspet));
   };
 
   const onFinishCrop = () => {
-	imageCardRef.current.style.backgroundImage = `url(${croppedImageUrlRef.current})`
-	imageCardRef.current.style.backgroundSize = "contain"
-	setImgSrc(null)
-  }
+	const imageCardMap = getMap(imageCardRef)
+	const imageCardNode = imageCardMap.get(clickedRefKey.current)
+    imageCardNode.style.backgroundImage = `url(${croppedImageUrlRef.current})`;
+    imageCardNode.style.backgroundSize = "contain";
+	console.log(croppedImageUrlRef.current)
+    setImgSrc(null);
+  };
 
-  async function imageCropComplete(crop) {
-    await userCrop(crop);
-  }
-  async function userCrop(crop) {
-    if (imageInputRef.current && crop.width && crop.height) {
-      const url = await getCroppedImage(imageInputRef.current, crop, "newFile.jpeg");
-	  croppedImageUrlRef.current = url
-    }
-  }
-  function getCroppedImage(image, crop, fileName) {
-    const imageCanvas = document.createElement("canvas");
-    const scaleX = image.naturalWidth / image.width;
-    const scaleY = image.naturalHeight / image.height;
-    imageCanvas.width = crop.width;
-    imageCanvas.height = crop.height;
-    const imgCx = imageCanvas.getContext("2d");
-    imgCx.drawImage(
-      image,
-	  crop.x * scaleX,
-      crop.y * scaleY,
-      crop.width * scaleX,
-      crop.height * scaleY,
-      0,
-      0,
-      crop.width,
-      crop.height
-    );
+  const onCancelCrop = () => {
+	if (croppedImageUrlRef.current) {
+		URL.revokeObjectURL(croppedImageUrlRef.current);
+	}
+    setImgSrc(null);
+  };
 
-	return new Promise((resolve, reject) => {
-		imageCanvas.toBlob((blob) => {
-			if (!blob) {
-			  reject(new Error("the image canvas is empty"));
-			  return;
-			}
-			blob.name = fileName;
-			let imageURL;
-			//URL.revokeObjectURL(imageURL);
-			imageURL = URL.createObjectURL(blob);
-			setCompletedCrop(imageURL);
-			resolve(imageURL);
-		  });
-	})
-    
-	
-  }
+  const getMap = (ref) => {
+	if (!ref.current) {
+		ref.current = new Map()
+	}
+	return ref.current
+}
+
+const getNode = (node, key, ref) => {
+	const map = getMap(ref)
+	if (node) {
+		map.set(key, node)
+	}
+}
 
   return (
     <main className="p-4 mx-72">
@@ -124,9 +121,11 @@ export default function Sell() {
         crop={crop}
         onImageLoad={onImageLoad}
         setCrop={setCrop}
-		imageCropComplete={imageCropComplete}
-		imageInputRef={imageInputRef}
-		onFinishCrop={onFinishCrop}
+        imageInputRef={imageInputRef}
+        onFinishCrop={onFinishCrop}
+		onCancelCrop={onCancelCrop}
+		setCompletedCrop={setCompletedCrop}
+		cropAspet={cropAspet}
       />
       <div className="grid grid-cols-2 gap-4">
         <div className="col-span-2 text-3xl font-semibold my-8">Details</div>
@@ -223,8 +222,20 @@ export default function Sell() {
         />
       </div>
       <section className="grid grid-cols-3 gap-10 mt-20">
-		<ImageUploadCard onSelectFile={onSelectFile} imageCardRef={imageCardRef}/>
-		
+        <ImageUploadCard
+          onSelectFile={onSelectFile}
+          imageCardRef={imageCardRef}
+		  getNode={getNode}
+		  id= {1}
+		  clickedRefKey={clickedRefKey}
+        />
+		<ImageUploadCard
+          onSelectFile={onSelectFile}
+          imageCardRef={imageCardRef}
+		  getNode={getNode}
+		  id= {2}
+		  clickedRefKey={clickedRefKey}
+        />
       </section>
       <div className="flex justify-end items-center mt-10">
         <Button
@@ -245,3 +256,198 @@ export default function Sell() {
     </main>
   );
 }
+
+/*
+
+import React, { useState, useRef } from 'react';
+import ReactCrop, {
+  centerCrop,
+  makeAspectCrop,
+  Crop,
+  PixelCrop,
+  convertToPixelCrop,
+} from 'react-image-crop';
+import { canvasPreview } from './canvasPreview';
+import { useDebounceEffect } from './useDebounceEffect';
+
+import 'react-image-crop/dist/ReactCrop.css';
+
+function centerAspectCrop(mediaWidth, mediaHeight, aspect) {
+  return centerCrop(
+    makeAspectCrop(
+      {
+        unit: '%',
+        width: 90,
+      },
+      aspect,
+      mediaWidth,
+      mediaHeight
+    ),
+    mediaWidth,
+    mediaHeight
+  );
+}
+
+export default function App() {
+  const [imgSrc, setImgSrc] = useState('');
+  const previewCanvasRef = useRef(null);
+  const imgRef = useRef(null);
+  const hiddenAnchorRef = useRef(null);
+  const blobUrlRef = useRef('');
+  const [crop, setCrop] = useState();
+  const [completedCrop, setCompletedCrop] = useState();
+  const [scale, setScale] = useState(1);
+  const [rotate, setRotate] = useState(0);
+  const [aspect, setAspect] = useState(16 / 9);
+
+  function onSelectFile(e) {
+    if (e.target.files && e.target.files.length > 0) {
+      setCrop(undefined);
+      const reader = new FileReader();
+      reader.addEventListener('load', () =>
+        setImgSrc(reader.result ? reader.result.toString() : '')
+      );
+      reader.readAsDataURL(e.target.files[0]);
+    }
+  }
+
+  function onImageLoad(e) {
+    if (aspect) {
+      const { width, height } = e.currentTarget;
+      setCrop(centerAspectCrop(width, height, aspect));
+    }
+  }
+
+  function onDownloadCropClick() {
+    if (!previewCanvasRef.current) {
+      throw new Error('Crop canvas does not exist');
+    }
+
+    previewCanvasRef.current.toBlob((blob) => {
+      if (!blob) {
+        throw new Error('Failed to create blob');
+      }
+      if (blobUrlRef.current) {
+        URL.revokeObjectURL(blobUrlRef.current);
+      }
+      blobUrlRef.current = URL.createObjectURL(blob);
+      hiddenAnchorRef.current.href = blobUrlRef.current;
+      hiddenAnchorRef.current.click();
+    });
+  }
+
+  useDebounceEffect(
+    async () => {
+      if (
+        completedCrop?.width &&
+        completedCrop?.height &&
+        imgRef.current &&
+        previewCanvasRef.current
+      ) {
+        canvasPreview(
+          imgRef.current,
+          previewCanvasRef.current,
+          completedCrop,
+          scale,
+          rotate
+        );
+      }
+    },
+    100,
+    [completedCrop, scale, rotate]
+  );
+
+  function handleToggleAspectClick() {
+    if (aspect) {
+      setAspect(undefined);
+    } else if (imgRef.current) {
+      const { width, height } = imgRef.current;
+      setAspect(16 / 9);
+      const newCrop = centerAspectCrop(width, height, 16 / 9);
+      setCrop(newCrop);
+      setCompletedCrop(convertToPixelCrop(newCrop, width, height));
+    }
+  }
+
+  return (
+    <div className="App">
+      <div className="Crop-Controls">
+        <input type="file" accept="image/*" onChange={onSelectFile} />
+        <div>
+          <label htmlFor="scale-input">Scale: </label>
+          <input
+            id="scale-input"
+            type="number"
+            step="0.1"
+            value={scale}
+            disabled={!imgSrc}
+            onChange={(e) => setScale(Number(e.target.value))}
+          />
+        </div>
+        <div>
+          <label htmlFor="rotate-input">Rotate: </label>
+          <input
+            id="rotate-input"
+            type="number"
+            value={rotate}
+            disabled={!imgSrc}
+            onChange={(e) =>
+              setRotate(Math.min(180, Math.max(-180, Number(e.target.value))))
+            }
+          />
+        </div>
+        <div>
+          <button onClick={handleToggleAspectClick}>
+            Toggle aspect {aspect ? 'off' : 'on'}
+          </button>
+        </div>
+      </div>
+      {!!imgSrc && (
+        <ReactCrop
+          crop={crop}
+          onChange={(_, percentCrop) => setCrop(percentCrop)}
+          onComplete={(c) => setCompletedCrop(c)}
+          aspect={aspect}
+        >
+          <img
+            ref={imgRef}
+            alt="Crop me"
+            src={imgSrc}
+            style={{ transform: `scale(${scale}) rotate(${rotate}deg)` }}
+            onLoad={onImageLoad}
+          />
+        </ReactCrop>
+      )}
+      {!!completedCrop && (
+        <>
+          <div>
+            <canvas
+              ref={previewCanvasRef}
+              style={{
+                border: '1px solid black',
+                objectFit: 'contain',
+                width: completedCrop.width,
+                height: completedCrop.height,
+              }}
+            />
+          </div>
+          <div>
+            <button onClick={onDownloadCropClick}>Download Crop</button>
+            <a
+              ref={hiddenAnchorRef}
+              download
+              style={{
+                position: 'absolute',
+                top: '-200vh',
+                visibility: 'hidden',
+              }}
+            >
+              Hidden download
+            </a>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+*/

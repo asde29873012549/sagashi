@@ -4,8 +4,17 @@ import { Fragment } from "react";
 import BlackCanvas from "./ui/blackCanvas";
 import { Button } from "@/components/ui/button";
 
-export default function PhotoCrop({ imgSrc, onImageLoad, crop, setCrop, imageCropComplete, imageInputRef, onFinishCrop }) {
-
+export default function PhotoCrop({
+  imgSrc,
+  onImageLoad,
+  crop,
+  setCrop,
+  imageInputRef,
+  onFinishCrop,
+  onCancelCrop,
+  setCompletedCrop,
+  cropAspet
+}) {
   return (
     <Fragment>
       {imgSrc && (
@@ -14,8 +23,8 @@ export default function PhotoCrop({ imgSrc, onImageLoad, crop, setCrop, imageCro
             <ReactCrop
               crop={crop}
               onChange={(_, percentCrop) => setCrop(percentCrop)}
-			  onComplete={imageCropComplete}
-              aspect={4 / 5}
+              onComplete={(c) => setCompletedCrop(c)}
+              aspect={cropAspet}
             >
               <img
                 ref={imageInputRef}
@@ -25,7 +34,20 @@ export default function PhotoCrop({ imgSrc, onImageLoad, crop, setCrop, imageCro
                 className="h-[70vh]"
               />
             </ReactCrop>
-			<Button className="mt-10 hover:bg-destructive" onClick={onFinishCrop}>CROP</Button>
+			<div>
+				<Button
+				className="mt-10 hover:bg-slate-600"
+				onClick={onFinishCrop}
+				>
+				CROP
+				</Button>
+				<Button
+				className="bg-destructive ml-5 hover:bg-slate-600"
+				onClick={onCancelCrop}
+				>
+				CANCEL
+				</Button>
+			</div>
           </div>
           <BlackCanvas />
         </Fragment>
