@@ -14,7 +14,7 @@ import PhotoCrop from "../../components/PhotoCrop";
 import { centerAspectCrop, getCroppedImage, useDebounceEffect } from "../../lib/utils";
 import ImageUploadCard from "../../components/ui/image-upload-card";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef} from "react";
 import { v4 as uuid } from "uuid";
 
 const cropAspet = 4/5
@@ -33,19 +33,19 @@ export default function Sell() {
 
   useDebounceEffect(() => {
 	const getCroppedImageUrl = async () => {
-		if (imageInputRef.current && crop.width && crop.height) {
+		if (imageInputRef.current && completeCrop.width && completeCrop.height) {
 			const url = await getCroppedImage(
 			  imageInputRef.current,
-			  crop,
+			  completeCrop,
 			  `${uuid()}.jpg`,
 			  croppedImageUrlRef
 			);
-			console.log('executed')
 			croppedImageUrlRef.current = url;
 		  }
 	}
+	
 	getCroppedImageUrl()
-  }, 200, [completeCrop, crop])
+  }, 200, [completeCrop])
 
   const onTagInputKeyDown = (e, id) => {
     if (e.keyCode === 32 || e.keyCode === 13) {
@@ -70,6 +70,7 @@ export default function Sell() {
 
   const onSelectFile = e => {
     if (e.target.files && e.target.files.length > 0) {
+	  setCrop(undefined)
       const reader = new FileReader();
 	  reader.readAsDataURL(e.target.files[0]);
       reader.addEventListener("load", () =>
@@ -256,198 +257,3 @@ const getNode = (node, key, ref) => {
     </main>
   );
 }
-
-/*
-
-import React, { useState, useRef } from 'react';
-import ReactCrop, {
-  centerCrop,
-  makeAspectCrop,
-  Crop,
-  PixelCrop,
-  convertToPixelCrop,
-} from 'react-image-crop';
-import { canvasPreview } from './canvasPreview';
-import { useDebounceEffect } from './useDebounceEffect';
-
-import 'react-image-crop/dist/ReactCrop.css';
-
-function centerAspectCrop(mediaWidth, mediaHeight, aspect) {
-  return centerCrop(
-    makeAspectCrop(
-      {
-        unit: '%',
-        width: 90,
-      },
-      aspect,
-      mediaWidth,
-      mediaHeight
-    ),
-    mediaWidth,
-    mediaHeight
-  );
-}
-
-export default function App() {
-  const [imgSrc, setImgSrc] = useState('');
-  const previewCanvasRef = useRef(null);
-  const imgRef = useRef(null);
-  const hiddenAnchorRef = useRef(null);
-  const blobUrlRef = useRef('');
-  const [crop, setCrop] = useState();
-  const [completedCrop, setCompletedCrop] = useState();
-  const [scale, setScale] = useState(1);
-  const [rotate, setRotate] = useState(0);
-  const [aspect, setAspect] = useState(16 / 9);
-
-  function onSelectFile(e) {
-    if (e.target.files && e.target.files.length > 0) {
-      setCrop(undefined);
-      const reader = new FileReader();
-      reader.addEventListener('load', () =>
-        setImgSrc(reader.result ? reader.result.toString() : '')
-      );
-      reader.readAsDataURL(e.target.files[0]);
-    }
-  }
-
-  function onImageLoad(e) {
-    if (aspect) {
-      const { width, height } = e.currentTarget;
-      setCrop(centerAspectCrop(width, height, aspect));
-    }
-  }
-
-  function onDownloadCropClick() {
-    if (!previewCanvasRef.current) {
-      throw new Error('Crop canvas does not exist');
-    }
-
-    previewCanvasRef.current.toBlob((blob) => {
-      if (!blob) {
-        throw new Error('Failed to create blob');
-      }
-      if (blobUrlRef.current) {
-        URL.revokeObjectURL(blobUrlRef.current);
-      }
-      blobUrlRef.current = URL.createObjectURL(blob);
-      hiddenAnchorRef.current.href = blobUrlRef.current;
-      hiddenAnchorRef.current.click();
-    });
-  }
-
-  useDebounceEffect(
-    async () => {
-      if (
-        completedCrop?.width &&
-        completedCrop?.height &&
-        imgRef.current &&
-        previewCanvasRef.current
-      ) {
-        canvasPreview(
-          imgRef.current,
-          previewCanvasRef.current,
-          completedCrop,
-          scale,
-          rotate
-        );
-      }
-    },
-    100,
-    [completedCrop, scale, rotate]
-  );
-
-  function handleToggleAspectClick() {
-    if (aspect) {
-      setAspect(undefined);
-    } else if (imgRef.current) {
-      const { width, height } = imgRef.current;
-      setAspect(16 / 9);
-      const newCrop = centerAspectCrop(width, height, 16 / 9);
-      setCrop(newCrop);
-      setCompletedCrop(convertToPixelCrop(newCrop, width, height));
-    }
-  }
-
-  return (
-    <div className="App">
-      <div className="Crop-Controls">
-        <input type="file" accept="image/*" onChange={onSelectFile} />
-        <div>
-          <label htmlFor="scale-input">Scale: </label>
-          <input
-            id="scale-input"
-            type="number"
-            step="0.1"
-            value={scale}
-            disabled={!imgSrc}
-            onChange={(e) => setScale(Number(e.target.value))}
-          />
-        </div>
-        <div>
-          <label htmlFor="rotate-input">Rotate: </label>
-          <input
-            id="rotate-input"
-            type="number"
-            value={rotate}
-            disabled={!imgSrc}
-            onChange={(e) =>
-              setRotate(Math.min(180, Math.max(-180, Number(e.target.value))))
-            }
-          />
-        </div>
-        <div>
-          <button onClick={handleToggleAspectClick}>
-            Toggle aspect {aspect ? 'off' : 'on'}
-          </button>
-        </div>
-      </div>
-      {!!imgSrc && (
-        <ReactCrop
-          crop={crop}
-          onChange={(_, percentCrop) => setCrop(percentCrop)}
-          onComplete={(c) => setCompletedCrop(c)}
-          aspect={aspect}
-        >
-          <img
-            ref={imgRef}
-            alt="Crop me"
-            src={imgSrc}
-            style={{ transform: `scale(${scale}) rotate(${rotate}deg)` }}
-            onLoad={onImageLoad}
-          />
-        </ReactCrop>
-      )}
-      {!!completedCrop && (
-        <>
-          <div>
-            <canvas
-              ref={previewCanvasRef}
-              style={{
-                border: '1px solid black',
-                objectFit: 'contain',
-                width: completedCrop.width,
-                height: completedCrop.height,
-              }}
-            />
-          </div>
-          <div>
-            <button onClick={onDownloadCropClick}>Download Crop</button>
-            <a
-              ref={hiddenAnchorRef}
-              download
-              style={{
-                position: 'absolute',
-                top: '-200vh',
-                visibility: 'hidden',
-              }}
-            >
-              Hidden download
-            </a>
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
-*/
