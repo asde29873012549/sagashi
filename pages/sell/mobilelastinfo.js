@@ -1,4 +1,3 @@
-import { Fragment } from "react";
 import { Button} from "@/components/ui/button";
 import ComboBox from '../../components/ui/comboBox'
 import { Input } from "@/components/ui/input";
@@ -13,8 +12,8 @@ import { centerAspectCrop, getCroppedImage, useDebounceEffect } from "../../lib/
 import ImageUploadCard from "../../components/ui/image-upload-card";
 const cropAspet = 4/5
 
-export default function MobileMidInfo() {
-	const [tags, setTags] = useState([]);
+export default function MobileLastInfo() {
+  const [tags, setTags] = useState([]);
   const [tagInputValue, setTagInputValue] = useState("");
   const [imgSrc, setImgSrc] = useState();
   const [crop, setCrop] = useState();
@@ -25,6 +24,18 @@ export default function MobileMidInfo() {
   const cancelIconRef = useRef()
   const croppedImageUrlRef = useRef();
   const clickedRefKey = useRef()
+  const childStateRef = useRef()
+  const [formInput, setFormInput] = useState({
+	ItemName:"",
+	Description:""
+  })
+  const dataRef = useRef({
+	Designers:null,
+	ItemName:null,
+	Description:null,
+	Tags:null,
+	Photos:{}
+})
 
   useDebounceEffect(() => {
 	const getCroppedImageUrl = async () => {
@@ -42,6 +53,13 @@ export default function MobileMidInfo() {
 	getCroppedImageUrl()
   }, 200, [completeCrop])
 
+  const onFormInput = (e, form) => {
+	setFormInput({...formInput, ...{[form]:e.target.value}})
+	dataRef.current[form] = e.target.value
+	dataRef.current.Designers = childStateRef.current.val.value
+	console.log(dataRef.current)
+  }
+
 	const onTagInputKeyDown = (e, id) => {
 		if (e.keyCode === 32 || e.keyCode === 13) {
 		  setTags([
@@ -52,10 +70,11 @@ export default function MobileMidInfo() {
 			},
 		  ]);
 		  setTagInputValue("");
+		  dataRef.current.Tags = e.target.value
 		}
 	  };
 	
-	  const onInput = e => {
+	  const onTagInput = e => {
 		setTagInputValue(e.target.value);
 	  };
 	
@@ -93,6 +112,7 @@ export default function MobileMidInfo() {
 		cancelIconNode.style.display = "block"
 		console.log(croppedImageUrlRef.current)
 		setImgSrc(null);
+		dataRef.current.Photos[clickedRefKey.current] = croppedImageUrlRef.current
 	  };
 	
 	  const onCancelCrop = () => {
@@ -113,6 +133,7 @@ export default function MobileMidInfo() {
 		cancelIconNode.style.display = "none"
 		cameraIconNode.style.display = "inline-block"
 		setImgSrc(null);
+		delete dataRef.current.Photos[clickedRefKey.current]
 	
 	  }
 	
@@ -144,11 +165,11 @@ export default function MobileMidInfo() {
 		cropAspet={cropAspet}
       />
 		<div className="font-semibold">Designers</div>
-		<ComboBox/>
+		<ComboBox ref={childStateRef}/>
 		<div className="font-semibold mt-6">Item Name</div>
-		<Input placeholder="Item Name" className="w-full h-10 mt-6" />
+		<Input placeholder="Item Name" className="w-full h-10 mt-6" value={formInput.ItemName} onChange={(e) => onFormInput(e, "ItemName")}/>
 		<div className="font-semibold mt-6">Description</div>
-		<Textarea placeholder="Add details about condition, how the garments fits, additional measurements, etc." className="w-full h-36 mt-6" />
+		<Textarea placeholder="Add details about condition, how the garments fits, additional measurements, etc." className="w-full h-36 mt-6"  value={formInput.Description} onChange={(e) => onFormInput(e, "Description")}/>
 		<div>
         <div className="font-semibold mt-6">Tags</div>
         <div>
@@ -167,7 +188,7 @@ export default function MobileMidInfo() {
           placeholder="#tags"
           className="h-12 mt-6"
           onKeyDown={(e) => onTagInputKeyDown(e, uuid())}
-          onChange={onInput}
+          onChange={onTagInput}
           value={tagInputValue}
         />
       </div>
@@ -188,10 +209,9 @@ export default function MobileMidInfo() {
 		}
 		</div>
 	  
-		<Button className="flex justify-content items-center bg-blue-800 mt-10 w-full bottom-0">
-			<Link href="/sell/mobilemidinfo">SUBMT</Link>
-		</Button>
-	  
+		<Button className="flex justify-content items-center bg-blue-800 w-full mt-10 bottom-0" asChild>
+			<Link href="/sell/mobilelastinfo">SUMIT</Link>
+	    </Button>
     </main>
   );
 }

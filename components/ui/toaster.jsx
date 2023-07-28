@@ -18,7 +18,7 @@ export function Toaster() {
           <Toast
             key={id}
             {...props}
-            className="bg-destructive max-w-fit text-background"
+            className="bg-gradient-to-tr from-cyan-950 to-cyan-900 max-w-fit text-background"
           >
             <div className="grid gap-1">
               {title && (

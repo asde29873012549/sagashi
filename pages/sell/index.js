@@ -265,7 +265,7 @@ const getNode = (node, key, ref) => {
           className="flex justify-center items-center border-2 border-foreground"
           onClick={() => {
             toast({
-              title: "Your Data Was Saved ! Come Back Later !",
+              title: "Data Saved ! Come Back Later !",
             });
           }}
         >
