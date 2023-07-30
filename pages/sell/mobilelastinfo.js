@@ -6,6 +6,7 @@ import Link from "next/link";
 import { GiCancel } from "react-icons/gi";
 
 import { useState, useRef } from "react";
+import {useRouter} from "next/router"
 import { v4 as uuid } from "uuid";
 import PhotoCrop from "../../components/PhotoCrop";
 import { getCroppedImage, useDebounceEffect } from "../../lib/utils";
@@ -13,6 +14,7 @@ import ImageUploadCard from "../../components/ui/image-upload-card";
 const cropAspet = 4 / 5;
 
 export default function MobileLastInfo() {
+  const router = useRouter()
   const [tags, setTags] = useState([]);
   const [formInput, setFormInput] = useState({
     ItemName: "",
@@ -35,7 +37,7 @@ export default function MobileLastInfo() {
     Designers: null,
     ItemName: null,
     Description: null,
-    Tags: null,
+    Tags: [],
     Photos: {},
   });
 
@@ -79,7 +81,7 @@ export default function MobileLastInfo() {
         },
       ]);
       setFormInput({ ...formInput, Tags: "" });
-      dataRef.current.Tags = e.target.value;
+      dataRef.current.Tags.push(e.target.value);
     }
   };
 
@@ -136,6 +138,11 @@ export default function MobileLastInfo() {
       map.set(key, node);
     }
   };
+
+  const onSubmit = e => {
+	e.preventDefault()
+	router.push('/')
+  }
 
   return (
     <main className="p-4 relative h-full">
@@ -201,13 +208,9 @@ export default function MobileLastInfo() {
           />
         ))}
       </div>
-
-      <Button
-        className="flex justify-content items-center bg-blue-800 w-full mt-10 bottom-0"
-        asChild
-      >
-        <Link href="/sell/mobilelastinfo">SUMIT</Link>
-      </Button>
+	  <Button className="flex justify-content items-center bg-blue-800 w-full mt-10 bottom-0" type="submit" onClick={onSubmit}>
+          SUBMIT
+	  </Button>
     </main>
   );
 }

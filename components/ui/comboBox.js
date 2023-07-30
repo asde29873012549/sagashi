@@ -60,7 +60,7 @@ export default React.forwardRef((_, ref) => {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between mt-6"
+          className="w-full justify-between mt-6 md:h-12 font-normal md:col-span-2"
         >
           {value
             ? frameworks.find((framework) => framework.value === value)?.label
@@ -68,7 +68,7 @@ export default React.forwardRef((_, ref) => {
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[calc(100vw-2rem)]">
+      <PopoverContent className="w-[calc(100vw-2rem)] md:w-[calc(100vw-36rem)]">
         <Command>
           <CommandInput placeholder="Search designers..." />
           <CommandEmpty>No designers found.</CommandEmpty>

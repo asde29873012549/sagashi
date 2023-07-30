@@ -5,6 +5,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import ComboBox from "../../components/ui/comboBox";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -12,25 +13,25 @@ import { GiCancel } from "react-icons/gi";
 import { useToast } from "@/components/ui/use-toast";
 import PhotoCrop from "../../components/PhotoCrop";
 import {
-  centerAspectCrop,
   getCroppedImage,
   useDebounceEffect,
 } from "../../lib/utils";
 import ImageUploadCard from "../../components/ui/image-upload-card";
 
 import { useState, useRef } from "react";
+import {useRouter} from "next/router"
 import { v4 as uuid } from "uuid";
 
 const cropAspet = 4 / 5;
 
 export default function Sell() {
+  const router = useRouter();
   const [tags, setTags] = useState([]);
   const [formInput, setFormInput] = useState({
     ItemName: "",
     Description: "",
     Tags: "",
   });
-  //const [tagInputValue, setTagInputValue] = useState("");
   const [imgSrc, setImgSrc] = useState();
   const [crop, setCrop] = useState();
   const [completeCrop, setCompletedCrop] = useState();
@@ -41,19 +42,30 @@ export default function Sell() {
     cameraIcon: null,
     cancelIcon: null,
   });
-  //const imageInputRef = useRef();
-  //const imageCardRef = useRef();
-  //const cameraIconRef = useRef();
-  //const cancelIconRef = useRef();
   const croppedImageUrlRef = useRef();
   const clickedRefKey = useRef();
+  const childStateRef = useRef();
   const dataRef = useRef({
+	Department: null,
+    Category: null,
+    SubCategory: null,
+	Condition: null,
+    Size: null,
+    Color: null,
+    Price: null,
     Designers: null,
     ItemName: null,
     Description: null,
-    Tags: null,
+    Tags: [],
     Photos: {},
   });
+
+  const [depValue, setDepValue] = useState();
+  const [catValue, setCatValue] = useState();
+  const [subCatValue, setSubCatValue] = useState();
+  const [colorValue, setColorValue] = useState();
+  const [conditionValue, setConditionValue] = useState();
+  const [sizeValue, setSizeValue] = useState();
 
   useDebounceEffect(
     () => {
@@ -95,7 +107,7 @@ export default function Sell() {
         },
       ]);
       setFormInput({ ...formInput, Tags: "" });
-      dataRef.current.Tags = e.target.value;
+      dataRef.current.Tags.push(e.target.value);
     }
   };
 
@@ -106,24 +118,6 @@ export default function Sell() {
   const onCancelTag = (tagId) => {
     setTags(tags.filter((tag) => tag.id !== tagId));
   };
-
-  /*
-  const onSelectFile = (e) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setCrop(undefined);
-      const reader = new FileReader();
-      reader.readAsDataURL(e.target.files[0]);
-      reader.addEventListener("load", () =>
-        setImgSrc(reader.result ? reader.result.toString() : ""),
-      );
-    }
-  };
-
-  const onImageLoad = (e) => {
-    const { width, height } = e.currentTarget;
-    console.log(width, height, "omimageload");
-    setCrop(centerAspectCrop(width, height, cropAspet));
-  };*/
 
   const onFinishCrop = () => {
     const imageCardNode = getMap("imageCard").get(clickedRefKey.current);
@@ -171,6 +165,11 @@ export default function Sell() {
     }
   };
 
+  const onSubmit = e => {
+	e.preventDefault()
+	router.push('/')
+  }
+
   return (
     <main className="p-4 mx-72">
       <PhotoCrop
@@ -185,18 +184,18 @@ export default function Sell() {
       />
       <div className="grid grid-cols-2 gap-4">
         <div className="col-span-2 text-3xl font-semibold my-8">Details</div>
-        <Select>
+        <Select value={depValue} setValue={setDepValue}>
           <SelectTrigger className="w-auto h-12">
-            <SelectValue placeholder="Department/Category" />
+            <SelectValue ref={dataRef} identifier="Department" val={depValue}/>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="menswear">Menswear</SelectItem>
             <SelectItem value="womenswear">Womenswear</SelectItem>
           </SelectContent>
         </Select>
-        <Select>
+        <Select value={catValue} setValue={setCatValue}>
           <SelectTrigger className="w-auto h-12">
-            <SelectValue placeholder="Sub-Category" />
+            <SelectValue ref={dataRef} identifier="Category" val={catValue}/>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="light">Light</SelectItem>
@@ -204,9 +203,9 @@ export default function Sell() {
             <SelectItem value="system">System</SelectItem>
           </SelectContent>
         </Select>
-        <Select>
-          <SelectTrigger className="w-auto mt-6 h-12">
-            <SelectValue placeholder="Designer" />
+		<Select value={subCatValue} setValue={setSubCatValue}>
+          <SelectTrigger className="w-auto h-12">
+            <SelectValue ref={dataRef} identifier="SubCategory" val={subCatValue}/>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="light">Light</SelectItem>
@@ -214,9 +213,9 @@ export default function Sell() {
             <SelectItem value="system">System</SelectItem>
           </SelectContent>
         </Select>
-        <Select>
-          <SelectTrigger className="w-auto mt-6 h-12">
-            <SelectValue placeholder="Size" />
+        <Select value={sizeValue} setValue={setSizeValue}>
+          <SelectTrigger className="w-auto h-12">
+            <SelectValue ref={dataRef} identifier="Size" val={sizeValue}/>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="light">Light</SelectItem>
@@ -224,20 +223,29 @@ export default function Sell() {
             <SelectItem value="system">System</SelectItem>
           </SelectContent>
         </Select>
+		<div className="col-span-1 text-3xl font-semibold mt-8">Designers</div>
+		<ComboBox ref={childStateRef}/>
 
         <div className="col-span-1 text-3xl font-semibold my-8">Item Name</div>
         <div className="col-span-1 text-3xl font-semibold my-8">Color</div>
-        <Input placeholder="Item Name" className="w-auto h-12" />
-        <Input
-          placeholder='Designer Color Name, i.e. "Frozen Yellow"'
-          className="w-auto h-12"
-        />
+        <Input placeholder="Item Name" className="w-auto h-12" value={formInput.ItemName}
+        onChange={(e) => onFormInput(e, "ItemName")}/>
+        <Select value={colorValue} setValue={setColorValue}>
+          <SelectTrigger className="w-auto h-12">
+            <SelectValue ref={dataRef} identifier="Color" val={colorValue}/>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="light">Light</SelectItem>
+            <SelectItem value="dark">Dark</SelectItem>
+            <SelectItem value="system">System</SelectItem>
+          </SelectContent>
+        </Select>
 
         <div className="col-span-1 text-3xl font-semibold my-8">Condition</div>
         <div className="col-span-1 text-3xl font-semibold my-8">Price</div>
-        <Select>
+        <Select value={conditionValue} setValue={setConditionValue}>
           <SelectTrigger className="w-auto h-12">
-            <SelectValue placeholder="Condition" />
+            <SelectValue ref={dataRef} identifier="Condition" val={conditionValue}/>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="light">Light</SelectItem>
@@ -253,6 +261,8 @@ export default function Sell() {
         <Textarea
           className="col-span-2 h-48"
           placeholder="Add details about condition, how the garments fits, additional measurements, etc."
+		  value={formInput.Description}
+          onChange={(e) => {console.log(dataRef);return onFormInput(e, "Description")}}
         />
       </div>
       <div>
@@ -302,7 +312,7 @@ export default function Sell() {
         >
           SAVE AS DRAFT
         </Button>
-        <Button className="flex justify-center items-center ml-6">
+        <Button className="flex justify-center items-center ml-6" type="submit" onClick={onSubmit}>
           SUBMIT
         </Button>
       </div>
