@@ -12,14 +12,11 @@ import { Button } from "@/components/ui/button";
 import { GiCancel } from "react-icons/gi";
 import { useToast } from "@/components/ui/use-toast";
 import PhotoCrop from "../../components/PhotoCrop";
-import {
-  getCroppedImage,
-  useDebounceEffect,
-} from "../../lib/utils";
+import { getCroppedImage, useDebounceEffect } from "../../lib/utils";
 import ImageUploadCard from "../../components/ui/image-upload-card";
 
 import { useState, useRef } from "react";
-import {useRouter} from "next/router"
+import { useRouter } from "next/router";
 import { v4 as uuid } from "uuid";
 
 const cropAspet = 4 / 5;
@@ -46,10 +43,10 @@ export default function Sell() {
   const clickedRefKey = useRef();
   const childStateRef = useRef();
   const dataRef = useRef({
-	Department: null,
+    Department: null,
     Category: null,
     SubCategory: null,
-	Condition: null,
+    Condition: null,
     Size: null,
     Color: null,
     Price: null,
@@ -165,10 +162,10 @@ export default function Sell() {
     }
   };
 
-  const onSubmit = e => {
-	e.preventDefault()
-	router.push('/')
-  }
+  const onSubmit = (e) => {
+    e.preventDefault();
+    router.push("/");
+  };
 
   return (
     <main className="p-4 mx-72">
@@ -186,7 +183,7 @@ export default function Sell() {
         <div className="col-span-2 text-3xl font-semibold my-8">Details</div>
         <Select value={depValue} setValue={setDepValue}>
           <SelectTrigger className="w-auto h-12">
-            <SelectValue ref={dataRef} identifier="Department" val={depValue}/>
+            <SelectValue ref={dataRef} identifier="Department" val={depValue} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="menswear">Menswear</SelectItem>
@@ -195,7 +192,7 @@ export default function Sell() {
         </Select>
         <Select value={catValue} setValue={setCatValue}>
           <SelectTrigger className="w-auto h-12">
-            <SelectValue ref={dataRef} identifier="Category" val={catValue}/>
+            <SelectValue ref={dataRef} identifier="Category" val={catValue} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="light">Light</SelectItem>
@@ -203,9 +200,13 @@ export default function Sell() {
             <SelectItem value="system">System</SelectItem>
           </SelectContent>
         </Select>
-		<Select value={subCatValue} setValue={setSubCatValue}>
+        <Select value={subCatValue} setValue={setSubCatValue}>
           <SelectTrigger className="w-auto h-12">
-            <SelectValue ref={dataRef} identifier="SubCategory" val={subCatValue}/>
+            <SelectValue
+              ref={dataRef}
+              identifier="SubCategory"
+              val={subCatValue}
+            />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="light">Light</SelectItem>
@@ -215,7 +216,7 @@ export default function Sell() {
         </Select>
         <Select value={sizeValue} setValue={setSizeValue}>
           <SelectTrigger className="w-auto h-12">
-            <SelectValue ref={dataRef} identifier="Size" val={sizeValue}/>
+            <SelectValue ref={dataRef} identifier="Size" val={sizeValue} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="light">Light</SelectItem>
@@ -223,16 +224,20 @@ export default function Sell() {
             <SelectItem value="system">System</SelectItem>
           </SelectContent>
         </Select>
-		<div className="col-span-1 text-3xl font-semibold mt-8">Designers</div>
-		<ComboBox ref={childStateRef}/>
+        <div className="col-span-1 text-3xl font-semibold mt-8">Designers</div>
+        <ComboBox ref={childStateRef} />
 
         <div className="col-span-1 text-3xl font-semibold my-8">Item Name</div>
         <div className="col-span-1 text-3xl font-semibold my-8">Color</div>
-        <Input placeholder="Item Name" className="w-auto h-12" value={formInput.ItemName}
-        onChange={(e) => onFormInput(e, "ItemName")}/>
+        <Input
+          placeholder="Item Name"
+          className="w-auto h-12"
+          value={formInput.ItemName}
+          onChange={(e) => onFormInput(e, "ItemName")}
+        />
         <Select value={colorValue} setValue={setColorValue}>
           <SelectTrigger className="w-auto h-12">
-            <SelectValue ref={dataRef} identifier="Color" val={colorValue}/>
+            <SelectValue ref={dataRef} identifier="Color" val={colorValue} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="light">Light</SelectItem>
@@ -245,7 +250,11 @@ export default function Sell() {
         <div className="col-span-1 text-3xl font-semibold my-8">Price</div>
         <Select value={conditionValue} setValue={setConditionValue}>
           <SelectTrigger className="w-auto h-12">
-            <SelectValue ref={dataRef} identifier="Condition" val={conditionValue}/>
+            <SelectValue
+              ref={dataRef}
+              identifier="Condition"
+              val={conditionValue}
+            />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="light">Light</SelectItem>
@@ -261,8 +270,11 @@ export default function Sell() {
         <Textarea
           className="col-span-2 h-48"
           placeholder="Add details about condition, how the garments fits, additional measurements, etc."
-		  value={formInput.Description}
-          onChange={(e) => {console.log(dataRef);return onFormInput(e, "Description")}}
+          value={formInput.Description}
+          onChange={(e) => {
+            console.log(dataRef);
+            return onFormInput(e, "Description");
+          }}
         />
       </div>
       <div>
@@ -270,7 +282,7 @@ export default function Sell() {
         <div>
           {tags.map((tag) => (
             <Button
-			  key={tag.id}
+              key={tag.id}
               variant="secondary"
               className="hover:bg-destructive mr-2 mb-2"
               onClick={() => onCancelTag(tag.id)}
@@ -289,7 +301,7 @@ export default function Sell() {
         />
       </div>
       <section className="grid grid-cols-3 gap-10 mt-20">
-	  {[1, 2, 3, 4, 5, 6].map((id) => (
+        {[1, 2, 3, 4, 5, 6].map((id) => (
           <ImageUploadCard
             key={id}
             setImgSrc={setImgSrc}
@@ -312,7 +324,11 @@ export default function Sell() {
         >
           SAVE AS DRAFT
         </Button>
-        <Button className="flex justify-center items-center ml-6" type="submit" onClick={onSubmit}>
+        <Button
+          className="flex justify-center items-center ml-6"
+          type="submit"
+          onClick={onSubmit}
+        >
           SUBMIT
         </Button>
       </div>
