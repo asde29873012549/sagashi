@@ -16,7 +16,7 @@ export default function Header() {
 
   return (
     <Fragment>
-      <div className="relative flex h-1/4 w-full items-center justify-center md:px-9 md:justify-between md:py-6 sm:px-6 sm:py-4 px-3 py-2">
+      <div className="top-0 z-[19] bg-background flex h-1/4 w-full items-center justify-center md:px-9 md:justify-between md:py-6 sm:px-6 sm:py-4 px-3 py-2" style={{position:"sticky"}}>
         <MenuBar />
         <Link href="/">
           <Image
@@ -57,7 +57,12 @@ export default function Header() {
             >
               SELL
             </Link>
-            <div className="inline-block hover:cursor-pointerk">SHOP</div>
+			<Link
+              className="inline-block hover:cursor-pointer"
+              href="/shop"
+            >
+              SHOP
+            </Link>
             <LuShoppingCart className="w-6 h-6 hover:cursor-pointer" />
           </div>
         </div>

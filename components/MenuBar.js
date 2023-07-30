@@ -24,7 +24,7 @@ export default function MenuBar() {
         <hr className="h-0.5 w-full bg-foreground border-0" />
         <hr className="h-0.5 w-full bg-foreground border-0" />
       </SheetTrigger>
-      <SheetContent>
+      <SheetContent side="bottom" className="w-screen h-[95vh] rounded-t-xl">
         <SheetHeader>
           <div className="flex justify-center items-center">
             <Button variant="ghost">Men</Button>
