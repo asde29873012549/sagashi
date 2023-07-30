@@ -3,18 +3,25 @@ import "react-image-crop/dist/ReactCrop.css";
 import { Fragment } from "react";
 import BlackCanvas from "./ui/blackCanvas";
 import { Button } from "@/components/ui/button";
+import { centerAspectCrop } from "../lib/utils";
+
+//import {useState, forwardRef, useImperativeHandle} from 'react'
 
 export default function PhotoCrop({
   imgSrc,
-  onImageLoad,
-  crop,
   setCrop,
-  imageInputRef,
+  crop,
+  imageRef,
   onFinishCrop,
   onCancelCrop,
   setCompletedCrop,
-  cropAspet
+  cropAspet,
 }) {
+  const onImageLoad = (e) => {
+    const { width, height } = e.currentTarget;
+    setCrop(centerAspectCrop(width, height, cropAspet));
+  };
+
   return (
     <Fragment>
       {imgSrc && (
@@ -27,27 +34,27 @@ export default function PhotoCrop({
               aspect={cropAspet}
             >
               <img
-                ref={imageInputRef}
+                ref={(node) => (imageRef.current.imageInput = node)}
                 alt="Crop me"
                 src={imgSrc}
                 onLoad={onImageLoad}
                 className="md:h-[70vh] md:w-auto w-[90vw]"
               />
             </ReactCrop>
-			<div>
-				<Button
-				className="mt-10 hover:bg-slate-600"
-				onClick={onFinishCrop}
-				>
-				CROP
-				</Button>
-				<Button
-				className="bg-destructive ml-5 hover:bg-slate-600"
-				onClick={onCancelCrop}
-				>
-				CANCEL
-				</Button>
-			</div>
+            <div>
+              <Button
+                className="mt-10 hover:bg-slate-600"
+                onClick={onFinishCrop}
+              >
+                CROP
+              </Button>
+              <Button
+                className="bg-destructive ml-5 hover:bg-slate-600"
+                onClick={onCancelCrop}
+              >
+                CANCEL
+              </Button>
+            </div>
           </div>
           <BlackCanvas />
         </Fragment>
