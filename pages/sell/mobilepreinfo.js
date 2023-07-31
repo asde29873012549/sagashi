@@ -16,8 +16,8 @@ export default function MobilePreInfo() {
   });
 
   const onBtnSelect = (e) => {
-    const dept = e.target.parentNode.getAttribute("data-department");
-    const text = e.target.innerText;
+    const dept = e.currentTarget.parentNode.getAttribute("data-department");
+    const text = e.currentTarget.innerText.trim();
     const btnMap = getMap(btnRef);
     const btnObj = btnMap.get(dept);
     const btnNode = btnObj[text];
@@ -74,7 +74,7 @@ export default function MobilePreInfo() {
           onClick={(e) => onBtnSelect(e)}
           ref={(node) => getNode(node, "Category", "Tops", btnRef)}
         >
-          <LuShirt />
+          <LuShirt className="pointer-events-none" />
           <div>Tops</div>
         </Button>
         <Button

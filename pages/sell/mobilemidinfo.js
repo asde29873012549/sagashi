@@ -21,8 +21,8 @@ export default function MobileMidInfo() {
   };
 
   const onBtnSelect = (e) => {
-    const dept = e.target.parentNode.getAttribute("data-department");
-    const text = e.target.innerText;
+    const dept = e.currentTarget.parentNode.getAttribute("data-department");
+    const text = e.currentTarget.innerText;
     const btnMap = getMap(btnRef);
     const btnObj = btnMap.get(dept);
     const btnNode = btnObj[text];

@@ -15,6 +15,8 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
+import { useState } from "react";
+
 export default function MenuBar() {
   return (
     <Sheet>
@@ -24,7 +26,7 @@ export default function MenuBar() {
         <hr className="h-0.5 w-full bg-foreground border-0" />
         <hr className="h-0.5 w-full bg-foreground border-0" />
       </SheetTrigger>
-      <SheetContent side="bottom" className="w-screen h-[95vh] rounded-t-xl">
+      <SheetContent side="bottom" className="w-screen h-[85vh] rounded-t-xl">
         <SheetHeader>
           <div className="flex justify-center items-center">
             <Button variant="ghost">Men</Button>

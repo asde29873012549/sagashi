@@ -2,7 +2,8 @@ import { Input as SearchInput } from "./ui/input";
 import Image from "next/image";
 import Link from "next/link";
 import { Fragment, useEffect } from "react";
-import { LuShoppingCart } from "react-icons/lu";
+import { LuShoppingCart, LuUser } from "react-icons/lu";
+import MessageIcon from "./MessageIcon";
 import MenuBar from "./MenuBar";
 import { LuSearch } from "react-icons/lu";
 
@@ -30,6 +31,7 @@ export default function Header() {
             className="hover:cursor-pointer w-40 h-auto md:w-60"
           />
         </Link>
+        <MessageIcon />
         <div className="hidden md:flex md:w-1/2 md:h-12 md:justify-end md:items-center md:px-14">
           <SearchInput
             placeholder="Search"
@@ -64,6 +66,9 @@ export default function Header() {
               SHOP
             </Link>
             <LuShoppingCart className="w-6 h-6 hover:cursor-pointer" />
+            <Link className="inline-block hover:cursor-pointer" href="/user">
+              <LuUser className="w-6 h-6" />
+            </Link>
           </div>
         </div>
       </div>

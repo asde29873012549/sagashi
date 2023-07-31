@@ -172,27 +172,26 @@ export default function Shop() {
           <AccordionItem value="item-7">
             <AccordionTrigger>Conditions</AccordionTrigger>
             <AccordionContent>
-              <Accordion type="single" collapsible>
-                <AccordionItem value="item-7-1">
-                  <AccordionTrigger>Jackets</AccordionTrigger>
-                  <AccordionContent>Blazers</AccordionContent>
-                  <AccordionContent>Leather Jackets</AccordionContent>
-                </AccordionItem>
-              </Accordion>
-              <Accordion type="single" collapsible>
-                <AccordionItem value="item-7-2">
-                  <AccordionTrigger>Blazers</AccordionTrigger>
-                  <AccordionContent>Short Blazers</AccordionContent>
-                  <AccordionContent>Long Jackets</AccordionContent>
-                </AccordionItem>
-              </Accordion>
-              <Accordion type="single" collapsible>
-                <AccordionItem value="item-7-3">
-                  <AccordionTrigger>Knitwear</AccordionTrigger>
-                  <AccordionContent>Blue Knitwear</AccordionContent>
-                  <AccordionContent>goe Jackets</AccordionContent>
-                </AccordionItem>
-              </Accordion>
+              <div className="flex items-center space-x-2">
+                <Checkbox id="new/neverWorn" />
+                <label
+                  htmlFor="new/neverWorn"
+                  className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ml-2"
+                >
+                  New/Never Worn
+                </label>
+              </div>
+            </AccordionContent>
+            <AccordionContent>
+              <div className="flex items-center space-x-2">
+                <Checkbox id="gentlyUsed" />
+                <label
+                  htmlFor="gentlyUsed"
+                  className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ml-2"
+                >
+                  Gently Used
+                </label>
+              </div>
             </AccordionContent>
           </AccordionItem>
         </Accordion>

@@ -5,7 +5,7 @@ export default function Banner() {
   return (
     <div className="block w-full h-auto">
       <div className="h-auto relative flex justify-center md:hidden">
-        <div className="absolute w-3/5 h-fit grid grid-cols-2 gap-4 top-2/3">
+        <div className="absolute w-3/5 h-24 grid grid-cols-2 gap-4 top-2/3">
           <Link
             className={
               buttonVariants({ variant: "outline" }) +
