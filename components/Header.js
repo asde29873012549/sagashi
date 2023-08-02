@@ -29,6 +29,7 @@ export default function Header() {
             width="500"
             height="250"
             className="hover:cursor-pointer w-40 h-auto md:w-60"
+			priority
           />
         </Link>
         <MessageIcon />

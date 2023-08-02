@@ -1,90 +1,164 @@
 import { Fragment, useState, useRef, createElement } from "react";
 import Image from "next/image";
 import { BsChevronCompactLeft, BsChevronCompactRight } from "react-icons/bs";
+import { Separator } from "@/components/ui/separator"
 import { AiOutlineLine } from "react-icons/ai";
 
 export default function ListingItem() {
   const slides = [
     {
+		id:1,
       url: "/mr_1.jpg",
     },
     {
+		id:2,
       url: "/mr_2.jpg",
     },
     {
+		id:3,
       url: "/mr_3.jpg",
     },
 
     {
+		id:4,
       url: "/mr_4.jpg",
     },
     {
+		id:5,
       url: "/mr_5.jpg",
     },
   ];
 
   const [direction, setDirection] = useState(1);
   const carouselRef = useRef();
+  const initialTouchRef = useRef();
+  const endingTouchRef = useRef();
+  const isSwiped = useRef(true);
+  const [currentImage, setCurrentImage] = useState(1)
 
   const prevSlide = () => {
-    setDirection((direction) => (direction > 0 ? direction * -1 : direction));
+    if (direction > 0) {
+      carouselRef.current.appendChild(carouselRef.current.firstElementChild);
+      setDirection((d) => d * -1);
+	  setCurrentImage(carouselRef.current.children[1].id)
+    }
+	setCurrentImage(carouselRef.current.children[slides.length-2].id)
+    carouselRef.current.style.justifyContent = "flex-end";
     carouselRef.current.style.transform = "translateX(100vw)";
   };
 
   const nextSlide = () => {
-    setDirection((direction) => (direction < 0 ? direction * -1 : direction));
+    if (direction < 0) {
+      carouselRef.current.prepend(carouselRef.current.lastElementChild);
+      setDirection((d) => d * -1);
+	  setCurrentImage(carouselRef.current.children[slides.length-2].id)
+    }
+	setCurrentImage(carouselRef.current.children[1].id)
+    carouselRef.current.style.justifyContent = "flex-start";
     carouselRef.current.style.transform = "translateX(-100vw)";
   };
 
   const onTransitionEnd = () => {
+	console.log(isSwiped.current)
+    if (!isSwiped.current) return;
+	console.log('isSwiped passed')
     direction > 0
-      ? carouselRef.current.appendChild(carouselRef.current.children[0])
-      : carouselRef.current.prepend(carouselRef.current.children[4]);
+      ? carouselRef.current.appendChild(carouselRef.current.firstElementChild)
+      : carouselRef.current.prepend(carouselRef.current.lastElementChild);
     carouselRef.current.style.transition = "none";
     carouselRef.current.style.transform = "translateX(0vw)";
     setTimeout(() => {
-      carouselRef.current.style.transition = "all 0.5s";
+      carouselRef.current.style.transition = "transform 0.5s";
     });
   };
 
-  const goToSlide = (slideIndex) => {
-    //setCurrentIndex(slideIndex);
+  const onTouchStart = (e) => {
+    initialTouchRef.current = e.touches[0].screenX;
+  };
+  const onTouchMove = (e) => {
+    endingTouchRef.current = e.touches[0].screenX;
+    const movement = e.touches[0].screenX - initialTouchRef.current;
+    carouselRef.current.style.transform = `translateX(${movement}px)`;
+  };
+
+  const onTouchEnd = () => {
+    const distance = endingTouchRef.current - initialTouchRef.current;
+    const swipeDirection = distance < 0 ? 1 : -1;
+	if (Math.abs(distance) > 50) {
+		isSwiped.current = true
+		if (swipeDirection !== direction) {
+			setDirection(swipeDirection);
+		  if (swipeDirection === 1) {
+			carouselRef.current.prepend(carouselRef.current.lastElementChild);
+			carouselRef.current.style.justifyContent = "flex-end";
+			carouselRef.current.style.transform = `translateX(100vw)`;
+			setCurrentImage(carouselRef.current.children[1].id)
+		  } else {
+			carouselRef.current.appendChild(carouselRef.current.firstElementChild);
+			carouselRef.current.style.justifyContent = "flex-end";
+			carouselRef.current.style.transform = `translateX(100vw)`;
+			setCurrentImage(carouselRef.current.children[slides.length-2].id)
+		  }
+		} else {
+			if (distance < 0) {
+				carouselRef.current.style.justifyContent = "flex-start";
+				carouselRef.current.style.transform = `translateX(-100vw)`;
+				setCurrentImage(carouselRef.current.children[1].id)
+
+			} else if (distance > 0) {
+				carouselRef.current.style.justifyContent = "flex-end";
+				carouselRef.current.style.transform = `translateX(100vw)`;
+				setCurrentImage(carouselRef.current.children[slides.length-2].id)
+			}
+		}
+    } else {
+      isSwiped.current = false;
+      carouselRef.current.style.transform = `translateX(0px)`;
+    }
+    
+    initialTouchRef.current = null;
+    endingTouchRef.current = null;
   };
 
   return (
     <Fragment>
-      <div className="aspect-[4/5] w-full m-auto relative group overflow-hidden">
-        <div
-          className="flex w-max ease-out duration-500"
-          data-direction={direction}
-          ref={carouselRef}
-          onTransitionEnd={onTransitionEnd}
-        >
-          {slides.map((slide) => (
-            <div className="relative w-screen aspect-[4/5]">
-              <Image src={slide.url} fill={true} alt="image" />
-            </div>
-          ))}
+      <div className="relative">
+        <div className="w-screen aspect-[4/5] overflow-hidden">
+          <div
+            className="flex justify-start transition-transform ease-out duration-500 w-full h-full"
+            ref={carouselRef}
+            onTransitionEnd={onTransitionEnd}
+          >
+            {slides.map((slide) => (
+              <div
+                className="w-screen aspect-[4/5] relative shrink-0"
+                key={slide.url}
+                id={slide.id}
+              >
+                <Image
+                  src={slide.url}
+                  fill={true}
+                  alt="image"
+                  onTouchStart={onTouchStart}
+                  onTouchMove={onTouchMove}
+                  onTouchEnd={onTouchEnd}
+				  priority
+                />
+              </div>
+            ))}
+          </div>
         </div>
         {/* Left Arrow */}
-        <div className="group-hover:block absolute top-[50%] -translate-x-0 translate-y-[-50%] left-5 text-2xl rounded-full p-2 bg-black/20 text-white cursor-pointer">
+        <div className="md:block absolute top-[50%] -translate-x-0 translate-y-[-50%] left-5 text-2xl rounded-full p-2 bg-black/20 text-white cursor-pointer">
           <BsChevronCompactLeft onClick={prevSlide} size={30} />
         </div>
         {/* Right Arrow */}
-        <div className="group-hover:block absolute top-[50%] -translate-x-0 translate-y-[-50%] right-5 text-2xl rounded-full p-2 bg-black/20 text-white cursor-pointer">
+        <div className="md:block absolute top-[50%] -translate-x-0 translate-y-[-50%] right-5 text-2xl rounded-full p-2 bg-black/20 text-white cursor-pointer">
           <BsChevronCompactRight onClick={nextSlide} size={30} />
         </div>
-      </div>
-      <div className="flex top-4 justify-center py-2">
-        {slides.map((slide, slideIndex) => (
-          <div
-            key={slideIndex}
-            onClick={() => goToSlide(slideIndex)}
-            className="text-2xl cursor-pointer"
-          >
-            <AiOutlineLine />
-          </div>
-        ))}
+		<div className={`flex h-10 w-36 justify-between items-center m-auto [&>*:nth-child(${currentImage})]:bg-slate-700 [&>*:nth-child(${currentImage})]:w-12`}>
+			{slides.map(slide => <Separator className="w-5 h-px rounded inline-block bg-slate-400 transition-all duration-500" key={slide.url}/>)}
+		</div>
       </div>
     </Fragment>
   );
