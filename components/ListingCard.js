@@ -6,7 +6,7 @@ import { PiHeart, PiHeartFill } from "react-icons/pi";
 
 import { useState } from "react";
 
-export default function ListingCard({ src }) {
+export default function ListingCard({ src, className }) {
   const [liked, setLiked] = useState(false);
   const router = useRouter();
 
@@ -14,7 +14,7 @@ export default function ListingCard({ src }) {
     setLiked((l) => !l);
   };
   return (
-    <div className="w-full h-fit ">
+    <div className={`w-full h-fit ${className}`}>
       <Link href={`/shop/${router.query.item}`}>
         <div className="relative w-full aspect-[4/5]">
           <Image src={src} fill={true} alt="pic" />

@@ -18,18 +18,17 @@ export default function Header() {
   return (
     <Fragment>
       <div
-        className="top-0 z-[19] bg-background flex h-1/4 w-full items-center justify-center md:px-9 md:justify-between md:py-6 sm:px-6 sm:py-4 px-3 py-2"
+        className="top-0 z-[19] bg-background flex h-1/5 md:h-20 w-full items-center justify-center md:px-9 md:justify-between md:py-6 sm:px-6 sm:py-4 px-3 py-2"
         style={{ position: "sticky" }}
       >
         <MenuBar />
-        <Link href="/">
+        <Link href="/" className="relative w-40 h-12 md:w-60 md:h-16">
           <Image
             src="/cactusLogo.png"
             alt="logo"
-            width="500"
-            height="250"
+			fill={true}
             className="hover:cursor-pointer w-40 h-auto md:w-60"
-			priority
+            priority
           />
         </Link>
         <MessageIcon />

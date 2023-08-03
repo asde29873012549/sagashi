@@ -1,165 +1,72 @@
-import { Fragment, useState, useRef, createElement } from "react";
-import Image from "next/image";
-import { BsChevronCompactLeft, BsChevronCompactRight } from "react-icons/bs";
-import { Separator } from "@/components/ui/separator"
-import { AiOutlineLine } from "react-icons/ai";
+import { Fragment } from "react";
+import Carousel from "../../components/Carousel";
+import { Button } from "@/components/ui/button"
+import ListingCard from '../../components/ListingCard'
+
 
 export default function ListingItem() {
-  const slides = [
-    {
-		id:1,
-      url: "/mr_1.jpg",
-    },
-    {
-		id:2,
-      url: "/mr_2.jpg",
-    },
-    {
-		id:3,
-      url: "/mr_3.jpg",
-    },
-
-    {
-		id:4,
-      url: "/mr_4.jpg",
-    },
-    {
-		id:5,
-      url: "/mr_5.jpg",
-    },
-  ];
-
-  const [direction, setDirection] = useState(1);
-  const carouselRef = useRef();
-  const initialTouchRef = useRef();
-  const endingTouchRef = useRef();
-  const isSwiped = useRef(true);
-  const [currentImage, setCurrentImage] = useState(1)
-
-  const prevSlide = () => {
-    if (direction > 0) {
-      carouselRef.current.appendChild(carouselRef.current.firstElementChild);
-      setDirection((d) => d * -1);
-	  setCurrentImage(carouselRef.current.children[1].id)
-    }
-	setCurrentImage(carouselRef.current.children[slides.length-2].id)
-    carouselRef.current.style.justifyContent = "flex-end";
-    carouselRef.current.style.transform = "translateX(100vw)";
-  };
-
-  const nextSlide = () => {
-    if (direction < 0) {
-      carouselRef.current.prepend(carouselRef.current.lastElementChild);
-      setDirection((d) => d * -1);
-	  setCurrentImage(carouselRef.current.children[slides.length-2].id)
-    }
-	setCurrentImage(carouselRef.current.children[1].id)
-    carouselRef.current.style.justifyContent = "flex-start";
-    carouselRef.current.style.transform = "translateX(-100vw)";
-  };
-
-  const onTransitionEnd = () => {
-	console.log(isSwiped.current)
-    if (!isSwiped.current) return;
-	console.log('isSwiped passed')
-    direction > 0
-      ? carouselRef.current.appendChild(carouselRef.current.firstElementChild)
-      : carouselRef.current.prepend(carouselRef.current.lastElementChild);
-    carouselRef.current.style.transition = "none";
-    carouselRef.current.style.transform = "translateX(0vw)";
-    setTimeout(() => {
-      carouselRef.current.style.transition = "transform 0.5s";
-    });
-  };
-
-  const onTouchStart = (e) => {
-    initialTouchRef.current = e.touches[0].screenX;
-  };
-  const onTouchMove = (e) => {
-    endingTouchRef.current = e.touches[0].screenX;
-    const movement = e.touches[0].screenX - initialTouchRef.current;
-    carouselRef.current.style.transform = `translateX(${movement}px)`;
-  };
-
-  const onTouchEnd = () => {
-    const distance = endingTouchRef.current - initialTouchRef.current;
-    const swipeDirection = distance < 0 ? 1 : -1;
-	if (Math.abs(distance) > 50) {
-		isSwiped.current = true
-		if (swipeDirection !== direction) {
-			setDirection(swipeDirection);
-		  if (swipeDirection === 1) {
-			carouselRef.current.prepend(carouselRef.current.lastElementChild);
-			carouselRef.current.style.justifyContent = "flex-end";
-			carouselRef.current.style.transform = `translateX(100vw)`;
-			setCurrentImage(carouselRef.current.children[1].id)
-		  } else {
-			carouselRef.current.appendChild(carouselRef.current.firstElementChild);
-			carouselRef.current.style.justifyContent = "flex-end";
-			carouselRef.current.style.transform = `translateX(100vw)`;
-			setCurrentImage(carouselRef.current.children[slides.length-2].id)
-		  }
-		} else {
-			if (distance < 0) {
-				carouselRef.current.style.justifyContent = "flex-start";
-				carouselRef.current.style.transform = `translateX(-100vw)`;
-				setCurrentImage(carouselRef.current.children[1].id)
-
-			} else if (distance > 0) {
-				carouselRef.current.style.justifyContent = "flex-end";
-				carouselRef.current.style.transform = `translateX(100vw)`;
-				setCurrentImage(carouselRef.current.children[slides.length-2].id)
-			}
-		}
-    } else {
-      isSwiped.current = false;
-      carouselRef.current.style.transform = `translateX(0px)`;
-    }
-    
-    initialTouchRef.current = null;
-    endingTouchRef.current = null;
-  };
-
   return (
-    <Fragment>
-      <div className="relative">
-        <div className="w-screen aspect-[4/5] overflow-hidden">
-          <div
-            className="flex justify-start transition-transform ease-out duration-500 w-full h-full"
-            ref={carouselRef}
-            onTransitionEnd={onTransitionEnd}
-          >
-            {slides.map((slide) => (
-              <div
-                className="w-screen aspect-[4/5] relative shrink-0"
-                key={slide.url}
-                id={slide.id}
-              >
-                <Image
-                  src={slide.url}
-                  fill={true}
-                  alt="image"
-                  onTouchStart={onTouchStart}
-                  onTouchMove={onTouchMove}
-                  onTouchEnd={onTouchEnd}
-				  priority
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-        {/* Left Arrow */}
-        <div className="md:block absolute top-[50%] -translate-x-0 translate-y-[-50%] left-5 text-2xl rounded-full p-2 bg-black/20 text-white cursor-pointer">
-          <BsChevronCompactLeft onClick={prevSlide} size={30} />
-        </div>
-        {/* Right Arrow */}
-        <div className="md:block absolute top-[50%] -translate-x-0 translate-y-[-50%] right-5 text-2xl rounded-full p-2 bg-black/20 text-white cursor-pointer">
-          <BsChevronCompactRight onClick={nextSlide} size={30} />
-        </div>
-		<div className={`flex h-10 w-36 justify-between items-center m-auto [&>*:nth-child(${currentImage})]:bg-slate-700 [&>*:nth-child(${currentImage})]:w-12`}>
-			{slides.map(slide => <Separator className="w-5 h-px rounded inline-block bg-slate-400 transition-all duration-500" key={slide.url}/>)}
+    <div  className="w-screen md:px-[7%]">
+      <div className="relative flex justify-between items-center flex-col md:flex-row">
+        <Carousel />
+		<div className="flex flex-col px-3">
+		<div className="flex flex-col items-between justify-center md:w-1/5">
+			<div className="font-semibold text-xl mb-1">Jacueqmus</div>
+			<div className="text-base mb-6">Yellow 'Le Bob Artichaut' Bucket Hat</div>
+			<div className="flex">
+				<div className="mr-1">Size :</div>
+				<div>XS</div>
+			</div>
+			<div className="flex">
+				<div className="mr-1">Color :</div>
+				<div>Blue</div>
+			</div>
+			<div className="flex mb-6">
+				<div className="mr-1">Condition :</div>
+				<div>New / Never Worn</div>
+			</div>
+			<div>
+				<div className="break-words">lorel ipsum lorel ipsum lorel ipsum lorel ipsum lorel ipsum lorel ipsum </div>
+			</div>
 		</div>
+		<div className="flex flex-col items-center justify-center md:w-1/5">
+			<div className="font-semibold text-xl">$1700</div>
+			<div className="flex text-slate-500 mb-4 justify-between items-center text-sm">
+				<div className="mr-2">+ 60</div>
+				<div>Family Mart Shipping</div>
+			</div>
+			<Button  className="w-full md:w-4/5 mb-4 h-12 hover:bg-background hover:border-foreground hover:border-2 hover:text-foreground" >ADD TO CART</Button>
+			<Button  className="w-full md:w-4/5 mb-4 h-12 hover:bg-background hover:border-foreground hover:border-2 hover:text-foreground">OFFER</Button>
+			<Button  className="w-full md:w-4/5 h-12 hover:bg-background hover:border-foreground hover:border-2 hover:text-foreground">MESSAGE SELLER</Button>
+		</div>
+		</div>
+		
       </div>
-    </Fragment>
+	  
+
+	  <div className="mt-20 px-3">
+		<div className="font-bold mb-6 text-xl">You may also like</div>
+		<div className="flex md:overflow-scroll no-scrollbar flex-wrap justify-between">
+			<ListingCard src="/banner.jpg" className="w-[48%] mb-4 md:w-1/6 md:mr-4 shrink-0" />
+			<ListingCard src="/banner.jpg" className="w-[48%] mb-4 md:w-1/6 md:mr-4 shrink-0"/>
+			<ListingCard src="/banner.jpg" className="w-[48%] mb-4 md:w-1/6 md:mr-4 shrink-0"/>
+			<ListingCard src="/banner.jpg" className="w-[48%] mb-4 md:w-1/6 md:mr-4 shrink-0"/>
+			<ListingCard src="/banner.jpg" className="w-[48%] mb-4 md:w-1/6 md:mr-4 shrink-0"/>
+			<ListingCard src="/banner.jpg" className="w-[48%] mb-4 md:w-1/6 md:mr-4 shrink-0"/>
+		</div>
+	  </div>
+
+	  <div className="mt-20 px-3">
+		<div className="font-bold mb-6 text-xl">Recently Viewed</div>
+		<div className="flex overflow-scroll no-scrollbar">
+			<ListingCard src="/banner.jpg" className="w-1/6 mr-4 shrink-0" />
+			<ListingCard src="/banner.jpg" className="w-1/6 mr-4 shrink-0"/>
+			<ListingCard src="/banner.jpg" className="w-1/6 mr-4 shrink-0"/>
+			<ListingCard src="/banner.jpg" className="w-1/6 mr-4 shrink-0"/>
+			<ListingCard src="/banner.jpg" className="w-1/6 mr-4 shrink-0"/>
+			<ListingCard src="/banner.jpg" className="w-1/6 mr-4 shrink-0"/>
+		</div>
+	  </div>
+    </div>
   );
 }
