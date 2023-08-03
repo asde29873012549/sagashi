@@ -15,7 +15,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 export default function MenuBar() {
   return (

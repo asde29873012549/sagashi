@@ -5,7 +5,11 @@ import { X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
-const Sheet = SheetPrimitive.Root;
+const Sheet = ({ children, open, setOpen }) => (
+  <SheetPrimitive.Root open={open} onOpenChange={setOpen}>
+    {children}
+  </SheetPrimitive.Root>
+);
 
 const SheetTrigger = SheetPrimitive.Trigger;
 

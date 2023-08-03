@@ -161,14 +161,14 @@ export default function MobileLastInfo() {
       <div className="font-semibold mt-6">Item Name</div>
       <Input
         placeholder="Item Name"
-        className="w-full h-10 mt-6"
+        className="w-full h-10 mt-6  text-base"
         value={formInput.ItemName}
         onChange={(e) => onFormInput(e, "ItemName")}
       />
       <div className="font-semibold mt-6">Description</div>
       <Textarea
         placeholder="Add details about condition, how the garments fits, additional measurements, etc."
-        className="w-full h-36 mt-6"
+        className="w-full h-36 mt-6  text-base"
         value={formInput.Description}
         onChange={(e) => onFormInput(e, "Description")}
       />
@@ -189,7 +189,7 @@ export default function MobileLastInfo() {
         </div>
         <Input
           placeholder="#tags"
-          className="h-12 mt-6"
+          className="h-12 mt-6  text-base"
           onKeyDown={(e) => onTagInputKeyDown(e, uuid())}
           onChange={onTagInput}
           value={formInput.Tags}

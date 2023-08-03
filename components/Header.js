@@ -26,7 +26,7 @@ export default function Header() {
           <Image
             src="/cactusLogo.png"
             alt="logo"
-			fill={true}
+            fill={true}
             className="hover:cursor-pointer w-40 h-auto md:w-60"
             priority
           />

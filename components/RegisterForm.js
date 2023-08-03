@@ -41,11 +41,20 @@ export default function RegisterForm() {
             <CardContent>
               <div className="mb-2 space-y-1 md:mb-6">
                 <Label htmlFor="username">USERNAME</Label>
-                <Input id="username" placeholder="username" className="w-80" />
+                <Input
+                  id="username"
+                  placeholder="username"
+                  className="w-80 text-base"
+                />
               </div>
               <div className="mb-5 space-y-1 md:mb-8">
                 <Label htmlFor="password">PASSWORD</Label>
-                <Input id="password" placeholder="password" className="w-80" />
+                <Input
+                  id="password"
+                  placeholder="password"
+                  className="w-80 text-base"
+                  type="password"
+                />
               </div>
               <Button className="mb-2 w-full md:mb-4">SIGN IN</Button>
               <div className="flex justify-center items-center">
@@ -70,18 +79,27 @@ export default function RegisterForm() {
             <CardContent>
               <div className="space-y-1 md:mb-6">
                 <Label htmlFor="username">USERNAME</Label>
-                <Input id="username" placeholder="username" className="w-80" />
+                <Input
+                  id="username"
+                  placeholder="username"
+                  className="w-80 text-base"
+                />
               </div>
               <div className="space-y-1 md:mb-6">
                 <Label htmlFor="password">PASSWORD</Label>
-                <Input id="password" placeholder="password" className="w-80" />
+                <Input
+                  id="password"
+                  placeholder="password"
+                  className="w-80 text-base"
+                  type="password"
+                />
               </div>
               <div className="space-y-1 md:mb-6">
                 <Label htmlFor="email">EMAIL</Label>
                 <Input
                   id="email"
                   placeholder="yourEmail@example.com"
-                  className="w-80"
+                  className="w-80 text-base"
                 />
               </div>
             </CardContent>

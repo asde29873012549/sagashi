@@ -284,7 +284,11 @@ export default function MobileMidInfo() {
       >
         Price
       </div>
-      <Input placeholder="price" className="mt-4" onChange={onPriceInput} />
+      <Input
+        placeholder="price"
+        className="mt-4 text-base"
+        onChange={onPriceInput}
+      />
       <Button
         className="flex justify-content items-center bg-blue-800 w-full mt-10 bottom-0"
         asChild
