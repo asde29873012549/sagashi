@@ -14,7 +14,7 @@ export default function ListingCard({ src, className }) {
     setLiked((l) => !l);
   };
   return (
-    <div className={`w-full h-fit ${className}`}>
+    <div className={`h-fit ${className}`}>
       <Link href={`/shop/${router.query.item}`}>
         <div className="relative w-full aspect-[4/5]">
           <Image src={src} fill={true} alt="pic" />

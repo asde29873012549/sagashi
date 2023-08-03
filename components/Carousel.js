@@ -4,7 +4,7 @@ import Image from "next/image";
 import { BsChevronCompactLeft, BsChevronCompactRight } from "react-icons/bs";
 import { Separator } from "@/components/ui/separator";
 
-export default function Carousel() {
+export default function Carousel({className}) {
   const slides = [
     {
       id: 1,
@@ -121,7 +121,7 @@ export default function Carousel() {
 
   return (
     <Fragment>
-      <div className="relative w-screen aspect-[4/5] overflow-hidden md:w-2/5 md:overflow-scroll no-scrollbar">
+      <div className={`relative w-screen aspect-[4/5] overflow-hidden md:w-2/5 md:overflow-scroll no-scrollbar ${className}`}>
         <div
           className="flex justify-start transition-transform ease-out duration-500 w-full h-full md:flex-col"
           ref={carouselRef}

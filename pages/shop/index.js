@@ -197,16 +197,16 @@ export default function Shop() {
         </Accordion>
       </div>
       <div className="grid grid-cols-2 gap-2 md:grid-cols-4 md:w-4/5">
-        <ListingCard src="/banner.jpg" />
-        <ListingCard src="/banner.jpg" />
-        <ListingCard src="/banner.jpg" />
-        <ListingCard src="/banner.jpg" />
-        <ListingCard src="/banner.jpg" />
-        <ListingCard src="/banner.jpg" />
-        <ListingCard src="/banner.jpg" />
-        <ListingCard src="/banner.jpg" />
-        <ListingCard src="/banner.jpg" />
-        <ListingCard src="/banner.jpg" />
+        <ListingCard src="/banner.jpg" className="w-full"/>
+        <ListingCard src="/banner.jpg" className="w-full"/>
+        <ListingCard src="/banner.jpg"  className="w-full"/>
+        <ListingCard src="/banner.jpg"  className="w-full"/>
+        <ListingCard src="/banner.jpg"  className="w-full"/>
+        <ListingCard src="/banner.jpg"  className="w-full"/>
+        <ListingCard src="/banner.jpg"  className="w-full"/>
+        <ListingCard src="/banner.jpg"  className="w-full"/>
+        <ListingCard src="/banner.jpg"  className="w-full"/>
+        <ListingCard src="/banner.jpg"  className="w-full"/>
       </div>
     </div>
   );
