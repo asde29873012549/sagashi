@@ -18,15 +18,54 @@ import {
 import { useRef, useState } from "react";
 
 export default function MenuBar() {
+  const menuRef = useRef();
+  const initialTouchRef = useRef();
+  const endingTouchRef = useRef();
+  const [open, setOpen] = useState(false);
+
+  const onTouchStart = (e) => {
+    initialTouchRef.current = e.touches[0].screenY;
+  };
+  const onTouchMove = (e) => {
+    endingTouchRef.current = e.touches[0].screenY;
+    const movement = endingTouchRef.current - initialTouchRef.current;
+    menuRef.current.style.transform = `translateY(${movement}px)`;
+  };
+
+  const onTouchEnd = (e) => {
+    const distance = endingTouchRef.current - initialTouchRef.current;
+    if (Math.abs(distance) > 70) {
+      menuRef.current.style.transform = `translateY(100vh)`;
+    }
+    initialTouchRef.current = null;
+    endingTouchRef.current = null;
+  };
+
+  const onTransitionEnd = (e) => {
+    if (e.target.role) {
+      setOpen(false);
+    }
+  };
   return (
-    <Sheet>
-      <SheetTrigger className="absolute left-2 w-6 h-6 flex flex-col justify-between md:hidden">
+    <Sheet open={open} setOpen={setOpen}>
+      <SheetTrigger className="w-6 h-6 flex flex-col justify-between md:hidden">
         <hr className="h-0.5 w-full bg-foreground border-0" />
         <hr className="h-0.5 w-full bg-foreground border-0" />
         <hr className="h-0.5 w-full bg-foreground border-0" />
         <hr className="h-0.5 w-full bg-foreground border-0" />
       </SheetTrigger>
-      <SheetContent side="bottom" className="w-screen h-[85vh] rounded-t-xl">
+      <SheetContent
+        side="bottom"
+        className="w-screen h-[85vh] rounded-t-xl transition-transform duration-75"
+        ref={menuRef}
+        onTransitionEnd={onTransitionEnd}
+      >
+        <div
+          className="w-full h-10 transition-all"
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
+        ></div>
         <SheetHeader>
           <div className="flex justify-center items-center">
             <Button variant="ghost">Men</Button>

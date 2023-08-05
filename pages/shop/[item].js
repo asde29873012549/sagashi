@@ -2,9 +2,18 @@ import { Fragment } from "react";
 import Carousel from "../../components/Carousel";
 import { Button } from "@/components/ui/button";
 import ListingCard from "../../components/ListingCard";
-import MessageBox from "../../components/MessageBox";
+import MessageBoxMobile from "../../components/MessageBoxMobile";
+import MessageBoxDesktop from "../../components/MessageBoxDesktop";
+
+import { useState } from "react";
 
 export default function ListingItem() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const onCloseMessageBox = () => {
+    console.log(isOpen);
+    setIsOpen((o) => !o);
+  };
   return (
     <div className="w-screen md:px-[7%]">
       <div className="relative flex justify-between items-center flex-col md:flex-row">
@@ -46,8 +55,19 @@ export default function ListingItem() {
             <Button className="w-full md:w-4/5 mb-4 h-12 hover:bg-background hover:border-foreground hover:border-2 hover:text-foreground">
               OFFER
             </Button>
-            <MessageBox className="w-full md:hidden" />
-            <Button className="hidden md:block w-full md:w-4/5 h-12 hover:bg-background hover:border-foreground hover:border-2 hover:text-foreground">
+            <MessageBoxMobile
+              className="w-full md:hidden"
+              isOpen={isOpen}
+              onCloseMessageBox={onCloseMessageBox}
+            />
+            <MessageBoxDesktop
+              isOpen={isOpen}
+              onCloseMessageBox={onCloseMessageBox}
+            />
+            <Button
+              className="hidden md:block w-full md:w-4/5 h-12 hover:bg-background hover:border-foreground hover:border-2 hover:text-foreground"
+              onClick={onCloseMessageBox}
+            >
               MESSAGE SELLER
             </Button>
           </div>

@@ -189,7 +189,7 @@ export default function MobileLastInfo() {
         </div>
         <Input
           placeholder="#tags"
-          className="h-12 mt-6  text-base"
+          className="h-12 mt-6 w-full text-base"
           onKeyDown={(e) => onTagInputKeyDown(e, uuid())}
           onChange={onTagInput}
           value={formInput.Tags}

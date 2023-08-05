@@ -5,6 +5,8 @@ import { BsChevronCompactLeft, BsChevronCompactRight } from "react-icons/bs";
 import { Separator } from "@/components/ui/separator";
 
 export default function Carousel({ className }) {
+  const lineRef = useRef();
+
   const slides = [
     {
       id: 1,
@@ -142,7 +144,6 @@ export default function Carousel({ className }) {
                 onTouchStart={onTouchStart}
                 onTouchMove={onTouchMove}
                 onTouchEnd={onTouchEnd}
-                priority
               />
             </div>
           ))}
@@ -157,7 +158,7 @@ export default function Carousel({ className }) {
         </div>
       </div>
       <div
-        className={`md:hidden flex h-10 w-36 justify-between items-center m-auto [&>*:nth-child(${currentImage})]:bg-slate-700 [&>*:nth-child(${currentImage})]:w-12`}
+        className={`md:hidden flex h-10 w-36 justify-between items-center m-auto odd:bg-slate-700 odd:w-12`}
       >
         {slides.map((slide) => (
           <Separator
@@ -169,3 +170,14 @@ export default function Carousel({ className }) {
     </Fragment>
   );
 }
+
+/**
+ * <div className={`md:hidden flex h-10 w-36 justify-between items-center m-auto [&>*:nth-child(currentImage)]:bg-slate-700 [&>*:nth-child(currentImage)]:w-12`}>
+        {slides.map((slide) => (
+          <Separator
+            className="w-5 h-px rounded inline-block bg-slate-400 transition-all duration-500"
+            key={slide.url}
+          />
+        ))}
+      </div>
+ */

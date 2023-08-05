@@ -286,7 +286,7 @@ export default function MobileMidInfo() {
       </div>
       <Input
         placeholder="price"
-        className="mt-4 text-base"
+        className="mt-4 text-base w-full"
         onChange={onPriceInput}
       />
       <Button
