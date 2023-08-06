@@ -4,8 +4,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import ItemCard from "./ItemCard";
 
 export default function MessageIcon() {
   return (
@@ -15,16 +14,9 @@ export default function MessageIcon() {
         <LuMessageCircle className="w-7 h-7 md:hidden" />
       </PopoverTrigger>
       <PopoverContent className="mr-1 max-h-[80%]">
-        <Alert>
-          <AlertDescription className="flex items-center justify-between">
-            <Avatar>
-              <AvatarImage src="https://github.com/shadcn.png" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-            <div className="ml-1 truncate px-2">123345677ssssssssssss86</div>
-            <div className="text-info text-xs shrink-0">3 min</div>
-          </AlertDescription>
-        </Alert>
+        <ItemCard src="https://github.com/shadcn.png" postTime="3 min">
+          12334444444444343434343434343
+        </ItemCard>
       </PopoverContent>
     </Popover>
   );

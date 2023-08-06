@@ -57,7 +57,9 @@ export default function Header() {
             src="/cactusLogo.png"
             alt="logo"
             fill={true}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="hover:cursor-pointer w-40 h-auto md:w-60"
+            priority
           />
         </Link>
         <MessageIcon />
@@ -111,7 +113,10 @@ export default function Header() {
             </Popover>
 
             <LuShoppingCart className="w-6 h-6 hover:cursor-pointer" />
-            <Link className="inline-block hover:cursor-pointer" href="/user">
+            <Link className="hidden md:inline-block hover:cursor-pointer" href="/user">
+              <LuUser className="w-6 h-6" />
+            </Link>
+			<Link className="inline-block hover:cursor-pointer md:hidden" href="/user/mobile">
               <LuUser className="w-6 h-6" />
             </Link>
           </div>
