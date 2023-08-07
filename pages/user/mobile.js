@@ -6,13 +6,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import MyItemSheet from "../../components/Sheets/MyItemSheet";
-import EditProfileSheet from "../../components/Sheets/EditProfileSheet";
-import EditAddressSheet from "../../components/Sheets/EditAddressSheet";
-import EditLanguageSheet from "../../components/Sheets/EditLanguageSheet";
-import EditCountrySheet from "../../components/Sheets/EditCountrySheet";
-import ContactUsForm from "../../components/Sheets/ContactUsForm";
-import ChangePasswordSheet from "../../components/Sheets/ChangePasswordSheet";
+import { BsFillPencilFill } from "react-icons/bs";
+import MobileSheetWrapper from "@/components/Sheets/MobileSheetWrapper";
 
 export default function User() {
   return (
@@ -30,7 +25,11 @@ export default function User() {
               <div>0 reviews</div>
             </div>
           </AlertDescription>
-          <ChangePasswordSheet />
+          <MobileSheetWrapper
+            trigger={<div className="text-xs underline">Change Password</div>}
+            feature="Change Password"
+            sheet="ChangePassword"
+          />
         </div>
       </Alert>
       <Accordion type="single" collapsible>
@@ -38,7 +37,11 @@ export default function User() {
           <AccordionTrigger>My Items</AccordionTrigger>
           <AccordionContent>
             <div className="flex justify-between items-center">
-              <MyItemSheet />
+              <MobileSheetWrapper
+                trigger={<div className="text-xs underline">See All Items</div>}
+                feature="My Items"
+                sheet="MyItem"
+              />
             </div>
           </AccordionContent>
         </AccordionItem>
@@ -49,20 +52,24 @@ export default function User() {
           <AccordionContent>
             <div className="flex justify-between items-center">
               <div className="flex justify-between items-center w-4/5">
-                <div className="w-2/5 ">
+                <div className="w-fit">
                   <div>NAME</div>
                   <div>EMAIL</div>
                   <div>DATE OF BIRTH</div>
                   <div>GENDER</div>
                 </div>
-                <div className="w-3/5 text-info">
+                <div className="w-fit text-info">
                   <div>Noah</div>
                   <div className="truncate">12345@gmail.com</div>
                   <div>1997/05/31</div>
                   <div>MALE</div>
                 </div>
               </div>
-              <EditProfileSheet />
+              <MobileSheetWrapper
+                trigger={<BsFillPencilFill />}
+                feature="Edit Profile"
+                sheet="MyProfile"
+              />
             </div>
           </AccordionContent>
         </AccordionItem>
@@ -76,7 +83,11 @@ export default function User() {
                 18 Saxon Lane Wausau, WI 54401 18 Saxon Lane Wausau, WI 54401 18
                 Saxon Lane Wausau, WI 54401
               </div>
-              <EditAddressSheet />
+              <MobileSheetWrapper
+                trigger={<BsFillPencilFill />}
+                feature="Edit Profile"
+                sheet="MyAddress"
+              />
             </div>
           </AccordionContent>
         </AccordionItem>
@@ -87,7 +98,11 @@ export default function User() {
           <AccordionContent>
             <div className="flex justify-between items-center">
               <div>Traditional Chinese</div>
-              <EditLanguageSheet />
+              <MobileSheetWrapper
+                trigger={<BsFillPencilFill />}
+                feature="Edit Language"
+                sheet="MyLanguage"
+              />
             </div>
           </AccordionContent>
         </AccordionItem>
@@ -98,7 +113,11 @@ export default function User() {
           <AccordionContent>
             <div className="flex justify-between items-center">
               <div>Taiwan</div>
-              <EditCountrySheet />
+              <MobileSheetWrapper
+                trigger={<BsFillPencilFill />}
+                feature="Edit Countries"
+                sheet="MyCountry"
+              />
             </div>
           </AccordionContent>
         </AccordionItem>
@@ -107,7 +126,15 @@ export default function User() {
         <AccordionItem value="item-1">
           <AccordionTrigger>Contact Us</AccordionTrigger>
           <AccordionContent>
-            <ContactUsForm />
+            <MobileSheetWrapper
+              trigger={
+                <div className="text-xs underline">
+                  Contact us through email
+                </div>
+              }
+              feature="Contact Us"
+              sheet="ContactUs"
+            />
           </AccordionContent>
         </AccordionItem>
       </Accordion>

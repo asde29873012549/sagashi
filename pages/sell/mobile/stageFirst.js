@@ -185,7 +185,7 @@ export default function MobilePreInfo() {
         className="flex justify-content items-center bg-blue-800 w-full mt-10 bottom-0"
         asChild
       >
-        <Link href="/sell/mobilemidinfo">NEXT</Link>
+        <Link href="/sell/mobile/stageSecond">NEXT</Link>
       </Button>
     </main>
   );

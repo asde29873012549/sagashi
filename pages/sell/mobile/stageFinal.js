@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import ComboBox from "../../components/ui/comboBox";
+import ComboBox from "../../../components/ui/comboBox";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import Link from "next/link";
@@ -8,9 +8,9 @@ import { GiCancel } from "react-icons/gi";
 import { useState, useRef } from "react";
 import { useRouter } from "next/router";
 import { v4 as uuid } from "uuid";
-import PhotoCrop from "../../components/PhotoCrop";
-import { getCroppedImage, useDebounceEffect } from "../../lib/utils";
-import ImageUploadCard from "../../components/ui/image-upload-card";
+import PhotoCrop from "../../../components/PhotoCrop";
+import { getCroppedImage, useDebounceEffect } from "../../../lib/utils";
+import ImageUploadCard from "../../../components/ui/image-upload-card";
 const cropAspet = 4 / 5;
 
 export default function MobileLastInfo() {

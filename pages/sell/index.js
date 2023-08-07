@@ -294,7 +294,7 @@ export default function Sell() {
         </div>
         <Input
           placeholder="#tags"
-          className="h-12 mt-3"
+          className="h-12 mt-3 w-full"
           onKeyDown={(e) => onTagInputKeyDown(e, uuid())}
           onChange={onTagInput}
           value={formInput.Tags}

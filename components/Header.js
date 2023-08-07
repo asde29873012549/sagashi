@@ -32,7 +32,7 @@ export default function Header() {
         <div className="md:w-1/6 md:flex md:justify-between">
           <Link
             className="hidden md:inline-block hover:cursor-pointer md:mr-2"
-            href="/sell"
+            href="/sell/mobile/stageFirst"
           >
             SELL
           </Link>
@@ -113,10 +113,16 @@ export default function Header() {
             </Popover>
 
             <LuShoppingCart className="w-6 h-6 hover:cursor-pointer" />
-            <Link className="hidden md:inline-block hover:cursor-pointer" href="/user">
+            <Link
+              className="hidden md:inline-block hover:cursor-pointer"
+              href="/user"
+            >
               <LuUser className="w-6 h-6" />
             </Link>
-			<Link className="inline-block hover:cursor-pointer md:hidden" href="/user/mobile">
+            <Link
+              className="inline-block hover:cursor-pointer md:hidden"
+              href="/user/mobile"
+            >
               <LuUser className="w-6 h-6" />
             </Link>
           </div>

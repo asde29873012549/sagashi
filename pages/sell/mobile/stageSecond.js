@@ -293,7 +293,7 @@ export default function MobileMidInfo() {
         className="flex justify-content items-center bg-blue-800 w-full mt-10 bottom-0"
         asChild
       >
-        <Link href="/sell/mobilelastinfo">NEXT</Link>
+        <Link href="/sell/mobile/stageFinal">NEXT</Link>
       </Button>
     </main>
   );
