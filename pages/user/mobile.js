@@ -7,7 +7,13 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { BsFillPencilFill } from "react-icons/bs";
-import MobileSheetWrapper from "@/components/Sheets/MobileSheetWrapper";
+import SheetWrapper from "@/components/User/Sheets/SheetWrapper";
+
+import ProfileInfo from "@/components/User/ProfileInfo";
+import LanguageInfo from "@/components/User/LanguageInfo";
+import AddressInfo from "@/components/User/AddressInfo";
+import CountryInfo from "@/components/User/CountryInfo";
+import About from "@/components/User/About";
 
 export default function User() {
   return (
@@ -25,7 +31,7 @@ export default function User() {
               <div>0 reviews</div>
             </div>
           </AlertDescription>
-          <MobileSheetWrapper
+          <SheetWrapper
             trigger={<div className="text-xs underline">Change Password</div>}
             feature="Change Password"
             sheet="ChangePassword"
@@ -37,7 +43,7 @@ export default function User() {
           <AccordionTrigger>My Items</AccordionTrigger>
           <AccordionContent>
             <div className="flex justify-between items-center">
-              <MobileSheetWrapper
+              <SheetWrapper
                 trigger={<div className="text-xs underline">See All Items</div>}
                 feature="My Items"
                 sheet="MyItem"
@@ -50,27 +56,15 @@ export default function User() {
         <AccordionItem value="item-1">
           <AccordionTrigger>My Profile</AccordionTrigger>
           <AccordionContent>
-            <div className="flex justify-between items-center">
-              <div className="flex justify-between items-center w-4/5">
-                <div className="w-fit">
-                  <div>NAME</div>
-                  <div>EMAIL</div>
-                  <div>DATE OF BIRTH</div>
-                  <div>GENDER</div>
-                </div>
-                <div className="w-fit text-info">
-                  <div>Noah</div>
-                  <div className="truncate">12345@gmail.com</div>
-                  <div>1997/05/31</div>
-                  <div>MALE</div>
-                </div>
-              </div>
-              <MobileSheetWrapper
-                trigger={<BsFillPencilFill />}
-                feature="Edit Profile"
-                sheet="MyProfile"
-              />
-            </div>
+            <ProfileInfo
+              sheet={
+                <SheetWrapper
+                  trigger={<BsFillPencilFill />}
+                  feature="Edit Profile"
+                  sheet="MyProfile"
+                />
+              }
+            />
           </AccordionContent>
         </AccordionItem>
       </Accordion>
@@ -78,17 +72,15 @@ export default function User() {
         <AccordionItem value="item-1">
           <AccordionTrigger>Shipping Address</AccordionTrigger>
           <AccordionContent>
-            <div className="flex justify-between items-center">
-              <div className="flex flex-wrap w-10/12">
-                18 Saxon Lane Wausau, WI 54401 18 Saxon Lane Wausau, WI 54401 18
-                Saxon Lane Wausau, WI 54401
-              </div>
-              <MobileSheetWrapper
-                trigger={<BsFillPencilFill />}
-                feature="Edit Profile"
-                sheet="MyAddress"
-              />
-            </div>
+            <AddressInfo
+              sheet={
+                <SheetWrapper
+                  trigger={<BsFillPencilFill />}
+                  feature="Edit Profile"
+                  sheet="MyAddress"
+                />
+              }
+            />
           </AccordionContent>
         </AccordionItem>
       </Accordion>
@@ -96,14 +88,15 @@ export default function User() {
         <AccordionItem value="item-1">
           <AccordionTrigger>Language</AccordionTrigger>
           <AccordionContent>
-            <div className="flex justify-between items-center">
-              <div>Traditional Chinese</div>
-              <MobileSheetWrapper
-                trigger={<BsFillPencilFill />}
-                feature="Edit Language"
-                sheet="MyLanguage"
-              />
-            </div>
+            <LanguageInfo
+              sheet={
+                <SheetWrapper
+                  trigger={<BsFillPencilFill />}
+                  feature="Edit Language"
+                  sheet="MyLanguage"
+                />
+              }
+            />
           </AccordionContent>
         </AccordionItem>
       </Accordion>
@@ -111,14 +104,15 @@ export default function User() {
         <AccordionItem value="item-1">
           <AccordionTrigger>Country/Region</AccordionTrigger>
           <AccordionContent>
-            <div className="flex justify-between items-center">
-              <div>Taiwan</div>
-              <MobileSheetWrapper
-                trigger={<BsFillPencilFill />}
-                feature="Edit Countries"
-                sheet="MyCountry"
-              />
-            </div>
+            <CountryInfo
+              sheet={
+                <SheetWrapper
+                  trigger={<BsFillPencilFill />}
+                  feature="Edit Countries"
+                  sheet="MyCountry"
+                />
+              }
+            />
           </AccordionContent>
         </AccordionItem>
       </Accordion>
@@ -126,7 +120,7 @@ export default function User() {
         <AccordionItem value="item-1">
           <AccordionTrigger>Contact Us</AccordionTrigger>
           <AccordionContent>
-            <MobileSheetWrapper
+            <SheetWrapper
               trigger={
                 <div className="text-xs underline">
                   Contact us through email
@@ -142,10 +136,23 @@ export default function User() {
         <AccordionItem value="item-1">
           <AccordionTrigger>About</AccordionTrigger>
           <AccordionContent>
-            <div className="flex flex-wrap w-full">
-              CACTUS is the one-stop destination for selling and buying. Makeing
-              money from your closet
-            </div>
+            <About />
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+	  <Accordion type="single" collapsible>
+        <AccordionItem value="item-1">
+          <AccordionTrigger>Terms & Conditions</AccordionTrigger>
+          <AccordionContent>
+            <div>123</div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+	  <Accordion type="single" collapsible>
+        <AccordionItem value="item-1">
+          <AccordionTrigger>Private Policy</AccordionTrigger>
+          <AccordionContent>
+            <div>123</div>
           </AccordionContent>
         </AccordionItem>
       </Accordion>

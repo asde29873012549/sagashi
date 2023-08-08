@@ -23,7 +23,7 @@ export default function SearchWord({ children }) {
             <div className="md:flex md:w-full md:h-12 md:justify-end md:items-center">
               <SearchInput
                 placeholder="Search"
-                className="md:w-full md:h-10 h-[45px] w-10/12"
+                className="md:w-full md:h-10 h-[45px] w-10/12 placeholder:text-info font-normal"
                 style={{ border: "none" }}
               ></SearchInput>
             </div>

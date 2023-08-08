@@ -63,7 +63,7 @@ export default function Banner() {
             <Link
               className={
                 buttonVariants({ variant: "outline" }) +
-                " md:h-16 md:text-background md:text-2xl md:border-3 md:font-bold"
+                " md:h-16 md:text-foreground md:text-2xl md:border-3 md:font-bold"
               }
               href="/menswear"
             >
@@ -72,7 +72,7 @@ export default function Banner() {
             <Link
               className={
                 buttonVariants({ variant: "outline" }) +
-                " md:h-16 md:text-background md:text-2xl md:border-3 md:font-bold"
+                " md:h-16 md:text-foreground md:text-2xl md:border-3 md:font-bold"
               }
               href="/womenswear"
             >

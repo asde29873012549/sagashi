@@ -137,7 +137,10 @@ export default function ContactUsForm({ setOpen, rows }) {
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
+		<div className="flex justify-start">
+		<Button type="submit" className="bg-sky-900 hover:bg-sky-950 w-1/6">Submit</Button>
+		</div>
+        
       </form>
     </Form>
   );

@@ -7,15 +7,21 @@ import {
 } from "@/components/ui/sheet";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import MyItem from "../../components/Sheets/MyItemSheet";
-import MyProfile from "../../components/Sheets/EditProfileSheet";
-import MyAddress from "../../components/Sheets/EditAddressSheet";
-import MyLanguage from "../../components/Sheets/EditLanguageSheet";
-import MyCountry from "../../components/Sheets/EditCountrySheet";
-import ContactUs from "../../components/Sheets/ContactUsForm";
-import ChangePassword from "../../components/Sheets/ChangePasswordSheet";
+import MyItem from "./MyItemSheet";
+import MyProfile from "./EditProfileSheet";
+import MyAddress from "./EditAddressSheet";
+import MyLanguage from "./EditLanguageSheet";
+import MyCountry from "./EditCountrySheet";
+import ContactUs from "./ContactUsForm";
+import ChangePassword from "./ChangePasswordSheet";
 
-export default function MobileSheetWrapper({ trigger, feature, sheet }) {
+export default function SheetWrapper({
+  trigger,
+  feature,
+  sheet,
+  side = "bottom",
+  className = "h-[88%] overflow-scroll",
+}) {
   const [open, setOpen] = useState(false);
 
   const onCancel = () => {
@@ -35,7 +41,7 @@ export default function MobileSheetWrapper({ trigger, feature, sheet }) {
   return (
     <Sheet open={open} setOpen={setOpen}>
       <SheetTrigger>{trigger}</SheetTrigger>
-      <SheetContent side="bottom" className="h-[88%] overflow-scroll">
+      <SheetContent side={side} className={className}>
         <SheetHeader>
           <SheetTitle>{feature}</SheetTitle>
           {sheets[sheet]}

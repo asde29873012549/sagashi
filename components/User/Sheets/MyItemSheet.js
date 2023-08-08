@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import ItemCard from "../ItemCard";
+import ItemCard from "../../ItemCard";
 import { BsFillPencilFill } from "react-icons/bs";
 import { Separator } from "@/components/ui/separator";
 

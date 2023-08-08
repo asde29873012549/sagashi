@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/command";
 
 import { useEffect, useState } from "react";
-import region from "../../lib/countries";
+import region from "../../../lib/countries";
 
 export default function EditCountrySheet() {
   const [countries, setCountries] = useState();
@@ -32,7 +32,7 @@ export default function EditCountrySheet() {
           placeholder="Search for country..."
           className="text-base"
         />
-        <CommandList className="max-h-[350px]">
+        <CommandList className="max-h-[350px] md:max-h-[500px]">
           <CommandEmpty>No results found.</CommandEmpty>
           {countries &&
             Object.values(countries).map((c) => (
