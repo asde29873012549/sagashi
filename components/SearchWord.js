@@ -12,10 +12,7 @@ export default function SearchWord({ children }) {
   return (
     <Dialog>
       <DialogTrigger>
-        <div className="flex">
-          <div>SEARCH</div>
-          {children}
-        </div>
+        <div className="flex">{children}</div>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

@@ -9,7 +9,7 @@ import ItemCard from "./ItemCard";
 export default function MessageIcon() {
   return (
     <Popover>
-      <PopoverTrigger style={{ position: "relative" }}>
+      <PopoverTrigger className="relative">
         <div className="rounded-full w-2.5 h-2.5 bg-red-700 absolute right-[2px] mb-3 z-50 md:hidden"></div>
         <LuMessageCircle className="w-7 h-7 md:hidden" />
       </PopoverTrigger>

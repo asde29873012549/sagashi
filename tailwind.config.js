@@ -78,10 +78,43 @@ module.exports = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: 0 },
         },
+        logo_scale: {
+          "0%": { transform: "translateX(0rem)" },
+          "67%": { transform: "translateX(0rem)" },
+          "100%": { transform: "translateY(-40px) scale(2)" },
+        },
+        logo_scale_mobile: {
+          "0%": { transform: "translateY(0rem)" },
+          "67%": { transform: "translateY(0rem)" },
+          "100%": { transform: "translateY(-14px) scale(2)" },
+        },
+        triangle_shrink: {
+          "0%": { transform: "translateX(0rem)" },
+          "67%": {
+            transform: "translateX(-27px) translateY(42px) scale(0.28)",
+          },
+          "100%": { transform: "translateX(-55px) translateY(2px) scale(0.5)" },
+        },
+        triangle_shrink_mobile: {
+          "0%": { transform: "translateX(0rem)" },
+          "67%": { transform: "translateX(-27px) translateY(25px) scale(0.6)" },
+          "100%": {
+            transform: "translateX(-55px) translateY(12px) scale(1.1)",
+          },
+        },
+        a_vanish: {
+          from: { opacity: "1" },
+          to: { opacity: "0" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        logo_scale: "logo_scale 3s ease-in-out",
+        triangle_shrink: "triangle_shrink 3s ease-in-out",
+        logo_scale_mobile: "logo_scale_mobile 3s ease-in-out",
+        triangle_shrink_mobile: "triangle_shrink_mobile 3s ease-in-out",
+        a_vanish: "a_vanish 2s ease-in-out",
       },
     },
   },

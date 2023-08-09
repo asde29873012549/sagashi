@@ -5,7 +5,9 @@ import { cn } from "@/lib/utils";
 
 const Popover = PopoverPrimitive.Root;
 
-const PopoverTrigger = PopoverPrimitive.Trigger;
+const PopoverTrigger = React.forwardRef(({ className, ...props }, ref) => {
+  return <PopoverPrimitive.Trigger className={className} {...props} />;
+});
 
 const PopoverContent = React.forwardRef(
   ({ className, align = "center", sideOffset = 4, ...props }, ref) => (

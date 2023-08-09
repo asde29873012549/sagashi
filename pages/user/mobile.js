@@ -76,7 +76,7 @@ export default function User() {
               sheet={
                 <SheetWrapper
                   trigger={<BsFillPencilFill />}
-                  feature="Edit Profile"
+                  feature="Edit Address"
                   sheet="MyAddress"
                 />
               }
@@ -140,7 +140,7 @@ export default function User() {
           </AccordionContent>
         </AccordionItem>
       </Accordion>
-	  <Accordion type="single" collapsible>
+      <Accordion type="single" collapsible>
         <AccordionItem value="item-1">
           <AccordionTrigger>Terms & Conditions</AccordionTrigger>
           <AccordionContent>
@@ -148,7 +148,7 @@ export default function User() {
           </AccordionContent>
         </AccordionItem>
       </Accordion>
-	  <Accordion type="single" collapsible>
+      <Accordion type="single" collapsible>
         <AccordionItem value="item-1">
           <AccordionTrigger>Private Policy</AccordionTrigger>
           <AccordionContent>

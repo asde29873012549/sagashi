@@ -138,7 +138,7 @@ export default function User() {
             <p>About</p>
             <hr className="w-0 h-px border-foreground group-hover:w-full transition-all duration-300 ease-in-out" />
           </Button>
-		  <Button
+          <Button
             variant="link"
             onClick={onAboutClick}
             className="group flex flex-col w-fit"
@@ -146,7 +146,7 @@ export default function User() {
             <p>Terms & Conditions</p>
             <hr className="w-0 h-px border-foreground group-hover:w-full transition-all duration-300 ease-in-out" />
           </Button>
-		  <Button
+          <Button
             variant="link"
             onClick={onAboutClick}
             className="group flex flex-col w-fit"

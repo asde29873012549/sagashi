@@ -89,4 +89,12 @@
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
   }
+
+  .animation-delay-1000 {
+    animation-delay: 1000ms;
+  }
+
+  .animation-fill-forward {
+    animation-fill-mode: forwards;
+  }
 }
