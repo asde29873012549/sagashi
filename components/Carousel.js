@@ -5,8 +5,6 @@ import { BsChevronCompactLeft, BsChevronCompactRight } from "react-icons/bs";
 import { Separator } from "@/components/ui/separator";
 
 export default function Carousel({ className }) {
-  const lineRef = useRef();
-
   const slides = [
     {
       id: 1,
@@ -91,30 +89,30 @@ export default function Carousel({ className }) {
         if (swipeDirection === 1) {
           carouselRef.current.prepend(carouselRef.current.lastElementChild);
           carouselRef.current.style.justifyContent = "flex-end";
-          carouselRef.current.style.transform = `translateX(100vw)`;
+          carouselRef.current.style.transform = "translateX(100vw)";
           setCurrentImage(carouselRef.current.children[1].id);
         } else {
           carouselRef.current.appendChild(
             carouselRef.current.firstElementChild,
           );
           carouselRef.current.style.justifyContent = "flex-end";
-          carouselRef.current.style.transform = `translateX(100vw)`;
+          carouselRef.current.style.transform = "translateX(100vw)";
           setCurrentImage(carouselRef.current.children[slides.length - 2].id);
         }
       } else {
         if (distance < 0) {
           carouselRef.current.style.justifyContent = "flex-start";
-          carouselRef.current.style.transform = `translateX(-100vw)`;
+          carouselRef.current.style.transform = "translateX(-100vw)";
           setCurrentImage(carouselRef.current.children[1].id);
         } else if (distance > 0) {
           carouselRef.current.style.justifyContent = "flex-end";
-          carouselRef.current.style.transform = `translateX(100vw)`;
+          carouselRef.current.style.transform = "translateX(100vw)";
           setCurrentImage(carouselRef.current.children[slides.length - 2].id);
         }
       }
     } else {
       isSwiped.current = false;
-      carouselRef.current.style.transform = `translateX(0px)`;
+      carouselRef.current.style.transform = "translateX(0px)";
     }
 
     initialTouchRef.current = null;
@@ -158,7 +156,9 @@ export default function Carousel({ className }) {
         </div>
       </div>
       <div
-        className={`md:hidden flex h-10 w-36 justify-between items-center m-auto odd:bg-slate-700 odd:w-12`}
+        className={
+          "md:hidden flex h-10 w-36 justify-between items-center m-auto odd:bg-slate-700 odd:w-12"
+        }
       >
         {slides.map((slide) => (
           <Separator

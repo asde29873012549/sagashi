@@ -32,7 +32,7 @@ export default function ListingCard({ src, className }) {
       </div>
       <div className="text-xs text-foreground truncate">Maison Margiela</div>
       <div className="flex justify-between text-sm text-foreground items-center">
-        <div>$300</div>
+        <div className="before:content-['$']">300</div>
         {liked ? (
           <PiHeartFill
             onClick={onLike}

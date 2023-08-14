@@ -29,7 +29,11 @@ export default function RegisterForm() {
           (!registerFormStatus && "opacity-0 invisible")
         }
       >
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList
+          className={`grid w-full grid-cols-2 ${
+            !registerFormStatus && "opacity-0 invisible"
+          }`}
+        >
           <TabsTrigger value="login">Login</TabsTrigger>
           <TabsTrigger value="register">Register</TabsTrigger>
         </TabsList>

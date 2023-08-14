@@ -1,6 +1,7 @@
 import {
   Sheet,
   SheetContent,
+  SheetClose,
   SheetDescription,
   SheetHeader,
   SheetTitle,
@@ -13,9 +14,30 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRef, useState } from "react";
 
 export default function MessageBoxMobile({ className }) {
+  const [open, setOpen] = useState(false);
   const [val, setVal] = useState("");
   const [message, setMessages] = useState([]);
   const messageBoxRef = useRef();
+
+  const onCloseSheet = () => {
+    setOpen(false);
+    console.log("123");
+    window.visualViewport.removeEventListener("resize", handleResize);
+  };
+
+  const onResizeMessageBox = () => {
+    setOpen(true);
+    window.visualViewport.addEventListener("resize", handleResize);
+  };
+
+  const handleResize = () => {
+    if (messageBoxRef.current) {
+      messageBoxRef.current.style.height =
+        window.visualViewport.height < 400
+          ? `${window.visualViewport.height}px`
+          : "85vh";
+    }
+  };
 
   const onInput = (e) => {
     setVal(e.target.value);
@@ -31,10 +53,16 @@ export default function MessageBoxMobile({ className }) {
   return (
     <div className={className}>
       <Sheet>
-        <SheetTrigger className="text-background bg-primary rounded-md w-full md:w-4/5 h-12 hover:bg-background hover:border-foreground hover:border-2 hover:text-foreground md:hidden">
+        <SheetTrigger
+          open={open}
+          onOpenChange={setOpen}
+          onClick={onResizeMessageBox}
+          className="text-background bg-primary rounded-md w-full md:w-4/5 h-12 hover:bg-background hover:border-foreground hover:border-2 hover:text-foreground md:hidden transition-all duration-500"
+        >
           MESSAGE SELLER
         </SheetTrigger>
         <SheetContent
+          onClick={onCloseSheet}
           ref={messageBoxRef}
           side="bottom"
           className="w-screen h-[85vh] rounded-t-xl p-0"
@@ -79,6 +107,7 @@ export default function MessageBoxMobile({ className }) {
             <Input
               className="rounded-full h-12 text-base w-full placeholder:text-slate-400"
               placeholder="Aa"
+              autoFocus={true}
               onChange={onInput}
               onKeyDown={onPressEnter}
               value={val}

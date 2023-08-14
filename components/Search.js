@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input as SearchInput } from "./ui/input";
 
-export default function SearchWord({ children }) {
+export default function Search({ children }) {
   return (
     <Dialog>
       <DialogTrigger>

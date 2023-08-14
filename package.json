@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "npx eslint pages/**/*.js components/ui/**/*.jsx components/**/*.js --fix"
+    "lint": "npx eslint pages/**/*.js components/**/*.js --fix"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.1.1",

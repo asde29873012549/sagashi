@@ -49,6 +49,7 @@ export default function Banner() {
           width="2000"
           height="2500"
           className="h-auto object-cover md:hidden"
+          priority
         />
       </div>
       <div className="hidden md:h-auto md:relative md:flex md:justify-center">

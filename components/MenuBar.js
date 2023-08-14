@@ -35,7 +35,7 @@ export default function MenuBar() {
   const onTouchEnd = (e) => {
     const distance = endingTouchRef.current - initialTouchRef.current;
     if (Math.abs(distance) > 70) {
-      menuRef.current.style.transform = `translateY(100vh)`;
+      menuRef.current.style.transform = "translateY(100vh)";
     }
     initialTouchRef.current = null;
     endingTouchRef.current = null;

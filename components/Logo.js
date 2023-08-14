@@ -5,9 +5,21 @@ export default function Logo() {
   return (
     <Link
       href="/"
-      className="absolute flex flex-col items-center w-40 h-6 md:w-60 md:h-fit m-auto inset-0 mt-1 mb-6 hover:cursor-pointer"
+      className="absolute w-[35vw] aspect-[3/1] md:w-[15vw] m-auto inset-0 mb-0.5 md:mb-2 hover:cursor-pointer"
     >
       <Image
+        src="/sagashi.webp"
+        alt="Sagashi_logo"
+        fill={true}
+        sizes="(max-width: 768px) 35vw, (max-width: 1200px) 15vw, 15vw"
+        priority
+      />
+    </Link>
+  );
+}
+
+/**
+ *  <Image
         src="/triangle_logo.png"
         alt="logo"
         width="30"
@@ -18,7 +30,7 @@ export default function Logo() {
       />
       <div className="relative">
         <Image
-          src="/sagashi_logo.png"
+          src="/sagashi-logo.png"
           alt="logo"
           width="30"
           height="30"
@@ -32,10 +44,8 @@ export default function Logo() {
           width="30"
           height="30"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          className="w-4 mt-1 absolute inset-0 left-3 animate-a_vanish animation-fill-forward animation-delay-1000 md:animation-fill-forward md:animation-delay-1000"
+          className="w-3.5 mt-[5px] absolute inset-0 left-3 animate-a_vanish animation-fill-forward animation-delay-1000 md:animation-fill-forward md:animation-delay-1000"
           priority
         />
       </div>
-    </Link>
-  );
-}
+ */
