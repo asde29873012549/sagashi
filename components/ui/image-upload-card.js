@@ -1,3 +1,4 @@
+/*eslint-disable*/
 import { BsCameraFill } from "react-icons/bs";
 import { MdCancel } from "react-icons/md";
 

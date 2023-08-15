@@ -1,19 +1,26 @@
+/* eslint-disable*/
 import { Fragment } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { LuShirt, LuWallet } from "react-icons/lu";
 import { PiPants, PiShirtFoldedBold } from "react-icons/pi";
 import { TbJacket, TbShoe } from "react-icons/tb";
+import { Progress } from "@/components/ui/progress";
 
-import { useState, useRef } from "react";
+import { useRef } from "react";
+
+import { makeProgress, sellSelector } from "../../../redux/sellSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function MobilePreInfo() {
+  const dispatch = useDispatch();
   const btnRef = useRef();
   const dataRef = useRef({
     Department: null,
     Category: null,
     SubCategory: null,
   });
+  const progressStatus = useSelector(sellSelector).progress;
 
   const onBtnSelect = (e) => {
     const dept = e.currentTarget.parentNode.getAttribute("data-department");
@@ -26,6 +33,18 @@ export default function MobilePreInfo() {
     );
     btnNode.style.backgroundColor = "rgb(203, 213, 225)";
     dataRef.current[dept] = text;
+
+    switch (dept) {
+      case "Department":
+        onMakeProgress(15);
+        break;
+      case "Category":
+        onMakeProgress(25);
+        break;
+      case "SubCategory":
+        onMakeProgress(35);
+        break;
+    }
   };
 
   const getMap = (ref) => {
@@ -45,148 +64,156 @@ export default function MobilePreInfo() {
     }
   };
 
+  const onMakeProgress = (progress) => dispatch(makeProgress(progress));
+
   return (
-    <main className="p-4">
-      <div className="grid grid-cols-2 gap-4" data-department="Department">
-        <div className="col-span-2 font-semibold">Department</div>
-        <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Department", "Menswear", btnRef)}
+    <Fragment>
+      <Progress
+        value={progressStatus}
+        className="rounded-none h-1 md:hidden shadow-sm fixed z-10"
+      />
+      <main className="p-4">
+        <div className="grid grid-cols-2 gap-4" data-department="Department">
+          <div className="col-span-2 font-semibold">Department</div>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "Department", "Menswear", btnRef)}
+          >
+            Menswear
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "Department", "Womenswear", btnRef)}
+          >
+            Womenswear
+          </Button>
+        </div>
+        <div className="grid grid-cols-2 gap-4 mt-6" data-department="Category">
+          <div className="col-span-2 font-semibold">Category</div>
+          <Button
+            variant="outline"
+            className="row-span-1 flex flex-col h-16 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "Category", "Tops", btnRef)}
+          >
+            <LuShirt className="pointer-events-none" />
+            <div>Tops</div>
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 flex flex-col h-16 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "Category", "Bottoms", btnRef)}
+          >
+            <PiPants />
+            <div>Bottoms</div>
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 flex flex-col h-16 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "Category", "Outerwear", btnRef)}
+          >
+            <TbJacket />
+            <div>Outerwear</div>
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 flex flex-col h-16 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "Category", "Footwear", btnRef)}
+          >
+            <TbShoe />
+            <div>Footwear</div>
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 flex flex-col h-16 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "Category", "Tailoring", btnRef)}
+          >
+            <PiShirtFoldedBold />
+            <div>Tailoring</div>
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 flex flex-col h-16 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "Category", "Accessories", btnRef)}
+          >
+            <LuWallet />
+            <div>Accessories</div>
+          </Button>
+        </div>
+        <div
+          className="grid grid-cols-2 gap-4 mt-6"
+          data-department="SubCategory"
         >
-          Menswear
-        </Button>
+          <div className="col-span-2 font-semibold">SubCategory</div>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "SubCategory", "Shirts", btnRef)}
+          >
+            Shirts
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) =>
+              getNode(node, "SubCategory", "Sleeveless Shirt", btnRef)
+            }
+          >
+            Sleeveless Shirt
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "SubCategory", "T-shirt", btnRef)}
+          >
+            T-shirt
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) =>
+              getNode(node, "SubCategory", "Long-Sleeve Shirt", btnRef)
+            }
+          >
+            Long-Sleeve Shirt
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "SubCategory", "Polos", btnRef)}
+          >
+            Polos
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "SubCategory", "Poncho", btnRef)}
+          >
+            Poncho
+          </Button>
+        </div>
         <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Department", "Womenswear", btnRef)}
+          className="flex justify-content items-center bg-sky-900 w-full mt-10 bottom-0"
+          asChild
         >
-          Womenswear
+          <Link href="/sell/mobile/stageSecond">NEXT</Link>
         </Button>
-      </div>
-      <div className="grid grid-cols-2 gap-4 mt-6" data-department="Category">
-        <div className="col-span-2 font-semibold">Category</div>
-        <Button
-          variant="outline"
-          className="row-span-1 flex flex-col h-16 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Category", "Tops", btnRef)}
-        >
-          <LuShirt className="pointer-events-none" />
-          <div>Tops</div>
-        </Button>
-        <Button
-          variant="outline"
-          className="row-span-1 flex flex-col h-16 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Category", "Bottoms", btnRef)}
-        >
-          <PiPants />
-          <div>Bottoms</div>
-        </Button>
-        <Button
-          variant="outline"
-          className="row-span-1 flex flex-col h-16 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Category", "Outerwear", btnRef)}
-        >
-          <TbJacket />
-          <div>Outerwear</div>
-        </Button>
-        <Button
-          variant="outline"
-          className="row-span-1 flex flex-col h-16 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Category", "Footwear", btnRef)}
-        >
-          <TbShoe />
-          <div>Footwear</div>
-        </Button>
-        <Button
-          variant="outline"
-          className="row-span-1 flex flex-col h-16 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Category", "Tailoring", btnRef)}
-        >
-          <PiShirtFoldedBold />
-          <div>Tailoring</div>
-        </Button>
-        <Button
-          variant="outline"
-          className="row-span-1 flex flex-col h-16 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Category", "Accessories", btnRef)}
-        >
-          <LuWallet />
-          <div>Accessories</div>
-        </Button>
-      </div>
-      <div
-        className="grid grid-cols-2 gap-4 mt-6"
-        data-department="SubCategory"
-      >
-        <div className="col-span-2 font-semibold">SubCategory</div>
-        <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "SubCategory", "Shirts", btnRef)}
-        >
-          Shirts
-        </Button>
-        <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) =>
-            getNode(node, "SubCategory", "Sleeveless Shirt", btnRef)
-          }
-        >
-          Sleeveless Shirt
-        </Button>
-        <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "SubCategory", "T-shirt", btnRef)}
-        >
-          T-shirt
-        </Button>
-        <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) =>
-            getNode(node, "SubCategory", "Long-Sleeve Shirt", btnRef)
-          }
-        >
-          Long-Sleeve Shirt
-        </Button>
-        <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "SubCategory", "Polos", btnRef)}
-        >
-          Polos
-        </Button>
-        <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "SubCategory", "Poncho", btnRef)}
-        >
-          Poncho
-        </Button>
-      </div>
-      <Button
-        className="flex justify-content items-center bg-blue-800 w-full mt-10 bottom-0"
-        asChild
-      >
-        <Link href="/sell/mobile/stageSecond">NEXT</Link>
-      </Button>
-    </main>
+      </main>
+    </Fragment>
   );
 }

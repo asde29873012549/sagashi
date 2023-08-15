@@ -1,3 +1,4 @@
+/* eslint-disable*/
 import Link from "next/link";
 import Image from "next/image";
 
@@ -5,7 +6,7 @@ export default function Logo() {
   return (
     <Link
       href="/"
-      className="absolute w-[35vw] aspect-[3/1] md:w-[15vw] m-auto inset-0 mb-0.5 md:mb-2 hover:cursor-pointer"
+      className="absolute w-[35vw] aspect-[3/1] md:w-[15vw] m-auto inset-0 mb-1.5 md:mb-2 hover:cursor-pointer"
     >
       <Image
         src="/sagashi.webp"

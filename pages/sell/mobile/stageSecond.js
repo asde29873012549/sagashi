@@ -1,11 +1,17 @@
+/* eslint-disable*/
 import { Fragment } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 
 import { useState, useRef } from "react";
+import { Progress } from "@/components/ui/progress";
+
+import { makeProgress, sellSelector } from "../../../redux/sellSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function MobileMidInfo() {
+  const dispatch = useDispatch();
   const [priceInputState, setPriceInputState] = useState();
   const btnRef = useRef();
   const dataRef = useRef({
@@ -31,7 +37,22 @@ export default function MobileMidInfo() {
     );
     btnNode.style.backgroundColor = "rgb(203, 213, 225)";
     dataRef.current[dept] = text;
+
+    switch (dept) {
+      case "Condition":
+        onMakeProgress(45);
+        break;
+      case "Size":
+        onMakeProgress(55);
+        break;
+      case "Color":
+        onMakeProgress(65);
+        break;
+    }
   };
+
+  const progressStatus = useSelector(sellSelector).progress;
+  const onMakeProgress = (progress) => dispatch(makeProgress(progress));
 
   const getMap = (ref) => {
     if (!ref.current) {
@@ -50,251 +71,265 @@ export default function MobileMidInfo() {
     }
   };
 
+  const onNextPage = () => {
+    onMakeProgress(75);
+  };
+
   return (
-    <main className="p-4 relative h-full">
-      <div className="grid grid-cols-2 gap-4" data-department="Condition">
-        <div className="col-span-2 font-semibold">Condition</div>
-        <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Condition", "New / Never Worn", btnRef)}
-        >
-          New / Never Worn
-        </Button>
-        <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Condition", "Gently Used", btnRef)}
-        >
-          Gently Used
-        </Button>
-        <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Condition", "Used", btnRef)}
-        >
-          Used
-        </Button>
-        <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Condition", "Very Worn", btnRef)}
-        >
-          Very Worn
-        </Button>
-      </div>
-      <div className="grid grid-cols-2 gap-4 mt-8" data-department="Size">
-        <div className="col-span-4 font-semibold">Size</div>
-        <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Size", "XXS", btnRef)}
-        >
-          XXS
-        </Button>
-        <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Size", "XS", btnRef)}
-        >
-          XS
-        </Button>
-        <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Size", "S", btnRef)}
-        >
-          S
-        </Button>
-        <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Size", "M", btnRef)}
-        >
-          M
-        </Button>
-        <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Size", "L", btnRef)}
-        >
-          L
-        </Button>
-        <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Size", "XL", btnRef)}
-        >
-          XL
-        </Button>
-        <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Size", "XXL", btnRef)}
-        >
-          XXL
-        </Button>
-        <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Size", "3XL", btnRef)}
-        >
-          3XL
-        </Button>
-      </div>
-      <div className="grid grid-cols-2 gap-4 mt-8" data-department="Color">
-        <div className="col-span-4 font-semibold">Color</div>
-        <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Color", "Black", btnRef)}
-        >
-          Black
-        </Button>
-        <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Color", "White", btnRef)}
-        >
-          White
-        </Button>
-        <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Color", "Blue", btnRef)}
-        >
-          Blue
-        </Button>
-        <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Color", "Red", btnRef)}
-        >
-          Red
-        </Button>
-        <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Color", "Grey", btnRef)}
-        >
-          Grey
-        </Button>
-        <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Color", "Brown", btnRef)}
-        >
-          Brown
-        </Button>
-        <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Color", "Navy", btnRef)}
-        >
-          Navy
-        </Button>
-        <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Color", "Green", btnRef)}
-        >
-          Green
-        </Button>
-        <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Color", "Yellow", btnRef)}
-        >
-          Yellow
-        </Button>
-        <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Color", "Orange", btnRef)}
-        >
-          Orange
-        </Button>
-        <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Color", "Purple", btnRef)}
-        >
-          Purple
-        </Button>
-        <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Color", "Beige", btnRef)}
-        >
-          Beige
-        </Button>
-        <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Color", "Pink", btnRef)}
-        >
-          Pink
-        </Button>
-        <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Color", "Silver", btnRef)}
-        >
-          Silver
-        </Button>
-        <Button
-          variant="outline"
-          className="row-span-1 focus:bg-accent"
-          onClick={(e) => onBtnSelect(e)}
-          ref={(node) => getNode(node, "Color", "Gold", btnRef)}
-        >
-          Gold
-        </Button>
-      </div>
-      <div
-        className="font-semibold mt-8"
-        data-department="Price"
-        value={priceInputState}
-      >
-        Price
-      </div>
-      <Input
-        placeholder="price"
-        className="mt-4 text-base w-full"
-        onChange={onPriceInput}
+    <Fragment>
+      <Progress
+        value={progressStatus}
+        className="rounded-none h-1 md:hidden shadow-sm fixed z-10"
       />
-      <Button
-        className="flex justify-content items-center bg-blue-800 w-full mt-10 bottom-0"
-        asChild
-      >
-        <Link href="/sell/mobile/stageFinal">NEXT</Link>
-      </Button>
-    </main>
+      <main className="p-4 relative h-full">
+        <div className="grid grid-cols-2 gap-4" data-department="Condition">
+          <div className="col-span-2 font-semibold">Condition</div>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) =>
+              getNode(node, "Condition", "New / Never Worn", btnRef)
+            }
+          >
+            New / Never Worn
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "Condition", "Gently Used", btnRef)}
+          >
+            Gently Used
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "Condition", "Used", btnRef)}
+          >
+            Used
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "Condition", "Very Worn", btnRef)}
+          >
+            Very Worn
+          </Button>
+        </div>
+        <div className="grid grid-cols-2 gap-4 mt-8" data-department="Size">
+          <div className="col-span-4 font-semibold">Size</div>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "Size", "XXS", btnRef)}
+          >
+            XXS
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "Size", "XS", btnRef)}
+          >
+            XS
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "Size", "S", btnRef)}
+          >
+            S
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "Size", "M", btnRef)}
+          >
+            M
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "Size", "L", btnRef)}
+          >
+            L
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "Size", "XL", btnRef)}
+          >
+            XL
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "Size", "XXL", btnRef)}
+          >
+            XXL
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "Size", "3XL", btnRef)}
+          >
+            3XL
+          </Button>
+        </div>
+        <div className="grid grid-cols-2 gap-4 mt-8" data-department="Color">
+          <div className="col-span-4 font-semibold">Color</div>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "Color", "Black", btnRef)}
+          >
+            Black
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "Color", "White", btnRef)}
+          >
+            White
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "Color", "Blue", btnRef)}
+          >
+            Blue
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "Color", "Red", btnRef)}
+          >
+            Red
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "Color", "Grey", btnRef)}
+          >
+            Grey
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "Color", "Brown", btnRef)}
+          >
+            Brown
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "Color", "Navy", btnRef)}
+          >
+            Navy
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "Color", "Green", btnRef)}
+          >
+            Green
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "Color", "Yellow", btnRef)}
+          >
+            Yellow
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "Color", "Orange", btnRef)}
+          >
+            Orange
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "Color", "Purple", btnRef)}
+          >
+            Purple
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "Color", "Beige", btnRef)}
+          >
+            Beige
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "Color", "Pink", btnRef)}
+          >
+            Pink
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "Color", "Silver", btnRef)}
+          >
+            Silver
+          </Button>
+          <Button
+            variant="outline"
+            className="row-span-1 focus:bg-accent"
+            onClick={(e) => onBtnSelect(e)}
+            ref={(node) => getNode(node, "Color", "Gold", btnRef)}
+          >
+            Gold
+          </Button>
+        </div>
+        <div
+          className="font-semibold mt-8"
+          data-department="Price"
+          value={priceInputState}
+        >
+          Price
+        </div>
+        <Input
+          placeholder="price"
+          className="mt-4 text-base w-full"
+          onChange={onPriceInput}
+        />
+        <Button
+          className="flex justify-content items-center bg-sky-900 w-full mt-10 bottom-0"
+          asChild
+        >
+          <Link href="/sell/mobile/stageFinal" onClick={onNextPage}>
+            NEXT
+          </Link>
+        </Button>
+      </main>
+    </Fragment>
   );
 }

@@ -1,3 +1,4 @@
+/* eslint-disable*/
 import Logo from "./Logo";
 import Link from "next/link";
 import { Fragment } from "react";

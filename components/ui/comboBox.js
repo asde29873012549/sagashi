@@ -1,3 +1,4 @@
+/* eslint-disable*/
 "use client";
 
 import * as React from "react";
@@ -41,7 +42,7 @@ const frameworks = [
   },
 ];
 
-export default React.forwardRef((_, ref) => {
+export default React.forwardRef(({ onMakeProgress }, ref) => {
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState("");
 
@@ -77,6 +78,7 @@ export default React.forwardRef((_, ref) => {
               <CommandItem
                 key={framework.value}
                 onSelect={(currentValue) => {
+                  onMakeProgress && onMakeProgress(85);
                   setValue(currentValue === value ? "" : currentValue);
                   setOpen(false);
                 }}

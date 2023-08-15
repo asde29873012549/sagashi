@@ -1,19 +1,25 @@
+/* eslint-disable*/
 import { Button } from "@/components/ui/button";
 import ComboBox from "../../../components/ui/comboBox";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import Link from "next/link";
 import { GiCancel } from "react-icons/gi";
+import { Progress } from "@/components/ui/progress";
 
-import { useState, useRef } from "react";
+import { useState, useRef, Fragment } from "react";
 import { useRouter } from "next/router";
 import { v4 as uuid } from "uuid";
 import PhotoCrop from "../../../components/PhotoCrop";
 import { getCroppedImage, useDebounceEffect } from "../../../lib/utils";
 import ImageUploadCard from "../../../components/ui/image-upload-card";
+
+import { makeProgress, sellSelector } from "../../../redux/sellSlice";
+import { useDispatch, useSelector } from "react-redux";
+
 const cropAspet = 4 / 5;
 
 export default function MobileLastInfo() {
+  const dispatch = useDispatch();
   const router = useRouter();
   const [tags, setTags] = useState([]);
   const [formInput, setFormInput] = useState({
@@ -104,6 +110,7 @@ export default function MobileLastInfo() {
     setImgSrc(null);
     setCrop(undefined);
     dataRef.current.Photos[clickedRefKey.current] = croppedImageUrlRef.current;
+    onMakeProgress(100);
   };
 
   const onCancelCrop = () => {
@@ -139,82 +146,92 @@ export default function MobileLastInfo() {
     }
   };
 
+  const progressStatus = useSelector(sellSelector).progress;
+  const onMakeProgress = (progress) => dispatch(makeProgress(progress));
+
   const onSubmit = (e) => {
     e.preventDefault();
     router.push("/");
   };
 
   return (
-    <main className="p-4 relative h-full">
-      <PhotoCrop
-        imgSrc={imgSrc}
-        setCrop={setCrop}
-        crop={crop}
-        imageRef={imageRef}
-        onFinishCrop={onFinishCrop}
-        onCancelCrop={onCancelCrop}
-        setCompletedCrop={setCompletedCrop}
-        cropAspet={cropAspet}
+    <Fragment>
+      <Progress
+        value={progressStatus}
+        className="rounded-none h-1 md:hidden shadow-sm fixed z-10"
       />
-      <div className="font-semibold">Designers</div>
-      <ComboBox ref={childStateRef} />
-      <div className="font-semibold mt-6">Item Name</div>
-      <Input
-        placeholder="Item Name"
-        className="w-full h-10 mt-6  text-base"
-        value={formInput.ItemName}
-        onChange={(e) => onFormInput(e, "ItemName")}
-      />
-      <div className="font-semibold mt-6">Description</div>
-      <Textarea
-        placeholder="Add details about condition, how the garments fits, additional measurements, etc."
-        className="w-full h-36 mt-6  text-base"
-        value={formInput.Description}
-        onChange={(e) => onFormInput(e, "Description")}
-      />
-      <div>
-        <div className="font-semibold mt-6">Tags</div>
+      <main className="p-4 relative h-full">
+        <PhotoCrop
+          imgSrc={imgSrc}
+          setCrop={setCrop}
+          crop={crop}
+          imageRef={imageRef}
+          onFinishCrop={onFinishCrop}
+          onCancelCrop={onCancelCrop}
+          setCompletedCrop={setCompletedCrop}
+          cropAspet={cropAspet}
+        />
+        <div className="font-semibold">Designers</div>
+        <ComboBox ref={childStateRef} onMakeProgress={onMakeProgress} />
+        <div className="font-semibold mt-6">Item Name</div>
+        <Input
+          placeholder="Item Name"
+          className="w-full h-10 mt-6  text-base"
+          value={formInput.ItemName}
+          onChange={(e) => onFormInput(e, "ItemName")}
+        />
+        <div className="font-semibold mt-6">Description</div>
+        <Textarea
+          placeholder="Add details about condition, how the garments fits, additional measurements, etc."
+          className="w-full h-36 mt-6  text-base"
+          value={formInput.Description}
+          onChange={(e) => onFormInput(e, "Description")}
+          onFocus={() => onMakeProgress(95)}
+        />
         <div>
-          {tags.map((tag) => (
-            <Button
-              key={tag.id}
-              variant="secondary"
-              className="hover:bg-destructive mr-2 mb-2 mt-6"
-              onClick={() => onCancelTag(tag.id)}
-            >
-              #{tag.value}
-              <GiCancel className="ml-1" />
-            </Button>
+          <div className="font-semibold mt-6">Tags</div>
+          <div>
+            {tags.map((tag) => (
+              <Button
+                key={tag.id}
+                variant="secondary"
+                className="hover:bg-destructive mr-2 mb-2 mt-6"
+                onClick={() => onCancelTag(tag.id)}
+              >
+                #{tag.value}
+                <GiCancel className="ml-1" />
+              </Button>
+            ))}
+          </div>
+          <Input
+            placeholder="#tags"
+            className="h-12 mt-6 w-full text-base"
+            onKeyDown={(e) => onTagInputKeyDown(e, uuid())}
+            onChange={onTagInput}
+            value={formInput.Tags}
+          />
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="mt-6 col-span-2 font-semibold">Photos</div>
+          {[1, 2, 3, 4, 5, 6].map((id) => (
+            <ImageUploadCard
+              key={id}
+              setImgSrc={setImgSrc}
+              getNode={getNode}
+              id={id}
+              clickedRefKey={clickedRefKey}
+              onCancelIconClick={onCancelIconClick}
+            />
           ))}
         </div>
-        <Input
-          placeholder="#tags"
-          className="h-12 mt-6 w-full text-base"
-          onKeyDown={(e) => onTagInputKeyDown(e, uuid())}
-          onChange={onTagInput}
-          value={formInput.Tags}
-        />
-      </div>
-      <div className="grid grid-cols-2 gap-4">
-        <div className="mt-6 col-span-2 font-semibold">Photos</div>
-        {[1, 2, 3, 4, 5, 6].map((id) => (
-          <ImageUploadCard
-            key={id}
-            setImgSrc={setImgSrc}
-            getNode={getNode}
-            id={id}
-            clickedRefKey={clickedRefKey}
-            onCancelIconClick={onCancelIconClick}
-          />
-        ))}
-      </div>
-      <Button
-        className="flex justify-content items-center bg-blue-800 w-full mt-10 bottom-0"
-        type="submit"
-        onClick={onSubmit}
-      >
-        SUBMIT
-      </Button>
-    </main>
+        <Button
+          className="flex justify-content items-center bg-sky-900 w-full mt-10 bottom-0"
+          type="submit"
+          onClick={onSubmit}
+        >
+          SUBMIT
+        </Button>
+      </main>
+    </Fragment>
   );
 }
