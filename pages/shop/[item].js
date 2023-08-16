@@ -1,3 +1,4 @@
+/*eslint-disable*/
 import { Fragment } from "react";
 import Carousel from "../../components/Carousel";
 import { Button } from "@/components/ui/button";

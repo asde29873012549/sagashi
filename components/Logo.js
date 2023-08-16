@@ -2,11 +2,11 @@
 import Link from "next/link";
 import Image from "next/image";
 
-export default function Logo() {
+export default function Logo({ className = "" }) {
   return (
     <Link
       href="/"
-      className="absolute w-[35vw] aspect-[3/1] md:w-[15vw] m-auto inset-0 mb-1.5 md:mb-2 hover:cursor-pointer"
+      className={`absolute w-[35vw] aspect-[3/1] md:w-[15vw] m-auto inset-0 mb-1.5 md:mb-2 hover:cursor-pointer ${className}`}
     >
       <Image
         src="/sagashi.webp"

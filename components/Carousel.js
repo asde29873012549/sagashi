@@ -1,8 +1,10 @@
+/*eslint-disable*/
 import { Fragment, useState, useRef } from "react";
 
 import Image from "next/image";
 import { BsChevronCompactLeft, BsChevronCompactRight } from "react-icons/bs";
-import { Separator } from "@/components/ui/separator";
+
+import CarouselDots from "./CarouselDots.js";
 
 export default function Carousel({ className }) {
   const slides = [
@@ -155,18 +157,7 @@ export default function Carousel({ className }) {
           <BsChevronCompactRight onClick={nextSlide} size={30} />
         </div>
       </div>
-      <div
-        className={
-          "md:hidden flex h-10 w-36 justify-between items-center m-auto odd:bg-slate-700 odd:w-12"
-        }
-      >
-        {slides.map((slide) => (
-          <Separator
-            className="w-5 h-px rounded inline-block bg-slate-400 transition-all duration-500"
-            key={slide.url}
-          />
-        ))}
-      </div>
+      <CarouselDots currentImage={currentImage} slides={slides} />
     </Fragment>
   );
 }

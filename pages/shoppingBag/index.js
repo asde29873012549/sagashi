@@ -1,3 +1,4 @@
+/*eslint-disable*/
 import OderItem from "@/components/OrderItem";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,7 @@ export default function ShoppingBag() {
           <OderItem />
           <OderItem />
         </div>
-        <div className="sticky bottom-0 w-full right-0 px-4 bg-background md:w-2/6 ">
+        <div className="sticky bottom-0 w-full right-0 px-4 bg-white/95 md:w-2/6 ">
           <div className="space-y-2">
             <div className="my-2 text-lg font-semibold">Summary</div>
             <div className="flex justify-between w-full">
