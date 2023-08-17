@@ -46,23 +46,28 @@ export default function Home() {
             src="/banner.jpg"
             className="w-[65%] mb-4 md:w-1/5 mr-2 md:mr-4 shrink-0"
           />
-          <div className="bg-slate-100/50 w-[65%] md:w-1/5 shrink-0 underline flex items-center justify-center cursor-pointer font-semibold">
-            See Full
-          </div>
+          <Button
+            variant="ghost"
+            className="bg-slate-100/50 w-[65%] md:w-1/5 shrink-0 underline flex items-center justify-center cursor-pointer font-semibold"
+            asChild
+          >
+            <Link href="/shop/newArrivals">See All</Link>
+          </Button>
         </main>
         <Button
           variant="outline"
           className="border-foreground font-semibold md:w-1/5 mt-3"
+          asChild
         >
-          SHOP NOW
+          <Link href="/shop/newArrivals">SHOP NOW</Link>
         </Button>
       </section>
 
       <section className="flex flex-col w-screen p-3 md:p-8">
         <h1 className="text-2xl md:text-3xl font-bold mt-10">
-          Popular Designers
+          Featured Designers
         </h1>
-        <p className="mb-6">Boutiques from the IT designers.</p>
+        <p className="mb-6">Boutiques from the popular designers.</p>
         <main className="flex w-full  overflow-scroll no-scrollbar ">
           <ListingCard
             src="/banner.jpg"
@@ -96,15 +101,20 @@ export default function Home() {
             src="/banner.jpg"
             className="w-[65%] mb-4 md:w-1/5 mr-2 md:mr-4 shrink-0"
           />
-          <div className="bg-slate-100/50 w-[65%] md:w-1/5 shrink-0 underline flex items-center justify-center cursor-pointer font-semibold">
-            See Full
-          </div>
+          <Button
+            variant="ghost"
+            className="bg-slate-100/50 w-[65%] md:w-1/5 shrink-0 underline flex items-center justify-center cursor-pointer font-semibold"
+            asChild
+          >
+            <Link href="/designers">See All</Link>
+          </Button>
         </main>
         <Button
           variant="outline"
           className="border-foreground font-semibold md:w-1/5 mt-3"
+          asChild
         >
-          SHOP NOW
+          <Link href="/shop/featuredDesigners">SHOP NOW</Link>
         </Button>
       </section>
 

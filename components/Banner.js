@@ -67,7 +67,7 @@ export default function Banner() {
                 buttonVariants({ variant: "outline" }) +
                 " md:h-16 md:text-foreground md:text-2xl md:border-3 md:font-bold"
               }
-              href="/menswear"
+              href="/shop/menswear"
             >
               Shop Mens
             </Link>
@@ -76,7 +76,7 @@ export default function Banner() {
                 buttonVariants({ variant: "outline" }) +
                 " md:h-16 md:text-foreground md:text-2xl md:border-3 md:font-bold"
               }
-              href="/womenswear"
+              href="/shop/womenswear"
             >
               Shop Womens
             </Link>
