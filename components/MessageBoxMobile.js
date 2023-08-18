@@ -1,3 +1,4 @@
+/*eslint-disable*/
 import {
   Sheet,
   SheetContent,
@@ -69,7 +70,7 @@ export default function MessageBoxMobile({ className }) {
         >
           <header className="sticky top-0 w-full h-14 flex items-center border-b border-slate-200 px-2 bg-gray-50 rounded-t-xl">
             <div className="flex items-center ml-3 w-full">
-              <Avatar>
+              <Avatar className="h-10 w-10">
                 <AvatarImage src="https://github.com/shadcn.png" />
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>

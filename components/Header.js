@@ -97,7 +97,7 @@ export default function Header() {
               <PopoverContent className="max-h-[80%]">
                 <Alert>
                   <AlertDescription className="flex items-center justify-between">
-                    <Avatar>
+                    <Avatar className="h-10 w-10">
                       <AvatarImage src="https://github.com/shadcn.png" />
                       <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
