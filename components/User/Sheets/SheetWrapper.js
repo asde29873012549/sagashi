@@ -1,3 +1,4 @@
+/*eslint-disable*/
 import {
   Sheet,
   SheetContent,
@@ -20,7 +21,7 @@ export default function SheetWrapper({
   feature,
   sheet,
   side = "bottom",
-  className = "h-[88%] overflow-scroll",
+  className = "h-[90%] overflow-scroll",
 }) {
   const [open, setOpen] = useState(false);
 

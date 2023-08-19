@@ -1,3 +1,4 @@
+/*eslint-disable*/
 import ListingCard from "../../components/ListingCard";
 import {
   Accordion,

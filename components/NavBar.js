@@ -31,24 +31,12 @@ export default function NavBar() {
                 </Link>
               </Button>
               <div className="flex flex-col flex-wrap mx-auto my-0 w-10/12 h-5/6 text-lg">
-                <div className="w-fit mx-5 my-2">Kiko Kosdadinov</div>
-                <div className="w-fit mx-5 my-2">Kiko Kosdadinov</div>
-                <div className="w-fit mx-5 my-2">Kiko Kosdadinov</div>
-                <div className="w-fit mx-5 my-2">Kiko Kosdadinov</div>
-                <div className="w-fit mx-5 my-2">Kiko Kosdadinov</div>
-                <div className="w-fit mx-5 my-2">Kiko Kosdadinov</div>
-                <div className="w-fit mx-5 my-2">Kiko Kosdadinov</div>
-                <div className="w-fit mx-5 my-2">Kiko Kosdadinov</div>
-                <div className="w-fit mx-5 my-2">Kiko Kosdadinov</div>
-                <div className="w-fit mx-5 my-2">Kiko Kosdadinov</div>
-                <div className="w-fit mx-5 my-2">Kiko Kosdadinov</div>
-                <div className="w-fit mx-5 my-2">Kiko Kosdadinov</div>
-                <div className="w-fit mx-5 my-2">Kiko Kosdadinov</div>
-                <div className="w-fit mx-5 my-2">Kiko Kosdadinov</div>
-                <div className="w-fit mx-5 my-2">Kiko Kosdadinov</div>
-                <div className="w-fit mx-5 my-2">Kiko Kosdadinov</div>
-                <div className="w-fit mx-5 my-2">Kiko Kosdadinov</div>
-                <div className="w-fit mx-5 my-2">Kiko Kosdadinov</div>
+                <Link
+                  href="/designers/data"
+                  className="w-fit mx-5 my-2 hover:font-semibold"
+                >
+                  Kiko Kosdadinov
+                </Link>
               </div>
             </NavigationMenuContent>
           </NavigationMenuItem>

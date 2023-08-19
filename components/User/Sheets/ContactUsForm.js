@@ -141,7 +141,7 @@ export default function ContactUsForm({ setOpen, rows }) {
         <div className="flex justify-start">
           <Button
             type="submit"
-            className="bg-sky-900 hover:bg-sky-950 w-full md:w-1/6"
+            className="bg-sky-900 hover:bg-sky-950 w-full max-w-[300px]"
           >
             Submit
           </Button>

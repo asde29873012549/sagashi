@@ -1,99 +1,76 @@
 /*eslint-disable*/
-import Image from "next/image";
-import { useState } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import DesignerCard from "@/components/DesignerCard";
-import { BsChevronCompactLeft, BsChevronCompactRight } from "react-icons/bs";
+import DesignerAlphabaticSec from "@/components/DesignerAlphabaticSec";
+import { useRef } from "react";
+
+const designers = [
+  "Vintage",
+  "Streetwear",
+  "Japanese Brand",
+  "Nike",
+  "Adidas",
+  "Supreme",
+  "Polo Ralph Lauren",
+  "Burberry",
+  "Jordan Brand",
+  "Louis Vuitton",
+  "Gucci",
+  "Uniqlo",
+  "Champion",
+  "A Bathing Ape",
+  "Carhartt",
+  "The North Face",
+  "New Era",
+  "Tommy Hilfiger",
+  "Stussy",
+  "Dolce & Gabbana",
+  "Anti Social Social Club",
+  "Prada",
+  "Issey Miyake",
+  "Ralph Lauren",
+  "Balenciaga",
+];
+
+const alphabat = Array.from({ length: 26 }, (_, i) =>
+  String.fromCharCode(65 + i),
+);
+
 export default function Designers() {
-  const [designerIntroSecExpand, setDesignerIntroSecExpand] = useState(false);
+  const alphabatRef = useRef();
 
-  const onReadmore = (e) => {
-    e.preventDefault();
-    setDesignerIntroSecExpand((ex) => !ex);
+  const onAlphabatClick = (alph) => {
+    const resMap = alphabatRef.current;
+    const node = resMap.get(alph);
+    node.scrollIntoView({ behavior: "smooth", block: "center" });
   };
-  return (
-    <main className="w-screen md:py-8 md:px-14">
-      <Image
-        src="/abstract.webp"
-        alt="abstract"
-        width={800}
-        height={250}
-        className="w-full h-52 object-cover"
-      />
-      <section
-        className={`relative w-full flex flex-col md:flex-row justify-between py-3 md:py-7 ${
-          designerIntroSecExpand ? "h-[400px] md:h-56" : "h-fit"
-        }`}
-      >
-        <div className="px-2 md:py-0 h-fit md:h-40 w-full md:w-2/5">
-          <div className="relative flex flex-col md:flex-row w-full h-full md:h-fit items-center">
-            <Avatar className="w-2/5 md:w-1/4 aspect-square mx-auto inset-0 -translate-y-1/2 md:translate-y-0 md:m-0 md:mr-6">
-              <AvatarImage src="https://github.com/shadcn.png" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col items-center md:items-start -translate-y-full md:translate-y-0">
-              <span className="text-3xl font-bold">Casablanca</span>
-              <span className="underline text-sm">1.3k listings</span>
-            </div>
-            <Button className="md:ml-5 w-24 h-fit py-2 -translate-y-full md:translate-y-0">
-              Follow
-            </Button>
-          </div>
-        </div>
-        <p className="w-full md:w-2/5 px-4 overflow-hidden">
-          Casablanca debuted its bold approach to luxury menswear in 2018.
-          Founded by Franco-Moroccan designer Charaf Tajer, Casablanca designs
-          pay homage to the Moroccan city’s vivid color story and ancient
-          architecture. Casablanca tops are crafted in intricate eye-catching
-          prints. Constructed of the finest silks and cashmere knits, the
-          sportswear-inspired label is one of the most exciting new luxury
-          design houses operating today. Casablanca knitwear and Casablanca
-          hoodies add an element of intrigue to any outfit. Along with the
-          line’s main offerings, exclusive collaborations such as Casablanca x
-          New Balance expand the brand’s reach. Casablanca designer Charaf Tajer
-          was no stranger to fashion when he started the label. Previously,
-          Tajer collaborated closely with streetwear brand Pigalle. In 2020,
-          Casablanca introduced its first-ever womenswear collection.
-        </p>
-        <div
-          className={`${
-            designerIntroSecExpand ? "absolute" : "hidden"
-          } bottom-0 w-full h-20 bg-gradient-to-t from-white to-transparent`}
-        ></div>
-        <Button
-          variant="ghost"
-          className="underline absolute bottom-0 right-0 hover:bg-transparent active:bg-transparent focus:bg-transparent translate-y-4"
-          onClick={onReadmore}
-        >
-          {designerIntroSecExpand ? "Read More..." : "Collapse..."}
-        </Button>
-      </section>
 
-      <section className="relative w-full h-fit md:px-0 px-4 mt-16 flex overflow-scroll no-scrollbar">
-        {/* Left Arrow */}
-        <div className="hidden md:absolute top-[50%] -translate-x-0 translate-y-[-50%] left-1 md:left-5 text-2xl rounded-full p-2 bg-black/20 text-white cursor-pointer z-2">
-          <BsChevronCompactLeft size={30} />
-        </div>
-        {/* Right Arrow */}
-        <div className="hidden md:absolute top-[50%] -translate-x-0 translate-y-[-50%] right-1 md:right-5 text-2xl rounded-full p-2 bg-black/20 text-white cursor-pointer  z-2">
-          <BsChevronCompactRight size={30} />
-        </div>
-        <DesignerCard
-          src="/banner.jpg"
-          className="w-[65%] md:w-1/5 mr-4 shrink-0"
+  return (
+    <main className="w-screen p-2 md:py-8 md:px-14">
+      <h1 className="my-4 md:my-8 text-xl md:text-2xl font-bold">
+        Designer from A-Z
+      </h1>
+      <header className="md:flex md:justify-between md:items-center md:w-full md:flex-wrap grid grid-cols-10">
+        {alphabat.map((alph) => (
+          <Button
+            variant="ghost"
+            className="w-fit px-1 md:px-3 m-0 text-xl"
+            key={alph}
+            onClick={() => onAlphabatClick(alph)}
+          >
+            {alph}
+          </Button>
+        ))}
+      </header>
+      <section className="mt-12">
+        <DesignerAlphabaticSec
+          alphabat="A"
+          designers={designers}
+          alphabatRef={alphabatRef}
         />
-        <DesignerCard
-          src="/banner.jpg"
-          className="w-[65%] md:w-1/5 mr-4 shrink-0"
-        />
-        <DesignerCard
-          src="/banner.jpg"
-          className="w-[65%] md:w-1/5 mr-4 shrink-0"
-        />
-        <DesignerCard
-          src="/banner.jpg"
-          className="w-[65%] md:w-1/5 mr-4 shrink-0"
+        <DesignerAlphabaticSec
+          alphabat="B"
+          designers={designers}
+          alphabatRef={alphabatRef}
         />
       </section>
     </main>

@@ -1,3 +1,4 @@
+/*eslint-disable*/
 import {
   Select,
   SelectContent,
@@ -11,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { GiCancel } from "react-icons/gi";
 import { useToast } from "@/components/ui/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 import PhotoCrop from "../../components/PhotoCrop";
 import { getCroppedImage, useDebounceEffect } from "../../lib/utils";
 import ImageUploadCard from "../../components/ui/image-upload-card";
@@ -164,7 +166,24 @@ export default function Sell() {
 
   const onSubmit = (e) => {
     e.preventDefault();
-    router.push("/");
+    const id = setTimeout(() => {
+      router.push("/");
+    }, 2000);
+    toast({
+      title: "Just One Step Left",
+      description: "Your submission will be reviewed to avoid illegal content.",
+      action: (
+        <ToastAction
+          altText="OK"
+          onClick={() => {
+            clearTimeout(id);
+            router.push("/");
+          }}
+        >
+          OK
+        </ToastAction>
+      ),
+    });
   };
 
   return (

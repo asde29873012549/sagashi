@@ -38,6 +38,7 @@ const toastVariants = cva(
 const Toast = React.forwardRef(({ className, variant, ...props }, ref) => {
   return (
     <ToastPrimitives.Root
+      duration={2000}
       ref={ref}
       className={cn(toastVariants({ variant }), className)}
       {...props}
