@@ -1,8 +1,8 @@
 export default function LanguageInfo({ sheet = "" }) {
-  return (
-    <div className="flex justify-between items-center">
-      <div>Traditional Chinese</div>
-      {sheet}
-    </div>
-  );
+	return (
+		<div className="flex items-center justify-between">
+			<div>Traditional Chinese</div>
+			{sheet}
+		</div>
+	);
 }

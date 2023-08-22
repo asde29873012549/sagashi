@@ -1,11 +1,4 @@
-/*eslint-disable*/
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import MyItem from "./MyItemSheet";
@@ -17,49 +10,45 @@ import ContactUs from "./ContactUsForm";
 import ChangePassword from "./ChangePasswordSheet";
 
 export default function SheetWrapper({
-  trigger,
-  feature,
-  sheet,
-  side = "bottom",
-  className = "h-[90%] overflow-scroll",
+	trigger,
+	feature,
+	sheet,
+	side = "bottom",
+	className = "h-[90%] overflow-scroll",
 }) {
-  const [open, setOpen] = useState(false);
+	const [open, setOpen] = useState(false);
 
-  const onCancel = () => {
-    setOpen(false);
-  };
+	const onCancel = () => {
+		setOpen(false);
+	};
 
-  const sheets = {
-    MyItem: <MyItem />,
-    MyProfile: <MyProfile />,
-    MyAddress: <MyAddress />,
-    MyLanguage: <MyLanguage />,
-    MyCountry: <MyCountry />,
-    ContactUs: <ContactUs setOpen={setOpen} />,
-    ChangePassword: <ChangePassword />,
-  };
+	const sheets = {
+		MyItem: <MyItem />,
+		MyProfile: <MyProfile />,
+		MyAddress: <MyAddress />,
+		MyLanguage: <MyLanguage />,
+		MyCountry: <MyCountry />,
+		ContactUs: <ContactUs setOpen={setOpen} />,
+		ChangePassword: <ChangePassword />,
+	};
 
-  return (
-    <Sheet open={open} setOpen={setOpen}>
-      <SheetTrigger>{trigger}</SheetTrigger>
-      <SheetContent side={side} className={className}>
-        <SheetHeader>
-          <SheetTitle>{feature}</SheetTitle>
-          {sheets[sheet]}
-          {sheet !== "MyItem" && sheet !== "ContactUs" && (
-            <div className="absolute bottom-0 right-0 w-full px-6">
-              <Button className="w-full mb-4">SAVE</Button>
-              <Button
-                variant="destructive"
-                className="w-full mb-4"
-                onClick={onCancel}
-              >
-                CANCEL
-              </Button>
-            </div>
-          )}
-        </SheetHeader>
-      </SheetContent>
-    </Sheet>
-  );
+	return (
+		<Sheet open={open} setOpen={setOpen}>
+			<SheetTrigger>{trigger}</SheetTrigger>
+			<SheetContent side={side} className={className}>
+				<SheetHeader>
+					<SheetTitle>{feature}</SheetTitle>
+					{sheets[sheet]}
+					{sheet !== "MyItem" && sheet !== "ContactUs" && (
+						<div className="absolute bottom-0 right-0 w-full px-6">
+							<Button className="mb-4 w-full">SAVE</Button>
+							<Button variant="destructive" className="mb-4 w-full" onClick={onCancel}>
+								CANCEL
+							</Button>
+						</div>
+					)}
+				</SheetHeader>
+			</SheetContent>
+		</Sheet>
+	);
 }
