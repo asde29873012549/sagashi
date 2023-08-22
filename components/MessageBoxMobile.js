@@ -1,12 +1,4 @@
-import {
-	Sheet,
-	SheetContent,
-	SheetClose,
-	SheetDescription,
-	SheetHeader,
-	SheetTitle,
-	SheetTrigger,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import Message from "./Message";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -72,7 +64,7 @@ export default function MessageBoxMobile({ className }) {
 								<AvatarFallback>CN</AvatarFallback>
 							</Avatar>
 							<div className="ml-2 w-9/12 overflow-hidden text-ellipsis whitespace-nowrap text-sm font-semibold">
-								Yellow 'Le Bob Artichaut' Bucket Hat Bucket Hat Bucket Hat
+								Yellow Le Bob Artichaut Bucket Hat Bucket Hat Bucket Hat
 							</div>
 						</div>
 					</header>
@@ -83,7 +75,7 @@ export default function MessageBoxMobile({ className }) {
 						}`}
 					>
 						{message.length > 0 ? (
-							message.map((message) => <Message>{message}</Message>)
+							message.map((message) => <Message key={message}>{message}</Message>)
 						) : (
 							<div className="flex flex-col">
 								<Avatar className="mx-auto h-24 w-24">
@@ -92,7 +84,7 @@ export default function MessageBoxMobile({ className }) {
 								</Avatar>
 								<div className="mt-2 flex flex-col items-center justify-center text-xs text-slate-400">
 									<div>Margiela</div>
-									<div>Yellow 'Le Bob Artichaut' Bucket Hat</div>
+									<div>Yellow Le Bob Artichaut Bucket Hat</div>
 									<div>Listed 3 months ago</div>
 								</div>
 							</div>

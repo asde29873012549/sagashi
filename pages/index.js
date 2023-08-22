@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import Banner from "../components/Banner";
+import Banner from "@/components/Banner";
 import ListingCard from "@/components/ListingCard";
 import DesignerCard from "@/components/DesignerCard";
 import { Button } from "@/components/ui/button";
@@ -62,7 +62,7 @@ export default function Home() {
 
 			<section className="relative flex w-screen flex-col p-3 md:p-8">
 				<h1 className="mt-10 text-2xl font-bold md:text-3xl">Curation</h1>
-				<p className="mb-6">Seasonal curation to meet the zenith of worlds' fashion trends</p>
+				<p className="mb-6">Seasonal curation to meet the zenith of worlds&apos; fashion trends</p>
 				<div className="relative h-[500px] w-full">
 					<Image
 						src="/curation_shoes.jpeg"

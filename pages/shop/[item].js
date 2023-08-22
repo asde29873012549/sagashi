@@ -20,7 +20,7 @@ export default function ListingItem() {
 				<div className="flex flex-col px-3 md:absolute md:w-full md:flex-row md:justify-between">
 					<div className="items-between flex flex-col justify-center md:w-1/5">
 						<div className="text-xl font-semibold">Jacueqmus</div>
-						<div className="mb-6 text-base">Yellow 'Le Bob Artichaut' Bucket Hat</div>
+						<div className="mb-6 text-base">Yellow Le Bob Artichaut Bucket Hat</div>
 						<div className="flex">
 							<div className="mr-1">Size :</div>
 							<div>XS</div>

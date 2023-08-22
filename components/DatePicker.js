@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-export default function DatePicker({ className, setFormVal, formVal }) {
+export default function DatePicker({ className, setFormVal }) {
 	const [date, setDate] = useState();
 
 	useEffect(() => {

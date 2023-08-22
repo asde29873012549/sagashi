@@ -9,7 +9,7 @@ import { LuSearch } from "react-icons/lu";
 import Search from "./Search";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 import { toggleRegisterForm } from "../redux/userSlice";
 import { useDispatch } from "react-redux";
