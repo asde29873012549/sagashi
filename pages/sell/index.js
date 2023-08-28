@@ -117,6 +117,10 @@ export default function Sell() {
 		const imageCardNode = getMap("imageCard").get(clickedRefKey.current);
 		const cameraIconNode = getMap("cameraIcon").get(clickedRefKey.current);
 		const cancelIconNode = getMap("cancelIcon").get(clickedRefKey.current);
+
+		const reader = new FileReader()
+		reader.readAsDataURL(photoInputRef.current.files[0])
+		
 		imageCardNode.style.backgroundImage = `url(${croppedImageUrlRef.current})`;
 		imageCardNode.style.backgroundSize = "contain";
 		cameraIconNode.style.display = "none";
@@ -161,6 +165,30 @@ export default function Sell() {
 
 	const onSubmit = (e) => {
 		e.preventDefault();
+
+		const formData = new FormData()
+
+		[["cat", 7], 
+		["size", 1],
+		["designer",1],
+		["item_name", "mass"],
+		["color", 1],
+		["condition", 1],
+		["price", 300],
+		["desc", "dddddd"],
+		["img", dataRef.current.Photos]].forEach(data => {
+			formData.append(data[0], data[1])
+		})
+
+		console.log(formData)
+
+		fetch("http://localhost:8080/listing/create", {
+			method:"POST",
+			body:formData
+		}).then(response => console.log(response))
+		.catch(err => console.log(err))
+
+		/*
 		const id = setTimeout(() => {
 			router.push("/");
 		}, 2000);
@@ -179,6 +207,7 @@ export default function Sell() {
 				</ToastAction>
 			),
 		});
+		*/
 	};
 
 	return (

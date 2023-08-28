@@ -21,7 +21,7 @@ export default function Header() {
 	return (
 		<Fragment>
 			<div
-				className="relative top-0 z-[19] flex h-14 w-full items-center justify-between bg-background px-3 py-2 shadow-md sm:px-6 sm:py-4 md:h-20 md:justify-between md:px-9 md:py-2 md:shadow-none"
+				className="relative top-0 z-[19] flex h-16 w-full items-center justify-between bg-background px-3 py-2 shadow-md sm:px-6 sm:py-4 md:h-20 md:justify-between md:px-9 md:py-1 md:shadow-none"
 				style={{ position: "sticky" }}
 			>
 				<MenuBar />
@@ -39,7 +39,7 @@ export default function Header() {
 						LOGIN
 					</div>
 				</div>
-				<Logo />
+				<Logo className="w-[20vw] md:w-[7vw] absolute m-auto"/>
 				<MessageIcon />
 
 				<div className="md:text-md fixed bottom-0 right-0 z-8 flex w-full items-center justify-around bg-background px-5 py-3 md:relative md:flex md:w-1/6 md:justify-end">

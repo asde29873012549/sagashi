@@ -5,10 +5,10 @@ export default function Logo({ className = "" }) {
 	return (
 		<Link
 			href="/"
-			className={`absolute inset-0 m-auto mb-1.5 aspect-[3/1] w-[35vw] hover:cursor-pointer md:mb-2 md:w-[15vw] ${className}`}
+			className={`relative aspect-[3/2] hover:cursor-pointer ${className}`}
 		>
 			<Image
-				src="/sagashi.webp"
+				src="/sagashi_logo.png"
 				alt="Sagashi_logo"
 				fill={true}
 				sizes="(max-width: 768px) 35vw, (max-width: 1200px) 15vw, 15vw"
