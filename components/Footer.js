@@ -1,4 +1,4 @@
-import Logo from '@/components/Logo';
+import Logo from "@/components/Logo";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/router";
@@ -13,9 +13,9 @@ export default function Footer() {
 	return (
 		<div className="relative my-14 flex h-fit w-screen flex-col bg-gray-200/50 px-3 py-4 md:mb-0 md:flex-row md:justify-between md:py-6">
 			<div className="mb-6 flex w-full flex-col items-start justify-center md:mb-0 md:w-2/5 md:items-start">
-				<Logo className="w-1/5"/>
+				<Logo className="w-1/5" />
 				<p className="text-sm">One-stop platform for buying/selling luxury goods.</p>
-				<p className="text-sm hidden md:inline">© 2033 sagashi.com</p>
+				<p className="hidden text-sm md:inline">© 2033 sagashi.com</p>
 			</div>
 
 			<div className="flex w-full flex-col items-start md:w-2/5">

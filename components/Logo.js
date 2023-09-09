@@ -3,10 +3,7 @@ import Image from "next/image";
 
 export default function Logo({ className = "" }) {
 	return (
-		<Link
-			href="/"
-			className={`relative aspect-[3/2] hover:cursor-pointer ${className}`}
-		>
+		<Link href="/" className={`relative aspect-[3/2] hover:cursor-pointer ${className}`}>
 			<Image
 				src="/sagashi_logo.png"
 				alt="Sagashi_logo"

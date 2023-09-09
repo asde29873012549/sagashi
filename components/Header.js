@@ -39,7 +39,7 @@ export default function Header() {
 						LOGIN
 					</div>
 				</div>
-				<Logo className="w-[20vw] md:w-[7vw] absolute m-auto"/>
+				<Logo className="absolute m-auto w-[20vw] md:w-[7vw]" />
 				<MessageIcon />
 
 				<div className="md:text-md fixed bottom-0 right-0 z-8 flex w-full items-center justify-around bg-background px-5 py-3 md:relative md:flex md:w-1/6 md:justify-end">

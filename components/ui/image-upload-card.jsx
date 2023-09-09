@@ -3,17 +3,27 @@ import { MdCancel } from "react-icons/md";
 
 export default function ImageUploadCard({
 	setImgSrc,
+	setBufferImage,
 	id,
 	getNode,
 	clickedRefKey,
 	onCancelIconClick,
+	//dataRef
 }) {
 	const onSelectFile = (e) => {
 		if (e.target.files && e.target.files.length > 0) {
+			//dataRef.current.test.push(e.target.files[0])
 			const reader = new FileReader();
+			const bufferReader = new FileReader();
 			reader.readAsDataURL(e.target.files[0]);
+			bufferReader.readAsArrayBuffer(e.target.files[0]);
 			reader.addEventListener("load", () =>
 				setImgSrc(reader.result ? reader.result.toString() : ""),
+			);
+			bufferReader.addEventListener(
+				"load",
+				() => setBufferImage(bufferReader.result ? bufferReader.result : ""),
+				// console.log(e.target.files[0], bufferReader.result, "45566666")
 			);
 		}
 	};

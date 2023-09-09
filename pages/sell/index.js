@@ -31,6 +31,7 @@ export default function Sell() {
 		Tags: "",
 	});
 	const [imgSrc, setImgSrc] = useState();
+	const [bufferImage, setBufferImage] = useState();
 	const [crop, setCrop] = useState();
 	const [completeCrop, setCompletedCrop] = useState();
 	const { toast } = useToast();
@@ -113,15 +114,34 @@ export default function Sell() {
 		setTags(tags.filter((tag) => tag.id !== tagId));
 	};
 
-	const onFinishCrop = () => {
+	const onFinishCrop = async () => {
 		const imageCardNode = getMap("imageCard").get(clickedRefKey.current);
 		const cameraIconNode = getMap("cameraIcon").get(clickedRefKey.current);
 		const cancelIconNode = getMap("cancelIcon").get(clickedRefKey.current);
 
-		const reader = new FileReader()
-		reader.readAsDataURL(photoInputRef.current.files[0])
-		
-		imageCardNode.style.backgroundImage = `url(${croppedImageUrlRef.current})`;
+		const formData = new FormData();
+		formData.append("originalImage", new Blob([bufferImage]));
+		formData.append(
+			"cropInfo",
+			JSON.stringify({
+				cropInfo: {
+					left: crop.x,
+					top: crop.y,
+					width: crop.width,
+					height: crop.height,
+				},
+			}),
+		);
+
+		const response = await fetch("http://localhost:3000/api/cropImage", {
+			method: "POST",
+			body: formData,
+		});
+
+		const data = await response.blob();
+		const imageURL = URL.createObjectURL(data);
+
+		imageCardNode.style.backgroundImage = `url(${imageURL})`;
 		imageCardNode.style.backgroundSize = "contain";
 		cameraIconNode.style.display = "none";
 		cancelIconNode.style.display = "block";
@@ -166,29 +186,33 @@ export default function Sell() {
 	const onSubmit = (e) => {
 		e.preventDefault();
 
+		/*
 		const formData = new FormData()
 
-		[["cat", 7], 
-		["size", 1],
-		["designer",1],
-		["item_name", "mass"],
-		["color", 1],
-		["condition", 1],
-		["price", 300],
-		["desc", "dddddd"],
-		["img", dataRef.current.Photos]].forEach(data => {
+		const datas = [
+			["cat", 7], 
+			["size", 1],
+			["designer",1],
+			["item_name", "mass"],
+			["color", 1],
+			["condition", 1],
+			["price", 300],
+			["desc", "dddddd"],
+			["photo", dataRef.current.test[0]], 
+			["photo", dataRef.current.test[1]]
+		]
+
+		datas.forEach(data => {
 			formData.append(data[0], data[1])
 		})
-
-		console.log(formData)
 
 		fetch("http://localhost:8080/listing/create", {
 			method:"POST",
 			body:formData
 		}).then(response => console.log(response))
 		.catch(err => console.log(err))
+		*/
 
-		/*
 		const id = setTimeout(() => {
 			router.push("/");
 		}, 2000);
@@ -207,7 +231,6 @@ export default function Sell() {
 				</ToastAction>
 			),
 		});
-		*/
 	};
 
 	return (
@@ -336,8 +359,10 @@ export default function Sell() {
 			<section className="mt-20 grid grid-cols-3 gap-10">
 				{[1, 2, 3, 4, 5, 6].map((id) => (
 					<ImageUploadCard
+						dataRef={dataRef}
 						key={id}
 						setImgSrc={setImgSrc}
+						setBufferImage={setBufferImage}
 						getNode={getNode}
 						id={id}
 						clickedRefKey={clickedRefKey}
