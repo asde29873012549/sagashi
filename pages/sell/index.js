@@ -12,84 +12,21 @@ import { Button } from "@/components/ui/button";
 import { GiCancel } from "react-icons/gi";
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
-import PhotoCrop from "../../components/PhotoCrop";
-import { getCroppedImage, useDebounceEffect } from "../../lib/utils";
 import ImageUploadCard from "../../components/ui/image-upload-card";
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/router";
 import { v4 as uuid } from "uuid";
 
-const cropAspet = 4 / 5;
-
 export default function Sell() {
 	const router = useRouter();
 	const [tags, setTags] = useState([]);
-	const [formInput, setFormInput] = useState({
-		ItemName: "",
-		Description: "",
-		Tags: "",
-	});
-	const [imgSrc, setImgSrc] = useState();
-	const [bufferImage, setBufferImage] = useState();
-	const [crop, setCrop] = useState();
-	const [completeCrop, setCompletedCrop] = useState();
+	const [formInput, setFormInput] = useState({});
 	const { toast } = useToast();
-	const imageRef = useRef({
-		imageInput: null,
-		imageCard: null,
-		cameraIcon: null,
-		cancelIcon: null,
-	});
-	const croppedImageUrlRef = useRef();
-	const clickedRefKey = useRef();
 	const childStateRef = useRef();
-	const dataRef = useRef({
-		Department: null,
-		Category: null,
-		SubCategory: null,
-		Condition: null,
-		Size: null,
-		Color: null,
-		Price: null,
-		Designers: null,
-		ItemName: null,
-		Description: null,
-		Tags: [],
-		Photos: {},
-	});
-
-	const [depValue, setDepValue] = useState();
-	const [catValue, setCatValue] = useState();
-	const [subCatValue, setSubCatValue] = useState();
-	const [colorValue, setColorValue] = useState();
-	const [conditionValue, setConditionValue] = useState();
-	const [sizeValue, setSizeValue] = useState();
-
-	useDebounceEffect(
-		() => {
-			const getCroppedImageUrl = async () => {
-				if (imageRef.current.imageInput && completeCrop.width && completeCrop.height) {
-					const url = await getCroppedImage(
-						imageRef.current.imageInput,
-						completeCrop,
-						`${uuid()}.jpg`,
-						croppedImageUrlRef,
-					);
-					croppedImageUrlRef.current = url;
-				}
-			};
-
-			getCroppedImageUrl();
-		},
-		200,
-		[completeCrop],
-	);
 
 	const onFormInput = (e, form) => {
 		setFormInput({ ...formInput, ...{ [form]: e.target.value } });
-		dataRef.current[form] = e.target.value;
-		dataRef.current.Designers = childStateRef.current.val.value;
 	};
 
 	const onTagInputKeyDown = (e, id) => {
@@ -102,7 +39,6 @@ export default function Sell() {
 				},
 			]);
 			setFormInput({ ...formInput, Tags: "" });
-			dataRef.current.Tags.push(e.target.value);
 		}
 	};
 
@@ -114,93 +50,9 @@ export default function Sell() {
 		setTags(tags.filter((tag) => tag.id !== tagId));
 	};
 
-	const onFinishCrop = async () => {
-		const imageCardNode = getMap("imageCard").get(clickedRefKey.current);
-		const cameraIconNode = getMap("cameraIcon").get(clickedRefKey.current);
-		const cancelIconNode = getMap("cancelIcon").get(clickedRefKey.current);
-
-		const formData = new FormData();
-		formData.append("originalImage", new Blob([bufferImage]));
-		formData.append(
-			"cropInfo",
-			JSON.stringify({
-				cropInfo: {
-					left: crop.x,
-					top: crop.y,
-					width: crop.width,
-					height: crop.height,
-				},
-			}),
-		);
-
-		const response = await fetch("http://localhost:3000/api/cropImage", {
-			method: "POST",
-			body: formData,
-		});
-
-		const data = await response.blob();
-		const imageURL = URL.createObjectURL(data);
-
-		imageCardNode.style.backgroundImage = `url(${imageURL})`;
-		imageCardNode.style.backgroundSize = "contain";
-		cameraIconNode.style.display = "none";
-		cancelIconNode.style.display = "block";
-		setImgSrc(null);
-		setCrop(undefined);
-		dataRef.current.Photos[clickedRefKey.current] = croppedImageUrlRef.current;
-	};
-
-	const onCancelCrop = () => {
-		if (croppedImageUrlRef.current) {
-			URL.revokeObjectURL(croppedImageUrlRef.current);
-		}
-		setImgSrc(null);
-		setCrop(undefined);
-	};
-
-	const onCancelIconClick = (id) => {
-		const cancelIconNode = getMap("cancelIcon").get(id);
-		const imageCardNode = getMap("imageCard").get(id);
-		const cameraIconNode = getMap("cameraIcon").get(id);
-		imageCardNode.style.backgroundImage = "";
-		cancelIconNode.style.display = "none";
-		cameraIconNode.style.display = "inline-block";
-		setImgSrc(null);
-		delete dataRef.current.Photos[id];
-	};
-
-	const getMap = (ref) => {
-		if (!imageRef.current[ref]) {
-			imageRef.current[ref] = new Map();
-		}
-		return imageRef.current[ref];
-	};
-
-	const getNode = (node, key, ref) => {
-		const map = getMap(ref);
-		if (node) {
-			map.set(key, node);
-		}
-	};
-
 	const onSubmit = (e) => {
-		e.preventDefault();
-
 		/*
 		const formData = new FormData()
-
-		const datas = [
-			["cat", 7], 
-			["size", 1],
-			["designer",1],
-			["item_name", "mass"],
-			["color", 1],
-			["condition", 1],
-			["price", 300],
-			["desc", "dddddd"],
-			["photo", dataRef.current.test[0]], 
-			["photo", dataRef.current.test[1]]
-		]
 
 		datas.forEach(data => {
 			formData.append(data[0], data[1])
@@ -235,57 +87,19 @@ export default function Sell() {
 
 	return (
 		<main className="mx-72 p-4">
-			<PhotoCrop
-				imgSrc={imgSrc}
-				setCrop={setCrop}
-				crop={crop}
-				imageRef={imageRef}
-				onFinishCrop={onFinishCrop}
-				onCancelCrop={onCancelCrop}
-				setCompletedCrop={setCompletedCrop}
-				cropAspet={cropAspet}
-			/>
 			<div className="grid grid-cols-2 gap-4">
 				<div className="col-span-2 my-8 text-3xl font-semibold">Details</div>
-				<Select value={depValue} setValue={setDepValue}>
-					<SelectTrigger className="h-12 w-auto">
-						<SelectValue ref={dataRef} identifier="Department" val={depValue} />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectItem value="menswear">Menswear</SelectItem>
-						<SelectItem value="womenswear">Womenswear</SelectItem>
-					</SelectContent>
-				</Select>
-				<Select value={catValue} setValue={setCatValue}>
-					<SelectTrigger className="h-12 w-auto">
-						<SelectValue ref={dataRef} identifier="Category" val={catValue} />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectItem value="light">Light</SelectItem>
-						<SelectItem value="dark">Dark</SelectItem>
-						<SelectItem value="system">System</SelectItem>
-					</SelectContent>
-				</Select>
-				<Select value={subCatValue} setValue={setSubCatValue}>
-					<SelectTrigger className="h-12 w-auto">
-						<SelectValue ref={dataRef} identifier="SubCategory" val={subCatValue} />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectItem value="light">Light</SelectItem>
-						<SelectItem value="dark">Dark</SelectItem>
-						<SelectItem value="system">System</SelectItem>
-					</SelectContent>
-				</Select>
-				<Select value={sizeValue} setValue={setSizeValue}>
-					<SelectTrigger className="h-12 w-auto">
-						<SelectValue ref={dataRef} identifier="Size" val={sizeValue} />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectItem value="light">Light</SelectItem>
-						<SelectItem value="dark">Dark</SelectItem>
-						<SelectItem value="system">System</SelectItem>
-					</SelectContent>
-				</Select>
+				{["Department", "Category", "SubCategory", "Size"].map((id) => (
+					<Select value={formInput} setValue={setFormInput} id={id} key={id}>
+						<SelectTrigger className="h-12 w-auto">
+							<SelectValue placeholder={id} />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="Menswear">Menswear</SelectItem>
+							<SelectItem value="Womenswear">Womenswear</SelectItem>
+						</SelectContent>
+					</Select>
+				))}
 				<div className="col-span-1 mt-8 text-3xl font-semibold">Designers</div>
 				<ComboBox ref={childStateRef} />
 
@@ -297,9 +111,9 @@ export default function Sell() {
 					value={formInput.ItemName}
 					onChange={(e) => onFormInput(e, "ItemName")}
 				/>
-				<Select value={colorValue} setValue={setColorValue}>
+				<Select value={formInput} setValue={setFormInput} id="Color">
 					<SelectTrigger className="h-12 w-auto">
-						<SelectValue ref={dataRef} identifier="Color" val={colorValue} />
+						<SelectValue placeholder="Color" />
 					</SelectTrigger>
 					<SelectContent>
 						<SelectItem value="light">Light</SelectItem>
@@ -310,9 +124,9 @@ export default function Sell() {
 
 				<div className="col-span-1 my-8 text-3xl font-semibold">Condition</div>
 				<div className="col-span-1 my-8 text-3xl font-semibold">Price</div>
-				<Select value={conditionValue} setValue={setConditionValue}>
+				<Select value={formInput} setValue={setFormInput} id="Condition">
 					<SelectTrigger className="h-12 w-auto">
-						<SelectValue ref={dataRef} identifier="Condition" val={conditionValue} />
+						<SelectValue placeholder="Condition" />
 					</SelectTrigger>
 					<SelectContent>
 						<SelectItem value="light">Light</SelectItem>
@@ -328,7 +142,6 @@ export default function Sell() {
 					placeholder="Add details about condition, how the garments fits, additional measurements, etc."
 					value={formInput.Description}
 					onChange={(e) => {
-						console.log(dataRef);
 						return onFormInput(e, "Description");
 					}}
 				/>
@@ -358,16 +171,7 @@ export default function Sell() {
 			</div>
 			<section className="mt-20 grid grid-cols-3 gap-10">
 				{[1, 2, 3, 4, 5, 6].map((id) => (
-					<ImageUploadCard
-						dataRef={dataRef}
-						key={id}
-						setImgSrc={setImgSrc}
-						setBufferImage={setBufferImage}
-						getNode={getNode}
-						id={id}
-						clickedRefKey={clickedRefKey}
-						onCancelIconClick={onCancelIconClick}
-					/>
+					<ImageUploadCard key={id} id={id} formInput={formInput} setFormInput={setFormInput} />
 				))}
 			</section>
 			<div className="mt-10 flex items-center justify-end">

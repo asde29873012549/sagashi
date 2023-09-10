@@ -4,21 +4,20 @@ import { Check, ChevronDown } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
-const Select = ({ children, value, setValue }) => (
-	<SelectPrimitive.Root value={value} onValueChange={setValue}>
+const Select = ({ children, value, setValue, id }) => (
+	<SelectPrimitive.Root
+		value={value[id]}
+		onValueChange={(e) => {
+			setValue({ ...value, [id]: e });
+		}}
+	>
 		{children}
 	</SelectPrimitive.Root>
 );
 
 const SelectGroup = SelectPrimitive.Group;
 
-const SelectValue = React.forwardRef(({ identifier, val }, ref) => (
-	<SelectPrimitive.Value
-		aria-label={val}
-		placeholder={identifier}
-		ref={() => val && (ref.current[identifier] = val)}
-	/>
-));
+const SelectValue = ({ placeholder }) => <SelectPrimitive.Value placeholder={placeholder} />;
 
 const SelectTrigger = React.forwardRef(({ className, children, ...props }, ref) => (
 	<SelectPrimitive.Trigger

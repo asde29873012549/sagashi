@@ -1,6 +1,9 @@
 import fs from "fs";
 import sharp from "sharp";
+import { fileTypeFromFile } from "file-type";
 import formidable, { errors as formidableErrors } from "formidable";
+import { ValidationError } from "@/lib/api_error.js";
+import Response from "@/lib/response_template.js";
 
 export const config = {
 	api: {
@@ -10,17 +13,22 @@ export const config = {
 
 export default async function handler(req, res) {
 	let file;
+	const allowFileType = ["image/png", "image/jpg", "image/jpeg", "image/webp"];
 
 	try {
 		const form = formidable({
 			maxFiles: 1,
 			maxFileSize: 5 * 1024 * 1024,
 			maxFields: 1,
-			uploadDir: "/Users/noahhong/Desktop",
 		});
 		const [fields, files] = await form.parse(req);
 
 		file = Object.values(files)[0][0];
+
+		const fileType = await fileTypeFromFile(file.filepath);
+		if (!allowFileType.includes(fileType.mime)) {
+			throw new ValidationError();
+		}
 
 		const Image = sharp(file.filepath);
 		const metadata = await Image.metadata();
@@ -35,15 +43,14 @@ export default async function handler(req, res) {
 			width: Math.floor((width / 100) * originalWidth),
 			height: Math.floor((height / 100) * originalHeight),
 		})
-			.png()
+			.webp()
 			.toBuffer();
 
-		res.setHeader("Content-Type", "image/png");
-		res.send(croppedImage);
+		res.setHeader("Content-Type", "image/webp");
+		res.status(200).send(croppedImage);
 	} catch (err) {
-		console.error(err);
-		if (err.code === formidableErrors.maxFieldsExceeded) {
-			console.error(err);
+		if (err instanceof ValidationError) {
+			res.status(err.status).json(new Response(err).fail());
 		}
 	} finally {
 		try {
