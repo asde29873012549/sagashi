@@ -11,10 +11,8 @@ export default function PhotoCrop({
 	imgSrc,
 	setCrop,
 	crop,
-	imageRef,
 	onFinishCrop,
 	onCancelCrop,
-	setCompletedCrop,
 	cropAspet,
 }) {
 	const onImageLoad = (e) => {
@@ -30,11 +28,9 @@ export default function PhotoCrop({
 						<ReactCrop
 							crop={crop}
 							onChange={(_, percentCrop) => setCrop(percentCrop)}
-							//onComplete={(c) => setCompletedCrop(c)}
 							aspect={cropAspet}
 						>
 							<img
-								// ref={(node) => (imageRef.current.imageInput = node)}
 								alt="Crop me"
 								src={imgSrc}
 								onLoad={onImageLoad}

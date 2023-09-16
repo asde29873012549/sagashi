@@ -10,7 +10,6 @@ export default function ListingItem() {
 	const [isOpen, setIsOpen] = useState(false);
 
 	const onCloseMessageBox = () => {
-		console.log(isOpen);
 		setIsOpen((o) => !o);
 	};
 	return (

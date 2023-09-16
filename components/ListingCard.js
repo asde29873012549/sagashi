@@ -17,7 +17,7 @@ export default function ListingCard({ src, className }) {
 		<div className={`h-fit ${className}`}>
 			<Link href={`/shop/${router.query.item}`}>
 				<div className="relative aspect-[4/5] w-full">
-					<Image src={src} fill={true} alt="pic" />
+					<Image src={src} fill={true} alt="pic" sizes="(max-width: 768px) 50vw, 33vw" />
 				</div>
 			</Link>
 			<div className="text-sm text-gray-500">8 months</div>

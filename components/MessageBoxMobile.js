@@ -42,10 +42,8 @@ export default function MessageBoxMobile({ className }) {
 
 	return (
 		<div className={className}>
-			<Sheet>
+			<Sheet open={open} setOpen={setOpen}>
 				<SheetTrigger
-					open={open}
-					onOpenChange={setOpen}
 					onClick={onResizeMessageBox}
 					className="h-12 w-full rounded-md bg-primary text-background transition-all duration-500 hover:border-2 hover:border-foreground hover:bg-background hover:text-foreground md:hidden md:w-4/5"
 				>

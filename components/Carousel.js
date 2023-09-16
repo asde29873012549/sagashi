@@ -135,9 +135,11 @@ export default function Carousel({ className }) {
 							id={slide.id}
 						>
 							<Image
+								priority
 								src={slide.url}
 								fill={true}
 								alt="image"
+								sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
 								onTouchStart={onTouchStart}
 								onTouchMove={onTouchMove}
 								onTouchEnd={onTouchEnd}

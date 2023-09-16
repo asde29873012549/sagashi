@@ -1,25 +1,45 @@
+import * as dotenv from "dotenv";
 import Message from "./Message";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { RxCross2 } from "react-icons/rx";
 import { motion } from "framer-motion";
+import socketInitializer from "@/lib/socketio/socketInitializer";
+import socket from "@/lib/socketio/client";
+import { useState, useEffect } from "react";
 
-import { useState } from "react";
+dotenv.config();
+
+const server_domain = process.env.NEXT_PUBLIC_SERVER_DOMAIN;
 
 export default function MessageBoxDesktop({ isOpen, onCloseMessageBox }) {
 	const [val, setVal] = useState("");
 	const [message, setMessages] = useState([]);
+	const [id, setId] = useState([]);
 
 	const onInput = (e) => {
 		setVal(e.target.value);
 	};
 
+	const listingOwnerId = "noah";
+
 	const onPressEnter = (e) => {
 		if (e.keyCode === 13) {
+			const client = localStorage.getItem("user");
+			const recipient = localStorage.getItem("user");
+			socket.emit("message", { message: val, recipient });
 			setMessages((m) => [...m, val]);
 			setVal("");
 		}
 	};
+
+	useEffect(() => {
+		socketInitializer(setMessages, setId, listingOwnerId);
+	}, []);
+
+	useEffect(() => {
+		isOpen && socket.connect();
+	}, [isOpen]);
 
 	return (
 		isOpen && (
@@ -29,7 +49,7 @@ export default function MessageBoxDesktop({ isOpen, onCloseMessageBox }) {
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.3 }}
 			>
-				<header className="sticky top-0 flex h-14 w-full items-center border-b border-slate-200 bg-gray-50 px-2">
+				<header className="sticky top-0 z-2 flex h-14 w-full items-center border-b border-slate-200 bg-gray-50 px-2">
 					<div className="flex w-full items-center justify-between">
 						<Avatar className="h-10 w-10">
 							<AvatarImage src="https://github.com/shadcn.png" />
@@ -47,7 +67,9 @@ export default function MessageBoxDesktop({ isOpen, onCloseMessageBox }) {
 					}`}
 				>
 					{message.length > 0 ? (
-						message.map((message) => <Message key={message}>{message}</Message>)
+						message.map((message, index) => (
+							<Message key={`${message}-${index}`}>{message}</Message>
+						))
 					) : (
 						<div className="flex flex-col">
 							<Avatar className="mx-auto h-24 w-24">
@@ -62,7 +84,7 @@ export default function MessageBoxDesktop({ isOpen, onCloseMessageBox }) {
 						</div>
 					)}
 				</main>
-				<footer className="sticky bottom-0 bg-background p-2">
+				<footer className="fixed bottom-0 w-80 bg-background p-2">
 					<Input
 						className="h-8 w-full rounded-full text-base placeholder:text-slate-400"
 						placeholder="Aa"
