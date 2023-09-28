@@ -1,7 +1,7 @@
 import fs from "fs";
 import sharp from "sharp";
 import { fileTypeFromFile } from "file-type";
-import formidable, { errors as formidableErrors } from "formidable";
+import formidable, { errors as formidableError } from "formidable";
 import { ValidationError } from "@/lib/api_error.js";
 import Response from "@/lib/response_template.js";
 
@@ -18,9 +18,10 @@ export default async function handler(req, res) {
 	try {
 		const form = formidable({
 			maxFiles: 1,
-			maxFileSize: 5 * 1024 * 1024,
+			maxFileSize: 8 * 1024 * 1024,
 			maxFields: 1,
 		});
+
 		const [fields, files] = await form.parse(req);
 
 		file = Object.values(files)[0][0];
@@ -52,11 +53,18 @@ export default async function handler(req, res) {
 		if (err instanceof ValidationError) {
 			res.status(err.status).json(new Response(err).fail());
 		}
+		if (err.code === formidableError.biggerThanTotalMaxFileSize) {
+			res
+				.status(500)
+				.json(new Response({ message: "File too large. Please stay under 8MB" }).fail());
+		}
+		res.status(500).json(new Response({ message: "Unknown Error" }).fail());
 	} finally {
 		try {
-			fs.unlink(file.filepath, (err) => {
-				if (err) throw err;
-			});
+			file &&
+				fs.unlink(file.filepath, (err) => {
+					if (err) throw err;
+				});
 		} catch (err) {
 			console.log(err);
 		}

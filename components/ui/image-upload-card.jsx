@@ -53,15 +53,20 @@ export default function ImageUploadCard({ id, formInput, setFormInput }) {
 			body: formData,
 		});
 
-		const data = await response.blob();
-		const imageURL = URL.createObjectURL(data);
-		setCroppedBackground(imageURL);
-		setFormInput({ ...formInput, photos: { ...formInput.photos, [id]: data } });
+		if (!response.ok) {
+			const error = await response.json();
+			console.log(error);
+		} else {
+			const data = await response.blob();
+			const imageURL = URL.createObjectURL(data);
+			setCroppedBackground(imageURL);
+			setFormInput({ ...formInput, photos: { ...formInput.photos, [id]: data } });
 
-		imageCardNode.style.backgroundImage = `url(${imageURL})`;
-		imageCardNode.style.backgroundSize = "contain";
-		cameraIconNode.style.display = "none";
-		cancelIconNode.style.display = "block";
+			imageCardNode.style.backgroundImage = `url(${imageURL})`;
+			imageCardNode.style.backgroundSize = "contain";
+			cameraIconNode.style.display = "none";
+			cancelIconNode.style.display = "block";
+		}
 		setImgSrc(null);
 		setCrop(undefined);
 	};

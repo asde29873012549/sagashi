@@ -12,6 +12,9 @@ dotenv.config();
 
 const server_domain = process.env.NEXT_PUBLIC_SERVER_DOMAIN;
 
+const listingOwner = "joy";
+const productId = 3;
+
 export default function MessageBoxDesktop({ isOpen, onCloseMessageBox }) {
 	const [val, setVal] = useState("");
 	const [message, setMessages] = useState([]);
@@ -21,12 +24,20 @@ export default function MessageBoxDesktop({ isOpen, onCloseMessageBox }) {
 		setVal(e.target.value);
 	};
 
-	const listingOwnerId = "noah";
-
 	const onPressEnter = (e) => {
 		if (e.keyCode === 13) {
-			const client = localStorage.getItem("user");
-			const recipient = localStorage.getItem("user");
+			// check the recipient should be who
+			let recipient;
+			let chatroom_id;
+
+			if (chatroom_id) {
+				const buyer = chatroom_id.split("-")[2];
+				recipient = buyer;
+			} else {
+				recipient = localStorage.getItem("user");
+				chatroom_id = `${productId}-${listingOwner}-${recipient}`;
+			}
+
 			socket.emit("message", { message: val, recipient });
 			setMessages((m) => [...m, val]);
 			setVal("");
@@ -34,11 +45,16 @@ export default function MessageBoxDesktop({ isOpen, onCloseMessageBox }) {
 	};
 
 	useEffect(() => {
-		socketInitializer(setMessages, setId, listingOwnerId);
+		socketInitializer(setMessages, setId);
+		socket.io.opts.query.user = localStorage && localStorage.getItem("user");
+		socket.io.opts.query.listingOwner = listingOwner;
+		socket.io.opts.query.productId = productId;
 	}, []);
 
 	useEffect(() => {
-		isOpen && socket.connect();
+		if (isOpen) {
+			socket.connect();
+		}
 	}, [isOpen]);
 
 	return (

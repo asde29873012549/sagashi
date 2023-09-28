@@ -12,6 +12,7 @@ export const config = {
 };
 
 const users = [];
+const activeRoom = {};
 
 export default async function handler(req, res) {
 	if (res.socket.server.io) {
@@ -30,36 +31,46 @@ export default async function handler(req, res) {
 		},
 		path: "/api/socketio",
 		addTrailingSlash: false,
-	});
+	}).listen(3001);
 
 	// Event handler for client connections
 	io.on("connection", (socket) => {
 		const listingOwner = socket.handshake.query.listingOwner;
-		const product = socket.handshake.query.product;
+		const productId = socket.handshake.query.productId;
 		const clientId = socket.handshake.query.user;
+		let chatroom_id = "";
 
-		console.log(listingOwner, clientId);
+		if (!users.includes(clientId)) {
+			users.push(clientId);
+		}
 
 		if (listingOwner !== clientId) {
-			console.log(`${product}-${listingOwner}-${clientId}`);
-			socket.join(`${product}-${listingOwner}-${clientId}`);
-			users.push(`${product}-${listingOwner}-${clientId}`);
-		}
-		if (listingOwner === clientId) {
-			users.forEach((chatroom) => {
-				console.log(chatroom);
+			chatroom_id = `${productId}-${listingOwner}-${clientId}`;
+			socket.join(chatroom_id);
+
+			if (!activeRoom[productId]) {
+				activeRoom[productId] = [chatroom_id];
+			} else {
+				activeRoom[productId].push(chatroom_id);
+			}
+			//console.log(activeRoom, "44");
+		} else {
+			activeRoom[productId].forEach((chatroom) => {
 				socket.join(chatroom);
 			});
+			//console.log(activeRoom, "55");
 		}
+
+		io.emit("client-new", users);
+
 		console.log(`A client connected. ID: ${clientId}-${socket.id}`);
-		io.emit("client-new", clientId);
 
 		// Event handler for receiving messages from the client
 		socket.on("message", ({ message, recipient }) => {
 			console.log("Received message:", message, recipient);
 
 			socket
-				.to(`${product}-${listingOwner}-${recipient}`)
+				.to(`${productId}-${listingOwner}-${recipient}`)
 				.emit("getMessage", { message, sender: clientId });
 		});
 

@@ -1,3 +1,5 @@
+import * as dotenv from "dotenv";
+import { signOut, useSession } from "next-auth/react";
 import Logo from "./Logo";
 import Link from "next/link";
 import { Fragment } from "react";
@@ -14,9 +16,18 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toggleRegisterForm } from "../redux/userSlice";
 import { useDispatch } from "react-redux";
 
+dotenv.config();
+
+const homepage = process.env.NEXT_PUBLIC_SERVER_DOMAIN;
+
 export default function Header() {
 	const dispatch = useDispatch();
+	const { data: session } = useSession();
 	const onToggleRegisterForm = () => dispatch(toggleRegisterForm());
+
+	const onLogout = () => {
+		signOut({ callbackUrl: homepage });
+	};
 
 	return (
 		<Fragment>
@@ -34,16 +45,16 @@ export default function Header() {
 					</Link>
 					<div
 						className="hidden hover:cursor-pointer md:inline-block"
-						onClick={onToggleRegisterForm}
+						onClick={session ? onLogout : onToggleRegisterForm}
 					>
-						LOGIN
+						{session ? "LOGOUT" : "LOGIN"}
 					</div>
 				</div>
 				<Logo className="absolute m-auto w-[20vw] md:w-[7vw]" />
-				<MessageIcon />
+				{session && <MessageIcon />}
 
-				<div className="md:text-md fixed bottom-0 right-0 z-8 flex w-full items-center justify-around bg-background px-5 py-3 md:relative md:flex md:w-1/6 md:justify-end">
-					<div className="flex w-full items-center justify-between">
+				<div className="md:text-md fixed bottom-0 right-0 z-8 flex w-full items-center justify-between bg-background px-5 py-3 md:relative md:flex md:w-1/6 md:justify-end">
+					<div className="flex w-full items-center justify-around md:w-fit md:space-x-6">
 						<div className="hidden md:inline-block" style={{ height: "28px" }}>
 							<Search>
 								<LuSearch className="mx-1 h-7 w-7 md:flex " />
@@ -61,44 +72,52 @@ export default function Header() {
 						</Link>
 						<div
 							className="inline-block hover:cursor-pointer md:hidden"
-							onClick={onToggleRegisterForm}
+							onClick={session ? onLogout : onToggleRegisterForm}
 						>
-							LOGIN
+							{session ? "LOGOUT" : "LOGIN"}
 						</div>
 						<div className="inline-block hover:cursor-pointer md:hidden" style={{ height: "28px" }}>
 							<Search>
 								<LuSearch className="mx-1 h-7 w-7 md:flex " />
 							</Search>
 						</div>
-						<Popover>
-							<PopoverTrigger className="hidden md:inline-block">
-								<div className="hidden md:relative md:flex ">
-									<LuMessageCircle className="h-7 w-7" />
-									<div className="absolute right-[1px] z-50 mb-3 h-2.5 w-2.5 rounded-full bg-red-700"></div>
-								</div>
-							</PopoverTrigger>
-							<PopoverContent className="max-h-[80%]">
-								<Alert>
-									<AlertDescription className="flex items-center justify-between">
-										<Avatar className="h-10 w-10">
-											<AvatarImage src="https://github.com/shadcn.png" />
-											<AvatarFallback>CN</AvatarFallback>
-										</Avatar>
-										<div className="ml-1 truncate px-2">123345677ssssssssssss86</div>
-										<div className="shrink-0 text-xs text-info">3 min</div>
-									</AlertDescription>
-								</Alert>
-							</PopoverContent>
-						</Popover>
-						<Link href="/shoppingBag">
-							<LuShoppingCart className="h-7 w-7 hover:cursor-pointer" />
-						</Link>
-						<Link className="hidden hover:cursor-pointer md:inline-block" href="/user">
-							<LuUser className="h-7 w-7" />
-						</Link>
-						<Link className="inline-block hover:cursor-pointer md:hidden" href="/user/mobile">
-							<LuUser className="h-7 w-7" />
-						</Link>
+						{session && (
+							<Popover>
+								<PopoverTrigger className="hidden md:inline-block">
+									<div className="hidden md:relative md:flex ">
+										<LuMessageCircle className="h-7 w-7" />
+										<div className="absolute right-[1px] z-50 mb-3 h-2.5 w-2.5 rounded-full bg-red-700"></div>
+									</div>
+								</PopoverTrigger>
+								<PopoverContent className="max-h-[80%]">
+									<Alert>
+										<AlertDescription className="flex items-center justify-between">
+											<Avatar className="h-10 w-10">
+												<AvatarImage src="https://github.com/shadcn.png" />
+												<AvatarFallback>CN</AvatarFallback>
+											</Avatar>
+											<div className="ml-1 truncate px-2">123345677ssssssssssss86</div>
+											<div className="shrink-0 text-xs text-info">3 min</div>
+										</AlertDescription>
+									</Alert>
+								</PopoverContent>
+							</Popover>
+						)}
+						{session && (
+							<Link href={"/shoppingBag"}>
+								<LuShoppingCart className="h-7 w-7 hover:cursor-pointer" />
+							</Link>
+						)}
+						{session && (
+							<Link className="hidden hover:cursor-pointer md:inline-block" href="/user">
+								<LuUser className="h-7 w-7" />
+							</Link>
+						)}
+						{session && (
+							<Link className="inline-block hover:cursor-pointer md:hidden" href="/user/mobile">
+								<LuUser className="h-7 w-7" />
+							</Link>
+						)}
 					</div>
 				</div>
 			</div>
