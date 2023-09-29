@@ -12,6 +12,27 @@ export default function ListingItem() {
 	const onCloseMessageBox = () => {
 		setIsOpen((o) => !o);
 	};
+
+	const onAddShoppingCart = async () => {
+		const response = await fetch(
+			"http://localhost:3000/api/proxy/user/asde29873012549@gmail.com/shoppingCart",
+			{
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({ product_id: 5 }),
+				withCredentials: true,
+			},
+		);
+
+		if (response) {
+			const res = await response.json();
+
+			console.log(res);
+		}
+	};
+
 	return (
 		<div className="w-screen md:px-[7%]">
 			<div className="relative flex flex-col items-center justify-between md:flex-row">
@@ -44,7 +65,10 @@ export default function ListingItem() {
 							<div className="mr-2">+ 60</div>
 							<div>Family Mart Shipping</div>
 						</div>
-						<Button className="mb-4 h-12 w-full hover:border-2 hover:border-foreground hover:bg-background hover:text-foreground md:w-4/5">
+						<Button
+							className="mb-4 h-12 w-full hover:border-2 hover:border-foreground hover:bg-background hover:text-foreground md:w-4/5"
+							onClick={onAddShoppingCart}
+						>
 							ADD TO CART
 						</Button>
 						<Button className="mb-4 h-12 w-full hover:border-2 hover:border-foreground hover:bg-background hover:text-foreground md:w-4/5">
