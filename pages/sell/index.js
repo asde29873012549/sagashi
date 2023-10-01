@@ -18,6 +18,13 @@ import { useState, useRef } from "react";
 import { useRouter } from "next/router";
 import { v4 as uuid } from "uuid";
 
+import { dehydrate, QueryClient, useQuery } from "@tanstack/react-query";
+import getAllCategories from "@/lib/queries/fetchQuery";
+import getAllSizes from "@/lib/queries/fetchQuery";
+import getAllColor from "@/lib/queries/fetchQuery";
+import getAllCondition from "@/lib/queries/fetchQuery";
+import getAllDesigners from "@/lib/queries/fetchQuery";
+
 export default function Sell() {
 	const router = useRouter();
 	const [tags, setTags] = useState([]);
@@ -25,8 +32,48 @@ export default function Sell() {
 	const { toast } = useToast();
 	const childStateRef = useRef();
 
+	const { data: categoryQuery } = useQuery({
+		queryKey: ["category"],
+		queryFn: () => getAllCategories({ uri: "/category" }),
+	});
+
+	const { data: sizeQuery, refetch: fetchSize } = useQuery({
+		queryKey: ["size", formInput.category_id && formInput.category_id],
+		queryFn: (obj) => getAllSizes({ uri: `/category/size/${obj.queryKey[1]}` }),
+		enabled: false,
+		refetchOnWindowFocus: false,
+	});
+
+	const { data: colorQuery } = useQuery({
+		queryKey: ["color"],
+		queryFn: () => getAllColor({ uri: "/listing/color" }),
+		refetchOnWindowFocus: false,
+	});
+
+	const { data: conditionQuery } = useQuery({
+		queryKey: ["condition"],
+		queryFn: () => getAllCondition({ uri: "/listing/condition" }),
+		refetchOnWindowFocus: false,
+	});
+
+	const { data: designerQuery } = useQuery({
+		queryKey: ["designer"],
+		queryFn: () => getAllDesigners({ uri: "/designer" }),
+		refetchOnWindowFocus: false,
+	});
+
 	const onFormInput = (e, form) => {
 		setFormInput({ ...formInput, ...{ [form]: e.target.value } });
+	};
+
+	const onSelect = (e, category, shouldFetchSize) => {
+		const [cat_id, cat_name] = String(e)?.split("_");
+
+		shouldFetchSize && fetchSize();
+
+		return category !== "department" || id !== "color" || id !== "condition"
+			? setFormInput({ ...formInput, [category]: cat_name, [`${category}_id`]: cat_id })
+			: setFormInput({ ...formInput, [category]: e });
 	};
 
 	const onTagInputKeyDown = (e, id) => {
@@ -66,7 +113,7 @@ export default function Sell() {
 		*/
 
 		const id = setTimeout(() => {
-			router.push("/");
+			//router.push("/");
 		}, 2000);
 		toast({
 			title: "Just One Step Left",
@@ -89,19 +136,103 @@ export default function Sell() {
 		<main className="mx-72 p-4">
 			<div className="grid grid-cols-2 gap-4">
 				<div className="col-span-2 my-8 text-3xl font-semibold">Details</div>
-				{["Department", "Category", "SubCategory", "Size"].map((id) => (
-					<Select value={formInput} setValue={setFormInput} id={id} key={id}>
-						<SelectTrigger className="h-12 w-auto">
-							<SelectValue placeholder={id} />
-						</SelectTrigger>
-						<SelectContent>
-							<SelectItem value="Menswear">Menswear</SelectItem>
-							<SelectItem value="Womenswear">Womenswear</SelectItem>
-						</SelectContent>
-					</Select>
-				))}
+				<Select value={formInput.department} onValueChange={(e) => onSelect(e, "department")}>
+					<SelectTrigger className="h-12 w-auto">
+						<SelectValue placeholder="Department" />
+					</SelectTrigger>
+					<SelectContent>
+						{categoryQuery.data &&
+							Object.keys(categoryQuery.data).map((department) => (
+								<SelectItem key={department} value={department}>
+									{department}
+								</SelectItem>
+							))}
+					</SelectContent>
+				</Select>
+				<Select
+					// manually passed in undefined if the value not exist, due to the constraints of radix ui
+					// Since the radix ui will only show the placeholder if the value is undefined, not even null or ""
+					value={formInput.category ? `${formInput.category_id}_${formInput.category}` : undefined}
+					onValueChange={(e) => onSelect(e, "category")}
+				>
+					<SelectTrigger className="h-12 w-auto">
+						<SelectValue placeholder="Category" />
+					</SelectTrigger>
+					<SelectContent>
+						{formInput.department ? (
+							Object.keys(categoryQuery.data[formInput.department]).map((category) => {
+								const cat_id = categoryQuery.data[formInput.department][category]?.id;
+								return (
+									<SelectItem key={cat_id} value={`${cat_id}_${category}`}>
+										{category}
+									</SelectItem>
+								);
+							})
+						) : (
+							<SelectItem value="Please Select Department First" className="text-cyan-900" disabled>
+								Please Select Department First
+							</SelectItem>
+						)}
+					</SelectContent>
+				</Select>
+				<Select
+					// manually passed in undefined if the value not exist, due to the constraints of radix ui
+					// Since the radix ui will only show the placeholder if the value is undefined, not even null or ""
+					value={
+						formInput.subCategory
+							? `${formInput.subCategory_id}_${formInput.subCategory}`
+							: undefined
+					}
+					onValueChange={(e) => onSelect(e, "subCategory", true)}
+				>
+					<SelectTrigger className="h-12 w-auto">
+						<SelectValue placeholder="SubCategory" />
+					</SelectTrigger>
+					<SelectContent>
+						{formInput.category_id ? (
+							Object.values(categoryQuery.data[formInput.department])
+								.filter((obj) => String(obj.id) === String(formInput.category_id))[0]
+								?.sub.map((subCategory) => {
+									const subCat_id = subCategory.id;
+									return (
+										<SelectItem key={subCat_id} value={`${subCat_id}_${subCategory.name}`}>
+											{subCategory.name}
+										</SelectItem>
+									);
+								})
+						) : (
+							<SelectItem value="Please Select Category First" className="text-cyan-900" disabled>
+								Please Select Category First
+							</SelectItem>
+						)}
+					</SelectContent>
+				</Select>
+				<Select
+					value={formInput.size ? `${formInput.size_id}_${formInput.size}` : undefined}
+					onValueChange={(e) => onSelect(e, "size")}
+				>
+					<SelectTrigger className="h-12 w-auto">
+						<SelectValue placeholder="Size" />
+					</SelectTrigger>
+					<SelectContent>
+						{formInput.subCategory_id ? (
+							sizeQuery?.data.map((obj, index) => (
+								<SelectItem
+									key={`${obj.Size.name}_${index}`}
+									value={`${obj.Size.id}_${obj.Size.name}`}
+								>
+									{obj.Size.name}
+								</SelectItem>
+							))
+						) : (
+							<SelectItem value="Please Select Category First" className="text-cyan-900" disabled>
+								Please Select Category First
+							</SelectItem>
+						)}
+					</SelectContent>
+				</Select>
 				<div className="col-span-1 mt-8 text-3xl font-semibold">Designers</div>
-				<ComboBox ref={childStateRef} />
+				<ComboBox ref={childStateRef} data={designerQuery?.data.pageData ?? []} />
 
 				<div className="col-span-1 my-8 text-3xl font-semibold">Item Name</div>
 				<div className="col-span-1 my-8 text-3xl font-semibold">Color</div>
@@ -111,27 +242,31 @@ export default function Sell() {
 					value={formInput.ItemName}
 					onChange={(e) => onFormInput(e, "ItemName")}
 				/>
-				<Select value={formInput} setValue={setFormInput} id="Color">
+				<Select value={formInput.color} onValueChange={(e) => onSelect(e, "color")}>
 					<SelectTrigger className="h-12 w-auto">
 						<SelectValue placeholder="Color" />
 					</SelectTrigger>
 					<SelectContent>
-						<SelectItem value="light">Light</SelectItem>
-						<SelectItem value="dark">Dark</SelectItem>
-						<SelectItem value="system">System</SelectItem>
+						{colorQuery?.data.map((color) => (
+							<SelectItem key={color} value={color}>
+								{color}
+							</SelectItem>
+						))}
 					</SelectContent>
 				</Select>
 
 				<div className="col-span-1 my-8 text-3xl font-semibold">Condition</div>
 				<div className="col-span-1 my-8 text-3xl font-semibold">Price</div>
-				<Select value={formInput} setValue={setFormInput} id="Condition">
+				<Select value={formInput.condition} onValueChange={(e) => onSelect(e, "condition")}>
 					<SelectTrigger className="h-12 w-auto">
 						<SelectValue placeholder="Condition" />
 					</SelectTrigger>
 					<SelectContent>
-						<SelectItem value="light">Light</SelectItem>
-						<SelectItem value="dark">Dark</SelectItem>
-						<SelectItem value="system">System</SelectItem>
+						{conditionQuery?.data.map((condition) => (
+							<SelectItem key={condition} value={condition}>
+								{condition}
+							</SelectItem>
+						))}
 					</SelectContent>
 				</Select>
 				<Input placeholder="Price" className="h-12 w-auto" />
@@ -192,4 +327,19 @@ export default function Sell() {
 			</div>
 		</main>
 	);
+}
+
+export async function getStaticProps() {
+	const queryClient = new QueryClient();
+
+	await queryClient.prefetchQuery({
+		queryKey: ["category"],
+		queryFn: () => getAllCategories({ uri: "/category", sever: true }),
+	});
+
+	return {
+		props: {
+			dehydratedState: dehydrate(queryClient),
+		},
+	};
 }

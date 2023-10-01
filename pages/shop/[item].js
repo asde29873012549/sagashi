@@ -14,23 +14,7 @@ export default function ListingItem() {
 	};
 
 	const onAddShoppingCart = async () => {
-		const response = await fetch(
-			"http://localhost:3000/api/proxy/user/asde29873012549@gmail.com/shoppingCart",
-			{
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ product_id: 5 }),
-				withCredentials: true,
-			},
-		);
-
-		if (response) {
-			const res = await response.json();
-
-			console.log(res);
-		}
+		//
 	};
 
 	return (

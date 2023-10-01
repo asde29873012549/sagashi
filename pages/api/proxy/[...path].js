@@ -19,8 +19,6 @@ export const config = {
 
 export default function handler(req, res) {
 	return new Promise(async (resolve, reject) => {
-		//const pathname = new URL(req.url, SERVER_DOMAIN).pathname;
-
 		const cookies = new Cookies(req, res);
 		const jwtToken = cookies.get("next-auth.session-token");
 

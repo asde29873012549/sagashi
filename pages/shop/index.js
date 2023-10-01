@@ -11,7 +11,7 @@ export default function Shop() {
 	return (
 		<div className="p-2 md:flex md:px-6">
 			<div className="hidden md:mr-10 md:inline-block md:w-1/5">
-				<Accordion type="multiple" collapsible>
+				<Accordion type="multiple">
 					<AccordionItem value="item-1">
 						<AccordionTrigger>Department</AccordionTrigger>
 						<AccordionContent>

@@ -54,7 +54,6 @@ export const authOptions = {
 	],
 	callbacks: {
 		async signIn({ user, account, profile }) {
-			console.log(user, account, profile);
 			if (account.provider === "google") {
 				try {
 					const response = await fetch(`${BACKEND_SERVER}/user/register`, {
