@@ -21,17 +21,23 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 
 export default function NavBar() {
-	const designersQuery = useQuery({
+	const {
+		data: designerData,
+		isError: designerError,
+		isLoading: designerLoading,
+	} = useQuery({
 		queryKey: ["featuredDesingers"],
 		queryFn: () => getFeaturedDesigners({ uri: "/designer/featured" }),
 	});
 
-	const {data: categoryQuery, isError: categoryError, isLoading: categoryLoading } = useQuery({
+	const {
+		data: categoryData,
+		isError: categoryError,
+		isLoading: categoryLoading,
+	} = useQuery({
 		queryKey: ["category"],
 		queryFn: () => getAllCategories({ uri: "/category" }),
 	});
-
-
 
 	return (
 		<NavigationMenu>
@@ -42,24 +48,28 @@ export default function NavBar() {
 							DESIGNERS
 						</NavigationMenuTrigger>
 						<NavigationMenuContent className="flex h-96 w-screen items-center px-9 py-7">
-							<Button variant="ghost hover:bg-white" className="text-lg font-bold md:w-60" asChild>
+							<Button
+								variant="ghost hover:bg-white"
+								className="text-lg font-normal md:w-60"
+								asChild
+							>
 								<Link href="/designers" className="hover:underline">
 									Designers A-Z
 								</Link>
 							</Button>
 							<div className="mx-auto my-0 flex h-5/6 w-10/12 flex-col flex-wrap text-lg">
-								{designersQuery.isError && <span className="m-auto">{genericError}</span>}
-								{designersQuery.isLoading
+								{designerError && <span className="m-auto">{genericError}</span>}
+								{designerError
 									? Array(25)
 											.fill(1)
 											.map((id, index) => (
 												<Skeleton key={`${index}-${id}`} className="mx-5 my-2 h-8 w-44" />
 											))
-									: designersQuery.data?.data.map((obj) => (
+									: designerData?.data.map((obj) => (
 											<Link
 												key={obj.designer_id}
 												href={`/designers/${obj.designer_id}`}
-												className="group mx-5 my-2 flex w-60 items-center text-gray-600 hover:font-medium"
+												className="group mx-5 my-2 flex w-60 translate-y-0 transform items-center font-light text-gray-600 transition-transform duration-300 ease-in-out hover:translate-y-0.5 hover:underline"
 											>
 												<span>{obj.Designer.name}</span>
 												<span className="hidden group-hover:block group-hover:text-cyan-700">
@@ -83,19 +93,16 @@ export default function NavBar() {
 											.map((id, index) => (
 												<Skeleton key={`${index}-${id}`} className="mx-5 my-2 h-8 w-48" />
 											))
-									: Object.keys(categoryQuery.data.Menswear).map((cat, index) => (
+									: Object.keys(categoryData.data.Menswear).map((cat, index) => (
 											<div className="flex flex-col" key={`${index}-${cat}`}>
-												<div className="my-2 w-56 font-semibold">{cat}</div>
+												<div className="my-2 w-56 font-normal">{cat}</div>
 												<div className="flex flex-col">
-													{categoryQuery.data.Menswear[cat].sub.map((subCat, index) => (
+													{categoryData.data.Menswear[cat].sub.map((subCat, index) => (
 														<div
-															className="group my-1 flex text-base hover:cursor-pointer"
+															className="my-1 flex translate-y-0 transform text-base font-light transition-transform duration-300 ease-in-out hover:translate-y-0.5 hover:cursor-pointer hover:underline"
 															key={`${index}-${subCat}`}
 														>
-															<span>{subCat}</span>
-															<span className="hidden group-hover:block group-hover:text-cyan-700">
-																<Dot />
-															</span>
+															<span>{subCat.name}</span>
 														</div>
 													))}
 												</div>
@@ -117,19 +124,16 @@ export default function NavBar() {
 											.map((id, index) => (
 												<Skeleton key={`${index}-${id}`} className="mx-5 my-2 h-8 w-48" />
 											))
-									: Object.keys(categoryQuery.data.Womenswear).map((cat, index) => (
+									: Object.keys(categoryData?.data.Womenswear).map((cat, index) => (
 											<div className="flex flex-col" key={`${index}-${cat}`}>
-												<div className="my-2 w-56 font-semibold">{cat}</div>
+												<div className="my-2 w-56 font-normal">{cat}</div>
 												<div className="flex flex-col">
-													{categoryQuery.data.Womenswear[cat].sub.map((subCat, index) => (
+													{categoryData?.data.Womenswear[cat].sub.map((subCat, index) => (
 														<div
-															className="group my-1 flex text-base hover:cursor-pointer"
+															className="my-1 flex translate-y-0 transform text-base font-light transition-transform duration-300 ease-in-out hover:translate-y-0.5 hover:cursor-pointer hover:underline"
 															key={`${index}-${subCat}`}
 														>
-															<span>{subCat}</span>
-															<span className="hidden group-hover:block group-hover:text-cyan-700">
-																<Dot />
-															</span>
+															<span>{subCat.name}</span>
 														</div>
 													))}
 												</div>

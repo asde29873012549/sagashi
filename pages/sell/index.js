@@ -11,19 +11,28 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { GiCancel } from "react-icons/gi";
 import { useToast } from "@/components/ui/use-toast";
-import { ToastAction } from "@/components/ui/toast";
 import ImageUploadCard from "../../components/ui/image-upload-card";
+import { useDispatch } from "react-redux";
+import { activate } from "@/redux/loadingSlice";
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/router";
 import { v4 as uuid } from "uuid";
 
-import { dehydrate, QueryClient, useQuery } from "@tanstack/react-query";
+import {
+	dehydrate,
+	QueryClient,
+	useQuery,
+	useInfiniteQuery,
+	useMutation,
+} from "@tanstack/react-query";
 import getAllCategories from "@/lib/queries/fetchQuery";
 import getAllSizes from "@/lib/queries/fetchQuery";
 import getAllColor from "@/lib/queries/fetchQuery";
 import getAllCondition from "@/lib/queries/fetchQuery";
 import getAllDesigners from "@/lib/queries/fetchQuery";
+import createDraft from "@/lib/queries/fetchQuery";
+import { genericError, saveDraftSuccess, uploadSuccess, submitEmptyDraft } from "@/lib/userMessage";
 
 export default function Sell() {
 	const router = useRouter();
@@ -31,34 +40,95 @@ export default function Sell() {
 	const [formInput, setFormInput] = useState({});
 	const { toast } = useToast();
 	const childStateRef = useRef();
+	const dispatch = useDispatch();
 
-	const { data: categoryQuery } = useQuery({
+	const { data: categoryData } = useQuery({
 		queryKey: ["category"],
 		queryFn: () => getAllCategories({ uri: "/category" }),
+		refetchOnWindowFocus: false,
 	});
 
-	const { data: sizeQuery, refetch: fetchSize } = useQuery({
+	const { data: sizeData, refetch: fetchSize } = useQuery({
 		queryKey: ["size", formInput.category_id && formInput.category_id],
 		queryFn: (obj) => getAllSizes({ uri: `/category/size/${obj.queryKey[1]}` }),
 		enabled: false,
 		refetchOnWindowFocus: false,
 	});
 
-	const { data: colorQuery } = useQuery({
+	const { data: colorData } = useQuery({
 		queryKey: ["color"],
 		queryFn: () => getAllColor({ uri: "/listing/color" }),
 		refetchOnWindowFocus: false,
 	});
 
-	const { data: conditionQuery } = useQuery({
+	const { data: conditionData } = useQuery({
 		queryKey: ["condition"],
 		queryFn: () => getAllCondition({ uri: "/listing/condition" }),
 		refetchOnWindowFocus: false,
 	});
 
-	const { data: designerQuery } = useQuery({
-		queryKey: ["designer"],
-		queryFn: () => getAllDesigners({ uri: "/designer" }),
+	const { mutateAsync: draftMutate } = useMutation({
+		mutationFn: (draft) =>
+			createDraft({ uri: "/listing/draft", method: "POST", body: draft, isFormData: true }),
+		onSuccess: () => {
+			dispatch(activate());
+			toast({
+				title: saveDraftSuccess.title,
+				description: saveDraftSuccess.desc,
+				status: saveDraftSuccess.status,
+			});
+
+			setTimeout(() => {
+				router.push("/");
+			}, 1500);
+		},
+		onError: (error) => {
+			dispatch(activate());
+			toast({
+				title: "Failed !",
+				description: genericError,
+				status: "fail",
+			});
+		},
+	});
+
+	const { mutateAsync: saveMutate } = useMutation({
+		mutationFn: (product) =>
+			createDraft({ uri: "/listing/create", method: "POST", body: product, isFormData: true }),
+		onSuccess: () => {
+			dispatch(activate());
+			toast({
+				title: uploadSuccess.title,
+				description: uploadSuccess.desc,
+				status: uploadSuccess.status,
+			});
+
+			setTimeout(() => {
+				router.push("/");
+			}, 1500);
+		},
+		onError: (error) => {
+			dispatch(activate());
+			toast({
+				title: "Failed !",
+				description: genericError,
+				status: "fail",
+			});
+		},
+	});
+
+	const {
+		data: designerData,
+		fetchNextPage,
+		hasNextPage,
+		isFetchingNextPage,
+	} = useInfiniteQuery({
+		queryKey: ["designer", "infinite"],
+		queryFn: ({ pageParam = "" }) =>
+			getAllDesigners({
+				uri: `/designer?cursor=${pageParam && encodeURI(JSON.stringify(pageParam))}`,
+			}),
+		getNextPageParam: (lastPage, pages) => lastPage?.data[lastPage.data.length - 1]?.sort,
 		refetchOnWindowFocus: false,
 	});
 
@@ -71,7 +141,7 @@ export default function Sell() {
 
 		shouldFetchSize && fetchSize();
 
-		return category !== "department" || id !== "color" || id !== "condition"
+		return category !== "department" && category !== "color" && category !== "condition"
 			? setFormInput({ ...formInput, [category]: cat_name, [`${category}_id`]: cat_id })
 			: setFormInput({ ...formInput, [category]: e });
 	};
@@ -85,51 +155,66 @@ export default function Sell() {
 					value: e.target.value,
 				},
 			]);
-			setFormInput({ ...formInput, Tags: "" });
+			setFormInput({ ...formInput, tags: "" });
 		}
-	};
-
-	const onTagInput = (e) => {
-		setFormInput({ ...formInput, Tags: e.target.value });
 	};
 
 	const onCancelTag = (tagId) => {
 		setTags(tags.filter((tag) => tag.id !== tagId));
 	};
 
-	const onSubmit = (e) => {
-		/*
-		const formData = new FormData()
+	const onSaveDraft = async () => {
+		if (Object.keys(formInput).length === 0) {
+			toast({
+				title: submitEmptyDraft.title,
+				description: submitEmptyDraft.desc,
+				status: submitEmptyDraft.status,
+			});
 
-		datas.forEach(data => {
-			formData.append(data[0], data[1])
-		})
+			return;
+		}
 
-		fetch("http://localhost:8080/listing/create", {
-			method:"POST",
-			body:formData
-		}).then(response => console.log(response))
-		.catch(err => console.log(err))
-		*/
+		dispatch(activate());
 
-		const id = setTimeout(() => {
-			//router.push("/");
-		}, 2000);
-		toast({
-			title: "Just One Step Left",
-			description: "Your submission will be reviewed to avoid illegal content.",
-			action: (
-				<ToastAction
-					altText="OK"
-					onClick={() => {
-						clearTimeout(id);
-						router.push("/");
-					}}
-				>
-					OK
-				</ToastAction>
-			),
+		const formData = new FormData();
+
+		Object.keys(formInput).forEach((key) => {
+			if (key === "photos") {
+				Object.values(formInput[key]).forEach((photo) => formData.append("photo", photo));
+			} else if (key === "tags" && tags.length > 0) {
+				formData.append("tags", tags.map((obj) => obj.value).join("&"));
+			} else {
+				formData.append(key, formInput[key]);
+			}
 		});
+
+		try {
+			await draftMutate(formData);
+		} catch (err) {
+			console.log(err);
+		}
+	};
+
+	const onSubmit = async () => {
+		dispatch(activate());
+
+		const formData = new FormData();
+
+		Object.keys(formInput).forEach((key) => {
+			if (key === "photos") {
+				Object.values(formInput[key]).forEach((photo) => formData.append("photo", photo));
+			} else if (key === "tags" && tags.length > 0) {
+				formData.append("tags", tags.map((obj) => obj.value).join("&"));
+			} else {
+				formData.append(key, formInput[key]);
+			}
+		});
+
+		try {
+			await saveMutate(formData);
+		} catch (err) {
+			console.log(err);
+		}
 	};
 
 	return (
@@ -141,8 +226,8 @@ export default function Sell() {
 						<SelectValue placeholder="Department" />
 					</SelectTrigger>
 					<SelectContent>
-						{categoryQuery.data &&
-							Object.keys(categoryQuery.data).map((department) => (
+						{categoryData?.data &&
+							Object.keys(categoryData.data).map((department) => (
 								<SelectItem key={department} value={department}>
 									{department}
 								</SelectItem>
@@ -160,8 +245,8 @@ export default function Sell() {
 					</SelectTrigger>
 					<SelectContent>
 						{formInput.department ? (
-							Object.keys(categoryQuery.data[formInput.department]).map((category) => {
-								const cat_id = categoryQuery.data[formInput.department][category]?.id;
+							Object.keys(categoryData.data[formInput.department]).map((category) => {
+								const cat_id = categoryData.data[formInput.department][category]?.id;
 								return (
 									<SelectItem key={cat_id} value={`${cat_id}_${category}`}>
 										{category}
@@ -190,7 +275,7 @@ export default function Sell() {
 					</SelectTrigger>
 					<SelectContent>
 						{formInput.category_id ? (
-							Object.values(categoryQuery.data[formInput.department])
+							Object.values(categoryData.data[formInput.department])
 								.filter((obj) => String(obj.id) === String(formInput.category_id))[0]
 								?.sub.map((subCategory) => {
 									const subCat_id = subCategory.id;
@@ -216,7 +301,7 @@ export default function Sell() {
 					</SelectTrigger>
 					<SelectContent>
 						{formInput.subCategory_id ? (
-							sizeQuery?.data.map((obj, index) => (
+							sizeData?.data.map((obj, index) => (
 								<SelectItem
 									key={`${obj.Size.name}_${index}`}
 									value={`${obj.Size.id}_${obj.Size.name}`}
@@ -225,29 +310,40 @@ export default function Sell() {
 								</SelectItem>
 							))
 						) : (
-							<SelectItem value="Please Select Category First" className="text-cyan-900" disabled>
+							<SelectItem
+								value="Please Select SubCategory First"
+								className="text-cyan-900"
+								disabled
+							>
 								Please Select Category First
 							</SelectItem>
 						)}
 					</SelectContent>
 				</Select>
 				<div className="col-span-1 mt-8 text-3xl font-semibold">Designers</div>
-				<ComboBox ref={childStateRef} data={designerQuery?.data.pageData ?? []} />
+				<ComboBox
+					ref={childStateRef}
+					data={designerData?.pages ?? []}
+					fetchNextPage={fetchNextPage}
+					isFetchingNextPage={isFetchingNextPage}
+					hasNextPage={hasNextPage}
+					setFormInput={setFormInput}
+				/>
 
 				<div className="col-span-1 my-8 text-3xl font-semibold">Item Name</div>
 				<div className="col-span-1 my-8 text-3xl font-semibold">Color</div>
 				<Input
 					placeholder="Item Name"
-					className="h-12 w-auto"
-					value={formInput.ItemName}
-					onChange={(e) => onFormInput(e, "ItemName")}
+					className="h-12 w-auto placeholder:text-gray-400"
+					value={formInput.item_name || ""}
+					onChange={(e) => onFormInput(e, "item_name")}
 				/>
 				<Select value={formInput.color} onValueChange={(e) => onSelect(e, "color")}>
 					<SelectTrigger className="h-12 w-auto">
 						<SelectValue placeholder="Color" />
 					</SelectTrigger>
 					<SelectContent>
-						{colorQuery?.data.map((color) => (
+						{colorData?.data.map((color) => (
 							<SelectItem key={color} value={color}>
 								{color}
 							</SelectItem>
@@ -262,22 +358,27 @@ export default function Sell() {
 						<SelectValue placeholder="Condition" />
 					</SelectTrigger>
 					<SelectContent>
-						{conditionQuery?.data.map((condition) => (
+						{conditionData?.data.map((condition) => (
 							<SelectItem key={condition} value={condition}>
 								{condition}
 							</SelectItem>
 						))}
 					</SelectContent>
 				</Select>
-				<Input placeholder="Price" className="h-12 w-auto" />
+				<Input
+					placeholder="Price"
+					className="h-12 w-auto placeholder:text-gray-400"
+					value={formInput.price || ""}
+					onChange={(e) => onFormInput(e, "price")}
+				/>
 
 				<div className="col-span-2 my-8 text-3xl font-semibold">Description</div>
 				<Textarea
-					className="col-span-2 h-48"
+					className="col-span-2 h-48 text-base placeholder:font-light placeholder:text-gray-400"
 					placeholder="Add details about condition, how the garments fits, additional measurements, etc."
-					value={formInput.Description}
+					value={formInput.desc || ""}
 					onChange={(e) => {
-						return onFormInput(e, "Description");
+						return onFormInput(e, "desc");
 					}}
 				/>
 			</div>
@@ -297,15 +398,15 @@ export default function Sell() {
 					))}
 				</div>
 				<Input
-					placeholder="#tags"
-					className="mt-3 h-12 w-full"
+					placeholder="Use whitespace or enter to separate #tags"
+					className="mt-3 h-12 w-full placeholder:font-light placeholder:text-gray-400"
 					onKeyDown={(e) => onTagInputKeyDown(e, uuid())}
-					onChange={onTagInput}
-					value={formInput.Tags}
+					onChange={(e) => onFormInput(e, "tags")}
+					value={formInput.tags || ""}
 				/>
 			</div>
 			<section className="mt-20 grid grid-cols-3 gap-10">
-				{[1, 2, 3, 4, 5, 6].map((id) => (
+				{["1", "2", "3", "4", "5", "6"].map((id) => (
 					<ImageUploadCard key={id} id={id} formInput={formInput} setFormInput={setFormInput} />
 				))}
 			</section>
@@ -313,11 +414,7 @@ export default function Sell() {
 				<Button
 					variant="outline"
 					className="flex items-center justify-center border-2 border-foreground"
-					onClick={() => {
-						toast({
-							title: "Data Saved ! Come Back Later !",
-						});
-					}}
+					onClick={onSaveDraft}
 				>
 					SAVE AS DRAFT
 				</Button>

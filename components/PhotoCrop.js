@@ -5,8 +5,6 @@ import BlackCanvas from "./ui/blackCanvas";
 import { Button } from "@/components/ui/button";
 import { centerAspectCrop } from "../lib/utils";
 
-//import {useState, forwardRef, useImperativeHandle} from 'react'
-
 export default function PhotoCrop({
 	imgSrc,
 	setCrop,

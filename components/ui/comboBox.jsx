@@ -13,93 +13,153 @@ import {
 	CommandItem,
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { mobileFormInput } from "@/redux/sellSlice";
+import { useDispatch } from "react-redux";
 
-export default forwardRef(({ onMakeProgress, data:datas = [] }, ref) => {
-	const [open, setOpen] = useState(false);
-	const [value, setValue] = useState("");
-
-	useImperativeHandle(
+export default forwardRef(
+	(
+		{
+			onMakeProgress,
+			data: datas = [],
+			fetchNextPage,
+			isFetchingNextPage,
+			hasNextPage,
+			setFormInput,
+			dispatchFormInput,
+			cacheValue,
+		},
 		ref,
-		() => ({
-			val: { value },
-		}),
-		[value],
-	);
+	) => {
+		const [open, setOpen] = useState(false);
+		const [value, setValue] = useState(cacheValue || "");
+		const dispatch = useDispatch();
 
-	const observer = useRef();
-	const lastDesignerElement = useCallback((node) => {
-		if (observer.current) observer.current.disconnect();
-		observer.current = new IntersectionObserver((entries) => {
-			if (entries[0].isIntersecting) {
-				console.log("visible")
-			}
-		});
+		useImperativeHandle(
+			ref,
+			() => ({
+				val: { value },
+			}),
+			[value],
+		);
 
-		if (node) observer.current.observe(node)
+		const observer = useRef();
+		const lastDesignerElement = useCallback(
+			(node) => {
+				if (isFetchingNextPage) return;
+				if (observer.current) {
+					observer.current.disconnect();
+				}
+				observer.current = new IntersectionObserver((entries) => {
+					if (entries[0].isIntersecting && hasNextPage) {
+						fetchNextPage();
+					}
+				});
 
-	}, [])
+				if (node) observer.current.observe(node);
+			},
+			[isFetchingNextPage, hasNextPage],
+		);
 
-	return (
-		<Popover open={open} onOpenChange={setOpen}>
-			<PopoverTrigger asChild>
-				<Button
-					variant="outline"
-					role="combobox"
-					aria-expanded={open}
-					className="mt-6 w-full justify-between font-normal md:col-span-2 md:h-12"
-				>
-					{value
-						? datas.find((data) => data.name === value)?.name
-						: "Select Designers..."}
-					<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-				</Button>
-			</PopoverTrigger>
-			<PopoverContent className="w-[calc(100vw-2rem)] md:w-[calc(100vw-38rem)] h-80">
-				<Command>
-					<CommandInput placeholder="Search designers..." />
-					<CommandEmpty>No designers found.</CommandEmpty>
-					<CommandGroup className="overflow-scroll">
-						{datas.map((data, index) => {
-							return datas.length === index + 1 ?
-							(<CommandItem
-								key={data.name}
-								onSelect={(currentValue) => {
-									onMakeProgress && onMakeProgress(85);
-									setValue(currentValue === value ? "" : currentValue);
-									setOpen(false);
-								}}
-								ref={lastDesignerElement}
-							>
-								<Check
-									className={cn(
-										"mr-2 h-4 w-4",
-										value === data.name ? "opacity-100" : "opacity-0",
-									)}
-								/>
-								{data.name}
-							</CommandItem>) :
-							(
-								<CommandItem
-								key={data.name}
-								onSelect={(currentValue) => {
-									onMakeProgress && onMakeProgress(85);
-									setValue(currentValue === value ? "" : currentValue);
-									setOpen(false);
-								}}
-							>
-								<Check
-									className={cn(
-										"mr-2 h-4 w-4",
-										value === data.name ? "opacity-100" : "opacity-0",
-									)}
-								/>
-								{data.name}
-							</CommandItem>
-							)
+		return (
+			<Popover open={open} onOpenChange={setOpen}>
+				<PopoverTrigger asChild>
+					<Button
+						variant="outline"
+						role="combobox"
+						aria-expanded={open}
+						className={`mt-6 w-full justify-between text-base font-light md:col-span-2 md:h-12 ${
+							!value && "!text-gray-400"
+						}`}
+					>
+						{value ? value : "Select Designers..."}
+						<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+					</Button>
+				</PopoverTrigger>
+				<PopoverContent className="h-80 w-[calc(100vw-2rem)] md:w-[calc(100vw-38rem)]">
+					<Command>
+						<CommandInput placeholder="Search designers..." />
+						<CommandEmpty>No designers found.</CommandEmpty>
+						<CommandGroup className="overflow-scroll">
+							{datas.map((page) => {
+								const pageData = page.data;
+								return pageData.map((data, index) => {
+									if (pageData.length === index + 1) {
+										return (
+											<CommandItem
+												key={data.name}
+												onSelect={(currentValue) => {
+													onMakeProgress && onMakeProgress(85);
+													setValue(data.name);
+
+													if (dispatchFormInput) {
+														dispatch(mobileFormInput({ key: "designer", value: data.name }));
+														dispatch(
+															mobileFormInput({ key: "designer_id", value: data.designer_id }),
+														);
+													} else {
+														setFormInput((prev) => ({
+															...prev,
+															designer: data.name,
+															designer_id: data.designer_id,
+														}));
+													}
+
+													setOpen(false);
+												}}
+												ref={lastDesignerElement}
+											>
+												<Check
+													className={cn(
+														"mr-2 h-4 w-4",
+														value === data.name ? "opacity-100" : "opacity-0",
+													)}
+												/>
+												{data.name}
+											</CommandItem>
+										);
+									} else {
+										return (
+											<CommandItem
+												key={data.name}
+												onSelect={(currentValue) => {
+													onMakeProgress && onMakeProgress(85);
+													setValue(data.name);
+													if (dispatchFormInput) {
+														dispatch(mobileFormInput({ key: "designer", value: data.name }));
+														dispatch(
+															mobileFormInput({ key: "designer_id", value: data.designer_id }),
+														);
+													} else {
+														setFormInput((prev) => ({
+															...prev,
+															designer: data.name,
+															designer_id: data.designer_id,
+														}));
+													}
+													setOpen(false);
+												}}
+											>
+												<Check
+													className={cn(
+														"mr-2 h-4 w-4",
+														value === data.name ? "opacity-100" : "opacity-0",
+													)}
+												/>
+												{data.name}
+											</CommandItem>
+										);
+									}
+								});
 							})}
-					</CommandGroup>
-				</Command>
-			</PopoverContent>
-		</Popover>
-	);
-});
+							{isFetchingNextPage && (
+								<CommandItem className="flex justify-center" disabled>
+									<div className="h-4 w-4 animate-spin  rounded-full border-2 border-solid border-gray-400 border-t-transparent"></div>
+								</CommandItem>
+							)}
+						</CommandGroup>
+					</Command>
+				</PopoverContent>
+			</Popover>
+		);
+	},
+);

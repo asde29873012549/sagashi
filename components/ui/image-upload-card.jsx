@@ -2,10 +2,13 @@ import { BsCameraFill } from "react-icons/bs";
 import { MdCancel } from "react-icons/md";
 import PhotoCrop from "@/components/PhotoCrop";
 import { Fragment, useState, useRef } from "react";
+import { mobileFormInput } from "@/redux/sellSlice";
+import { useDispatch } from "react-redux";
 
 const cropAspet = 4 / 5;
+const NEXT_PUBLIC_SERVER_DOMAIN = process.env.NEXT_PUBLIC_SERVER_DOMAIN;
 
-export default function ImageUploadCard({ id, formInput, setFormInput }) {
+export default function ImageUploadCard({ id, formInput, setFormInput, dispatchFormInput }) {
 	const [imgSrc, setImgSrc] = useState();
 	const [crop, setCrop] = useState();
 	const [bufferImage, setBufferImage] = useState();
@@ -13,6 +16,7 @@ export default function ImageUploadCard({ id, formInput, setFormInput }) {
 	const imageCardRef = useRef();
 	const cameraIconRef = useRef();
 	const cancelIconRef = useRef();
+	const dispatch = useDispatch();
 
 	const onSelectFile = (e) => {
 		if (e.target.files && e.target.files.length > 0) {
@@ -48,7 +52,7 @@ export default function ImageUploadCard({ id, formInput, setFormInput }) {
 			}),
 		);
 
-		const response = await fetch("http://localhost:3000/api/cropImage", {
+		const response = await fetch(`${NEXT_PUBLIC_SERVER_DOMAIN}/api/cropImage`, {
 			method: "POST",
 			body: formData,
 		});
@@ -60,7 +64,11 @@ export default function ImageUploadCard({ id, formInput, setFormInput }) {
 			const data = await response.blob();
 			const imageURL = URL.createObjectURL(data);
 			setCroppedBackground(imageURL);
-			setFormInput({ ...formInput, photos: { ...formInput.photos, [id]: data } });
+			if (dispatchFormInput) {
+				dispatch(mobileFormInput({ key: "photos", value: { ...formInput.photos, [id]: data } }));
+			} else {
+				setFormInput({ ...formInput, photos: { ...formInput.photos, [id]: data } });
+			}
 
 			imageCardNode.style.backgroundImage = `url(${imageURL})`;
 			imageCardNode.style.backgroundSize = "contain";
@@ -85,9 +93,13 @@ export default function ImageUploadCard({ id, formInput, setFormInput }) {
 		imageCardNode.style.backgroundImage = "";
 		cancelIconNode.style.display = "none";
 		cameraIconNode.style.display = "inline-block";
-		const Input = { ...formInput };
-		delete Input.photos?.[id];
-		setFormInput(Input);
+		const { [id]: _, ...restImages } = formInput.photos;
+		if (dispatchFormInput) {
+			dispatch(mobileFormInput({ key: "photos", value: restImages }));
+		} else {
+			setFormInput((prev) => ({ ...prev, photos: restImages }));
+		}
+
 		setImgSrc(null);
 	};
 
@@ -120,7 +132,7 @@ export default function ImageUploadCard({ id, formInput, setFormInput }) {
 					</div>
 					<input
 						type="file"
-						accept="image/png, image/jpg"
+						accept="image/png, image/jpg, image/jpeg, image/webp"
 						className="hidden"
 						multiple={false}
 						onChange={onSelectFile}
