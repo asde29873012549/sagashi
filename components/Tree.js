@@ -36,29 +36,109 @@ export default function Tree({ treeData, onChangeFilter, filter }) {
 	});
 
 	const onDesignerSelect = (e) => {
-		onAddFilter((prev) => (!prev.includes(e) ? [...prev, e] : prev));
+		onChangeFilter((prev) =>
+			prev.designers ? { ...prev, designers: [...prev.designers, e] } : { ...prev, designers: [e] },
+		);
 	};
 
-	const onCheck = (key, value, department) => {
+	const onCheck = (key, value, department, category) => {
 		const newFilter = { ...filter };
 
-		// Determine the target property based on the key
-		const targetProperty = key === "category" ? department : key;
-
-		if (!newFilter[targetProperty]) {
-			newFilter[targetProperty] = [value];
-		} else {
-			const isValueExist = newFilter[targetProperty].includes(value);
-			if (isValueExist) {
-				newFilter[targetProperty] = newFilter[targetProperty].filter((item) => item !== value);
+		if (key === "category") {
+			if (!newFilter[department] || !newFilter[department][value]) {
+				newFilter[department] = {
+					...newFilter[department],
+					[value]: {
+						...newFilter[department]?.[value],
+						subCategory: treeData.Category[department][value].sub.map((obj) => obj.name),
+					},
+				};
 			} else {
-				newFilter[targetProperty].push(value);
-			}
+				const isValueExist = newFilter[department][value]?.subCategory ?? false;
+				if (isValueExist) {
+					delete newFilter[department][value].subCategory;
+				} else {
+					newFilter[department][value].subCategory = treeData.Category[department][value].sub.map(
+						(obj) => obj.name,
+					);
+				}
 
-			if (newFilter[targetProperty].length === 0) {
-				delete newFilter[targetProperty];
+				if (Object.keys(newFilter[department][value]).length === 0) {
+					delete newFilter[department][value];
+				}
+			}
+		} else if (key === "sizes") {
+			if (
+				!newFilter[department] ||
+				!newFilter[department][category] ||
+				!newFilter[department][category].sizes
+			) {
+				newFilter[department] = {
+					...newFilter[department],
+					[category]: { ...newFilter[department]?.[category], sizes: [value] },
+				};
+			} else {
+				const isValueExist = newFilter[department][category].sizes.includes(value);
+				if (isValueExist) {
+					newFilter[department][category].sizes = newFilter[department][category].sizes.filter(
+						(item) => item !== value,
+					);
+					newFilter[department][category].sizes.length < 1 &&
+						delete newFilter[department][category].sizes;
+				} else {
+					newFilter[department][category].sizes.push(value);
+				}
+
+				if (Object.keys(newFilter[department][category]).length === 0) {
+					delete newFilter[department];
+				}
+			}
+		} else if (key === "subCategory") {
+			if (
+				!newFilter[department] ||
+				!newFilter[department][category] ||
+				!newFilter[department][category].subCategory
+			) {
+				newFilter[department] = {
+					...newFilter[department],
+					[category]: { ...newFilter[department]?.[category], subCategory: [value] },
+				};
+			} else {
+				const isValueExist = newFilter[department][category].subCategory.includes(value);
+				if (isValueExist) {
+					newFilter[department][category].subCategory = newFilter[department][
+						category
+					].subCategory.filter((item) => item !== value);
+					newFilter[department][category].subCategory.length < 1 &&
+						delete newFilter[department][category].subCategory;
+				} else {
+					newFilter[department][category].subCategory.push(value);
+				}
+				if (Object.keys(newFilter[department][category]).length === 0) {
+					delete newFilter[department][category];
+				}
+			}
+		} else {
+			if (!newFilter[key]) {
+				newFilter[key] = [value];
+			} else {
+				const isValueExist = newFilter[key].includes(value);
+				if (isValueExist) {
+					newFilter[key] = newFilter[key].filter((item) => item !== value);
+				} else {
+					newFilter[key].push(value);
+				}
+
+				if (newFilter[key].length === 0) {
+					delete newFilter[key];
+				}
 			}
 		}
+
+		if (Object.keys(newFilter[department]).length === 0) {
+			delete newFilter[department];
+		}
+
 		onChangeFilter(newFilter);
 	};
 
@@ -85,7 +165,17 @@ export default function Tree({ treeData, onChangeFilter, filter }) {
 	};
 
 	const shouldRenderSize = Object.keys(filter).length > 0;
-	const isChecked = (key, value) => {
+	const isChecked = (key, value, department, category) => {
+		if (key === "Menswear" || key === "Womenswear") {
+			if (!filter[key] || !filter[key][value] || !filter[key][value].subCategory) return false;
+
+			return filter[key][value].subCategory.length === treeData.Category[key][value].sub.length
+				? true
+				: false;
+		} else if (key === "sizes" || key === "subCategory") {
+			if (!filter[department]) return false;
+			return filter[department][category]?.[key]?.includes(value) ?? false;
+		}
 		return filter[key]?.includes(value) ?? false;
 	};
 
@@ -157,8 +247,10 @@ export default function Tree({ treeData, onChangeFilter, filter }) {
 											<div className="flex items-center space-x-2">
 												<Checkbox
 													id={obj.name}
-													checked={isChecked("subCategory", obj.name)}
-													onCheckedChange={() => onCheck("subCategory", obj.name)}
+													checked={isChecked("subCategory", obj.name, department, category)}
+													onCheckedChange={() =>
+														onCheck("subCategory", obj.name, department, category)
+													}
 												/>
 												<label
 													htmlFor={obj.name}
@@ -204,8 +296,8 @@ export default function Tree({ treeData, onChangeFilter, filter }) {
 												<div className="flex items-center space-x-2">
 													<Checkbox
 														id={`${index}-${size}`}
-														checked={isChecked("sizes", size)}
-														onCheckedChange={() => onCheck("sizes", size)}
+														checked={isChecked("sizes", size, department, category)}
+														onCheckedChange={() => onCheck("sizes", size, department, category)}
 													/>
 													<label
 														htmlFor={`${index}-${size}`}

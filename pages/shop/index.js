@@ -20,6 +20,7 @@ export default function Shop() {
 		setFilter(filter);
 		const department = filter.department ? [...filter.department] : null;
 		const category = filter.Menswear || filter.Womenswear ? {} : null;
+		//const subCategory = filter.subCategory ? [...filter.subCategory] : null;
 
 		if (filter.Menswear) {
 			category.Menswear = filter.Menswear;
