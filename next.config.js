@@ -15,6 +15,12 @@ const nextConfig = {
 				port: "",
 				pathname: "/sagashi_curations/**",
 			},
+			{
+				protocol: "https",
+				hostname: "storage.googleapis.com",
+				port: "",
+				pathname: "/sagashi_products_data/**",
+			},
 		],
 	},
 };

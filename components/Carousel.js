@@ -36,78 +36,64 @@ export default function Carousel({ className }) {
 	const endingTouchRef = useRef();
 	const isSwiped = useRef(true);
 	const [currentImage, setCurrentImage] = useState(1);
+	const isTouchActiveRef = useRef(false);
 
 	const prevSlide = () => {
 		if (direction > 0) {
 			carouselRef.current.appendChild(carouselRef.current.firstElementChild);
 			setDirection((d) => d * -1);
-			setCurrentImage(carouselRef.current.children[1].id);
 		}
-		setCurrentImage(carouselRef.current.children[slides.length - 2].id);
-		carouselRef.current.style.justifyContent = "flex-end";
-		carouselRef.current.style.transform = "translateX(100%)";
+		handleTouchPrevSlide();
 	};
 
 	const nextSlide = () => {
 		if (direction < 0) {
 			carouselRef.current.prepend(carouselRef.current.lastElementChild);
 			setDirection((d) => d * -1);
-			setCurrentImage(carouselRef.current.children[slides.length - 2].id);
 		}
-		setCurrentImage(carouselRef.current.children[1].id);
-		carouselRef.current.style.justifyContent = "flex-start";
-		carouselRef.current.style.transform = "translateX(-100%)";
+		handleTouchNextSlide();
 	};
 
 	const onTransitionEnd = () => {
-		if (!isSwiped.current) return;
+		if (!isSwiped.current || isTouchActiveRef.current) return;
 		direction > 0
 			? carouselRef.current.appendChild(carouselRef.current.firstElementChild)
 			: carouselRef.current.prepend(carouselRef.current.lastElementChild);
 		carouselRef.current.style.transition = "none";
-		carouselRef.current.style.transform = "translateX(0%)";
+		carouselRef.current.style.transform = "translateX(0)";
 		setTimeout(() => {
 			carouselRef.current.style.transition = "transform 0.5s";
 		});
 	};
 
 	const onTouchStart = (e) => {
+		isTouchActiveRef.current = true;
 		initialTouchRef.current = e.touches[0].screenX;
 	};
 	const onTouchMove = (e) => {
 		endingTouchRef.current = e.touches[0].screenX;
-		const movement = e.touches[0].screenX - initialTouchRef.current;
-		carouselRef.current.style.transform = `translateX(${movement}px)`;
+		carouselRef.current.style.transform = `translateX(${
+			endingTouchRef.current - initialTouchRef.current
+		}px)`;
 	};
 
 	const onTouchEnd = () => {
+		isTouchActiveRef.current = false;
 		const distance = endingTouchRef.current - initialTouchRef.current;
-		const swipeDirection = distance < 0 ? 1 : -1;
-		if (Math.abs(distance) > 50) {
+		const isDirectionChanged = distance * direction > 0;
+		if (Math.abs(distance) > 30) {
 			isSwiped.current = true;
-			if (swipeDirection !== direction) {
-				setDirection(swipeDirection);
-				if (swipeDirection === 1) {
+			if (isDirectionChanged) {
+				setDirection((d) => d * -1);
+				if (distance < 0) {
 					carouselRef.current.prepend(carouselRef.current.lastElementChild);
-					carouselRef.current.style.justifyContent = "flex-end";
-					carouselRef.current.style.transform = "translateX(100vw)";
-					setCurrentImage(carouselRef.current.children[1].id);
+					handleTouchNextSlide();
 				} else {
 					carouselRef.current.appendChild(carouselRef.current.firstElementChild);
-					carouselRef.current.style.justifyContent = "flex-end";
-					carouselRef.current.style.transform = "translateX(100vw)";
-					setCurrentImage(carouselRef.current.children[slides.length - 2].id);
+					handleTouchPrevSlide();
 				}
 			} else {
-				if (distance < 0) {
-					carouselRef.current.style.justifyContent = "flex-start";
-					carouselRef.current.style.transform = "translateX(-100vw)";
-					setCurrentImage(carouselRef.current.children[1].id);
-				} else if (distance > 0) {
-					carouselRef.current.style.justifyContent = "flex-end";
-					carouselRef.current.style.transform = "translateX(100vw)";
-					setCurrentImage(carouselRef.current.children[slides.length - 2].id);
-				}
+				distance < 0 ? handleTouchNextSlide() : handleTouchPrevSlide();
 			}
 		} else {
 			isSwiped.current = false;
@@ -118,13 +104,25 @@ export default function Carousel({ className }) {
 		endingTouchRef.current = null;
 	};
 
+	const handleTouchNextSlide = () => {
+		carouselRef.current.style.justifyContent = "flex-start";
+		carouselRef.current.style.transform = `translateX(-${carouselRef.current.offsetWidth}px)`;
+		return setCurrentImage(carouselRef.current.children[1].id);
+	};
+
+	const handleTouchPrevSlide = () => {
+		carouselRef.current.style.justifyContent = "flex-end";
+		carouselRef.current.style.transform = `translateX(${carouselRef.current.offsetWidth}px)`;
+		return setCurrentImage(carouselRef.current.children[slides.length - 2].id);
+	};
+
 	return (
 		<Fragment>
 			<div
 				className={`no-scrollbar relative aspect-[4/5] w-screen overflow-hidden md:w-2/5 md:overflow-scroll ${className}`}
 			>
 				<div
-					className="flex h-full w-full justify-start transition-transform duration-500 ease-out md:flex-col"
+					className="duration-400 flex h-full w-full justify-start transition-transform ease-out md:flex-col"
 					ref={carouselRef}
 					onTransitionEnd={onTransitionEnd}
 				>
@@ -160,14 +158,3 @@ export default function Carousel({ className }) {
 		</Fragment>
 	);
 }
-
-/**
- * <div className={`md:hidden flex h-10 w-36 justify-between items-center m-auto [&>*:nth-child(currentImage)]:bg-slate-700 [&>*:nth-child(currentImage)]:w-12`}>
-        {slides.map((slide) => (
-          <Separator
-            className="w-5 h-px rounded inline-block bg-slate-400 transition-all duration-500"
-            key={slide.url}
-          />
-        ))}
-      </div>
- */

@@ -8,6 +8,7 @@ import Link from "next/link";
 import { dehydrate, QueryClient, useQuery } from "@tanstack/react-query";
 import getFeaturedDesigners from "@/lib/queries/fetchQuery";
 import getCurations from "@/lib/queries/fetchQuery";
+import getNewArrivalsProducts from "@/lib/queries/fetchQuery";
 
 export default function Home() {
 	const { data: designerData } = useQuery({
@@ -20,6 +21,13 @@ export default function Home() {
 		queryFn: () => getCurations({ uri: "/listing/curation" }),
 	});
 
+	const { data: newArrivalsProductData } = useQuery({
+		queryKey: ["products", "newArraivals"],
+		queryFn: () => getNewArrivalsProducts({ uri: "/listing?newArrivals=true" }),
+	});
+
+	console.log(newArrivalsProductData);
+
 	return (
 		<Fragment>
 			<Banner />
@@ -27,14 +35,13 @@ export default function Home() {
 				<h1 className="mt-10 text-2xl font-bold md:text-3xl">New In</h1>
 				<p className="mb-6">Freshly in boutiques for your best choice.</p>
 				<main className="no-scrollbar flex  w-full items-center overflow-scroll">
-					<ListingCard src="/banner.jpg" className="mb-4 mr-2 w-[65%] shrink-0 md:mr-4 md:w-1/5" />
-					<ListingCard src="/banner.jpg" className="mb-4 mr-2 w-[65%] shrink-0 md:mr-4 md:w-1/5" />
-					<ListingCard src="/banner.jpg" className="mb-4 mr-2 w-[65%] shrink-0 md:mr-4 md:w-1/5" />
-					<ListingCard src="/banner.jpg" className="mb-4 mr-2 w-[65%] shrink-0 md:mr-4 md:w-1/5" />
-					<ListingCard src="/banner.jpg" className="mb-4 mr-2 w-[65%] shrink-0 md:mr-4 md:w-1/5" />
-					<ListingCard src="/banner.jpg" className="mb-4 mr-2 w-[65%] shrink-0 md:mr-4 md:w-1/5" />
-					<ListingCard src="/banner.jpg" className="mb-4 mr-2 w-[65%] shrink-0 md:mr-4 md:w-1/5" />
-					<ListingCard src="/banner.jpg" className="mb-4 mr-2 w-[65%] shrink-0 md:mr-4 md:w-1/5" />
+					{newArrivalsProductData?.data?.map((obj) => (
+						<ListingCard
+							key={obj.prod_id}
+							src={obj.primary_image}
+							className="mb-4 mr-2 w-[65%] shrink-0 md:mr-4 md:w-1/5"
+						/>
+					))}
 					<Button
 						variant="ghost"
 						className=" flex w-[65%] shrink-0 cursor-pointer items-center justify-center font-semibold underline md:w-1/5"

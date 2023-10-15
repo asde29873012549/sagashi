@@ -28,12 +28,7 @@ export default function PhotoCrop({
 							onChange={(_, percentCrop) => setCrop(percentCrop)}
 							aspect={cropAspet}
 						>
-							<img
-								alt="Crop me"
-								src={imgSrc}
-								onLoad={onImageLoad}
-								className="w-[90vw] md:h-[70vh] md:w-auto"
-							/>
+							<img alt="Crop me" src={imgSrc} onLoad={onImageLoad} className="h-[70vh] w-auto" />
 						</ReactCrop>
 						<div>
 							<Button className="mt-10 hover:bg-slate-600" onClick={onFinishCrop}>

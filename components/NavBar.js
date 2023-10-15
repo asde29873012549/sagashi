@@ -93,11 +93,11 @@ export default function NavBar() {
 											.map((id, index) => (
 												<Skeleton key={`${index}-${id}`} className="mx-5 my-2 h-8 w-48" />
 											))
-									: Object.keys(categoryData.data.Menswear).map((cat, index) => (
+									: Object.keys(categoryData?.data.Menswear ?? {}).map((cat, index) => (
 											<div className="flex flex-col" key={`${index}-${cat}`}>
 												<div className="my-2 w-56 font-normal">{cat}</div>
 												<div className="flex flex-col">
-													{categoryData.data.Menswear[cat].sub.map((subCat, index) => (
+													{categoryData?.data.Menswear[cat].sub.map((subCat, index) => (
 														<div
 															className="my-1 flex translate-y-0 transform text-base font-light transition-transform duration-300 ease-in-out hover:translate-y-0.5 hover:cursor-pointer hover:underline"
 															key={`${index}-${subCat}`}
@@ -124,7 +124,7 @@ export default function NavBar() {
 											.map((id, index) => (
 												<Skeleton key={`${index}-${id}`} className="mx-5 my-2 h-8 w-48" />
 											))
-									: Object.keys(categoryData?.data.Womenswear).map((cat, index) => (
+									: Object.keys(categoryData?.data.Womenswear ?? {}).map((cat, index) => (
 											<div className="flex flex-col" key={`${index}-${cat}`}>
 												<div className="my-2 w-56 font-normal">{cat}</div>
 												<div className="flex flex-col">

@@ -14,34 +14,38 @@ export default function Shop() {
 		queryFn: () => getTree({ uri: "/tree" }),
 		refetchOnWindowFocus: false,
 	});
-	const [tree, setTree] = useState(OriginTreeData.data || null);
+	const [tree, setTree] = useState(OriginTreeData?.data || null);
 	console.log(filter);
 	const onChangeFilter = (filter) => {
 		setFilter(filter);
 		const department = filter.department ? [...filter.department] : null;
-		const category = filter.Menswear || filter.Womenswear ? {} : null;
+		const category = filter.subCategory ? {} : null;
 		//const subCategory = filter.subCategory ? [...filter.subCategory] : null;
 
-		if (filter.Menswear) {
-			category.Menswear = filter.Menswear;
+		if (filter.subCategory?.some((obj) => obj.dept === "Menswear")) {
+			category.Menswear = [
+				...new Set(filter.subCategory.map((obj) => (obj.dept === "Menswear" ? obj.cat : []))),
+			];
 
 			if (department) !department.includes("Menswear") && department.push("Menswear");
 		}
 
-		if (filter.Womenswear) {
-			category.Womenswear = filter.Womenswear;
+		if (filter.subCategory?.some((obj) => obj.dept === "Womenswear")) {
+			category.Womenswear = [
+				...new Set(filter.subCategory.map((obj) => (obj.dept === "Womenswear" ? obj.cat : []))),
+			];
 
 			if (department) !department.includes("Womenswear") && department.push("Womenswear");
 		}
 
-		const reformedTree = reformTree(OriginTreeData.data, { department, category });
+		const reformedTree = reformTree(OriginTreeData?.data, { department, category });
 
 		setTree(reformedTree);
 	};
 
 	return (
 		<>
-			<FilterSection filter={filter} />
+			<FilterSection filter={filter} setFilter={setFilter} />
 			<div className="p-2 md:flex md:px-6">
 				<div className="hidden md:mr-10 md:inline-block md:w-1/5">
 					<Tree treeData={tree} onChangeFilter={onChangeFilter} filter={filter} />

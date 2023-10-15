@@ -1,12 +1,15 @@
+import { Separator } from "./ui/separator";
+
 export default function CarouselDots({ currentImage, slides }) {
 	return (
-		<div
-			className={`m-auto flex h-10 w-24 items-center justify-between md:hidden [&>*:nth-child(${currentImage})]:text-slate-700`}
-		>
+		<div className={`m-auto flex h-10 w-36 items-center justify-between md:hidden`}>
 			{slides.map((slide) => (
-				<div key={slide.id} className="text-3xl text-slate-300">
-					•
-				</div>
+				<Separator
+					className={`inline-block h-px w-4 rounded bg-slate-400 transition-all duration-500 ${
+						currentImage == slide.id ? "w-12 bg-slate-700" : ""
+					}`}
+					key={slide.url}
+				/>
 			))}
 		</div>
 	);
