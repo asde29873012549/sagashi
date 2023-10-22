@@ -26,8 +26,6 @@ export default function Home() {
 		queryFn: () => getNewArrivalsProducts({ uri: "/listing?newArrivals=true" }),
 	});
 
-	console.log(newArrivalsProductData);
-
 	return (
 		<Fragment>
 			<Banner />
@@ -35,10 +33,12 @@ export default function Home() {
 				<h1 className="mt-10 text-2xl font-bold md:text-3xl">New In</h1>
 				<p className="mb-6">Freshly in boutiques for your best choice.</p>
 				<main className="no-scrollbar flex  w-full items-center overflow-scroll">
-					{newArrivalsProductData?.data?.map((obj) => (
+					{newArrivalsProductData?.data?.result.map((obj) => (
 						<ListingCard
 							key={obj.prod_id}
 							src={obj.primary_image}
+							prod_id={obj.prod_id}
+							product_data={obj}
 							className="mb-4 mr-2 w-[65%] shrink-0 md:mr-4 md:w-1/5"
 						/>
 					))}
@@ -59,11 +59,11 @@ export default function Home() {
 				<h1 className="mt-10 text-2xl font-bold md:text-3xl">Featured Designers</h1>
 				<p className="mb-6">Boutiques from the popular designers.</p>
 				<main className="no-scrollbar flex w-full items-center overflow-scroll">
-					{designerData.data.slice(0, 7).map((obj) => (
+					{designerData?.data.slice(0, 7).map((obj) => (
 						<DesignerCard
 							key={obj.Designer.name}
 							src={obj.Designer.logo}
-							designer_id={obj.id}
+							designer_id={obj.designer_id}
 							className="mb-4 mr-2 w-[65%] shrink-0 md:mr-4 md:w-1/5"
 							name={obj.Designer.name}
 						/>

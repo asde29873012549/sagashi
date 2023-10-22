@@ -44,7 +44,7 @@ export default function FilterSection({ filter = {}, setFilter }) {
 
 	return (
 		filterArray.length > 0 && (
-			<div className="h-fit w-screen flex-wrap p-2 md:flex md:px-6">
+			<div className="box-border h-fit w-full flex-wrap p-2 md:flex md:px-6">
 				{filterArray.map((obj, index) => (
 					<Button
 						variant="outline"

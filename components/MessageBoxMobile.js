@@ -13,7 +13,6 @@ export default function MessageBoxMobile({ className }) {
 
 	const onCloseSheet = () => {
 		setOpen(false);
-		console.log("123");
 		window.visualViewport.removeEventListener("resize", handleResize);
 	};
 

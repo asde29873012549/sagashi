@@ -5,37 +5,15 @@ import { BsChevronCompactLeft, BsChevronCompactRight } from "react-icons/bs";
 
 import CarouselDots from "./CarouselDots.js";
 
-export default function Carousel({ className }) {
-	const slides = [
-		{
-			id: 1,
-			url: "/mr_1.jpg",
-		},
-		{
-			id: 2,
-			url: "/mr_2.jpg",
-		},
-		{
-			id: 3,
-			url: "/mr_3.jpg",
-		},
-
-		{
-			id: 4,
-			url: "/mr_4.jpg",
-		},
-		{
-			id: 5,
-			url: "/mr_5.jpg",
-		},
-	];
+export default function Carousel({ primary_image, secondary_images, className }) {
+	const slides = [primary_image, ...Object.values(secondary_images)];
 
 	const [direction, setDirection] = useState(1);
 	const carouselRef = useRef();
 	const initialTouchRef = useRef();
 	const endingTouchRef = useRef();
 	const isSwiped = useRef(true);
-	const [currentImage, setCurrentImage] = useState(1);
+	const [currentImage, setCurrentImage] = useState(0);
 	const isTouchActiveRef = useRef(false);
 
 	const prevSlide = () => {
@@ -126,15 +104,15 @@ export default function Carousel({ className }) {
 					ref={carouselRef}
 					onTransitionEnd={onTransitionEnd}
 				>
-					{slides.map((slide) => (
+					{slides.map((slide, index) => (
 						<div
 							className="relative aspect-[4/5] w-screen shrink-0 md:w-full"
-							key={slide.url}
-							id={slide.id}
+							key={index}
+							id={index}
 						>
 							<Image
 								priority
-								src={slide.url}
+								src={slide}
 								fill={true}
 								alt="image"
 								sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

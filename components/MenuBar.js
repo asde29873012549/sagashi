@@ -45,7 +45,6 @@ export default function MenuBar() {
 		endingTouchRef.current = e.touches[0].screenY;
 		const movement = endingTouchRef.current - initialTouchRef.current;
 		menuRef.current.style.transform = `translateY(${movement}px)`;
-		//console.log(movement)
 	};
 
 	const onTouchEnd = () => {

@@ -2,7 +2,7 @@ import * as dotenv from "dotenv";
 import { signOut, useSession } from "next-auth/react";
 import Logo from "./Logo";
 import Link from "next/link";
-import { Fragment } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { LuShoppingCart, LuUser } from "react-icons/lu";
 import MessageIcon from "./MessageIcon";
 import { LuMessageCircle } from "react-icons/lu";
@@ -19,18 +19,92 @@ import { useDispatch } from "react-redux";
 dotenv.config();
 
 const homepage = process.env.NEXT_PUBLIC_SERVER_DOMAIN;
+const NOTIFICATION_SERVER = process.env.NEXT_PUBLIC_NOTIFICATION_SERVER;
 
 export default function Header() {
+	const [notification, setNotification] = useState([]);
+	const [messageActive, setMessageActive] = useState(false);
 	const dispatch = useDispatch();
 	const { data: session } = useSession();
 	const onToggleRegisterForm = () => dispatch(toggleRegisterForm());
+
+	useEffect(() => {
+		const eventSource = new EventSource(`${NOTIFICATION_SERVER}/events`, { withCredentials: true });
+
+		eventSource.onmessage = (event) => {
+			const newNotification = JSON.parse(event.data);
+			console.log(newNotification, "newNotification");
+			setNotification((prev) => [newNotification, ...prev]);
+			setMessageActive(true);
+		};
+	}, []);
+
+	const isUsingMobile = () => {
+		if (typeof window !== "undefined") return window.innerWidth < 768; //&& navigator.maxTouchPoints > 0;
+	};
 
 	const onLogout = () => {
 		signOut({ callbackUrl: homepage });
 	};
 
+	const onMessageIconClick = () => {
+		setMessageActive(false);
+	};
+
 	return (
-		<Fragment>
+		!isUsingMobile() && (
+			<Fragment>
+				<div className="top-0 z-[19] hidden w-full bg-background md:relative md:flex md:h-20 md:items-center md:justify-between md:px-9 md:py-1 md:shadow-none">
+					<MenuBar />
+					<div className="flex w-1/6 justify-between">
+						<Link className="mr-2 inline-block hover:cursor-pointer" href="/sell">
+							SELL
+						</Link>
+						<Link className="inline-block hover:cursor-pointer" href="/shop">
+							SHOP
+						</Link>
+						<div
+							className="inline-block hover:cursor-pointer"
+							onClick={session ? onLogout : onToggleRegisterForm}
+						>
+							{session ? "LOGOUT" : "LOGIN"}
+						</div>
+					</div>
+					<Logo className="absolute m-auto w-[7vw]" />
+					<div className="text-md flex w-1/6 justify-end">
+						<div className="flex w-fit space-x-6">
+							<div className="inline-block" style={{ height: "28px" }}>
+								<Search>
+									<LuSearch className="mx-1 h-7 w-7" />
+								</Search>
+							</div>
+							{session && (
+								<MessageIcon
+									message={notification}
+									messageActive={messageActive}
+									onMessageIconClick={onMessageIconClick}
+								/>
+							)}
+							{session && (
+								<Link href={"/shoppingBag"}>
+									<LuShoppingCart className="h-7 w-7 hover:cursor-pointer" />
+								</Link>
+							)}
+							{session && (
+								<Link className="inline-block hover:cursor-pointer" href="/user">
+									<LuUser className="h-7 w-7" />
+								</Link>
+							)}
+						</div>
+					</div>
+				</div>
+			</Fragment>
+		)
+	);
+}
+
+/*
+<Fragment>
 			<div
 				className="relative top-0 z-[19] flex h-16 w-full items-center justify-between bg-background px-3 py-2 shadow-md sm:px-6 sm:py-4 md:h-20 md:justify-between md:px-9 md:py-1 md:shadow-none"
 				style={{ position: "sticky" }}
@@ -51,7 +125,7 @@ export default function Header() {
 					</div>
 				</div>
 				<Logo className="absolute m-auto w-[20vw] md:w-[7vw]" />
-				{session && <MessageIcon />}
+				{session && <MessageIcon message={notification} />}
 
 				<div className="md:text-md fixed bottom-0 right-0 z-8 flex w-full items-center justify-between bg-background px-5 py-3 md:relative md:flex md:w-1/6 md:justify-end">
 					<div className="flex w-full items-center justify-around md:w-fit md:space-x-6">
@@ -122,5 +196,4 @@ export default function Header() {
 				</div>
 			</div>
 		</Fragment>
-	);
-}
+*/

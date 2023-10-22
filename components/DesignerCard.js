@@ -17,13 +17,13 @@ export default function DesignerCard({ src, className, name, designer_id }) {
 		<div
 			className={`flex h-fit flex-col justify-center rounded-md border pb-4 drop-shadow-lg ${className}`}
 		>
-			<Link href={`/shop/${designer_id}`}>
+			<Link href={`/designers/${designer_id}`}>
 				<div className="relative aspect-[4/5] w-full rounded-md ">
 					<Image src={src} fill={true} alt="pic" />
 				</div>
 			</Link>
 			<div className="flex flex-col items-center justify-center">
-				<Link href={`/shop/${designer_id}`}>
+				<Link href={`/designers/${designer_id}`}>
 					<div className="mb-1 mt-2 text-xl font-bold text-foreground">{name}</div>
 				</Link>
 			</div>

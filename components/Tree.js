@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input";
 
 import debounce from "@/lib/utils";
 
-export default function Tree({ treeData, onChangeFilter, filter }) {
+export default function Tree({ treeData, onChangeFilter, filter, isDesignerSpecific }) {
 	const [searchInput, setSearchInput] = useState("");
 	const [initialDesignerData, setInitialDesignerData] = useState(true);
 	const [openedAccordion, setOpenedAccordion] = useState([]);
@@ -163,9 +163,6 @@ export default function Tree({ treeData, onChangeFilter, filter }) {
 					))}
 				</AccordionContent>
 			</AccordionItem>
-			<AccordionItem value="item-2">
-				<AccordionTrigger>NEW ARRIVALS</AccordionTrigger>
-			</AccordionItem>
 			<AccordionItem value="item-3">
 				<AccordionTrigger>Category</AccordionTrigger>
 				{Object.keys(treeData?.Category ?? []).map((department) => (
@@ -279,36 +276,39 @@ export default function Tree({ treeData, onChangeFilter, filter }) {
 					<AccordionContent className="text-sm">Please select category first</AccordionContent>
 				)}
 			</AccordionItem>
-			<AccordionItem value="item-5">
-				<AccordionTrigger>Designers</AccordionTrigger>
-				<AccordionContent>
-					<Command>
-						<CommandInput
-							placeholder="Search for designers..."
-							value={searchInput}
-							onValueChange={onSearch}
-						/>
-						<CommandList>
-							<CommandEmpty>No results found.</CommandEmpty>
-							{initialDesignerData
-								? treeData?.Designer.map((designer, index) => (
-										<CommandItem
-											key={`${designer}-${index}`}
-											className="cursor-pointer"
-											onSelect={onDesignerSelect}
-										>
-											{designer}
-										</CommandItem>
-								  ))
-								: designerData?.data.map((obj) => (
-										<CommandItem key={obj.name} className="cursor-pointer">
-											{obj.name}
-										</CommandItem>
-								  ))}
-						</CommandList>
-					</Command>
-				</AccordionContent>
-			</AccordionItem>
+			{!isDesignerSpecific && (
+				<AccordionItem value="item-5">
+					<AccordionTrigger>Designers</AccordionTrigger>
+					<AccordionContent>
+						<Command>
+							<CommandInput
+								placeholder="Search for designers..."
+								value={searchInput}
+								onValueChange={onSearch}
+							/>
+							<CommandList>
+								<CommandEmpty>No results found.</CommandEmpty>
+								{initialDesignerData
+									? treeData?.Designer?.map((designer, index) => (
+											<CommandItem
+												key={`${designer}-${index}`}
+												className="cursor-pointer"
+												onSelect={onDesignerSelect}
+											>
+												{designer}
+											</CommandItem>
+									  ))
+									: designerData?.data.map((obj) => (
+											<CommandItem key={obj.name} className="cursor-pointer">
+												{obj.name}
+											</CommandItem>
+									  ))}
+							</CommandList>
+						</Command>
+					</AccordionContent>
+				</AccordionItem>
+			)}
+
 			<AccordionItem value="item-6">
 				<AccordionTrigger>Price</AccordionTrigger>
 				<AccordionContent>
