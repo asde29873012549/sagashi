@@ -88,7 +88,7 @@ export default function Home() {
 			<section className="relative flex w-screen flex-col p-3 md:p-8">
 				<h1 className="mt-10 text-2xl font-bold md:text-3xl">Curation</h1>
 				<p className="mb-6">Seasonal curation to meet the zenith of worlds&apos; fashion trends</p>
-				{curationData.data.map((obj, index) => (
+				{curationData?.data.map((obj, index) => (
 					<div className="relative mb-16 h-[500px] w-full" key={`${obj.theme}-${index}`}>
 						<Image src={obj.image} alt={obj.theme} fill={true} className="object-cover" />
 						<div className="absolute z-3 flex h-full w-full flex-col items-center justify-end px-5 pb-8 text-background md:justify-center">

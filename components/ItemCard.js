@@ -13,7 +13,7 @@ export default function ItemCard({ src, children, timing }) {
 					</Avatar>
 				</div>
 				<div>
-					<p className="ml-1 w-full whitespace-break-spaces px-2">{children}</p>
+					<p className="ml-1 line-clamp-2 w-full whitespace-break-spaces px-2">{children}</p>
 					<div className="ml-1 shrink-0 px-2 text-xs text-info">{getDateDistance(timing)}</div>
 				</div>
 			</AlertDescription>

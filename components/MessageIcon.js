@@ -1,20 +1,22 @@
 import { LuMessageCircle } from "react-icons/lu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import ItemCard from "./ItemCard";
-import { likeListing, gotFollowed, receivedOrder } from "@/lib/msg_template";
-import { useState } from "react";
+import { likeListing, gotFollowed, receivedOrder, uploadListing } from "@/lib/msg_template";
 
 export default function MessageIcon({ message, messageActive, onMessageIconClick }) {
 	const mes_type_helper = (message) => {
 		message.forEach((msg) => {
 			switch (msg.type) {
-				case "like":
+				case "notification.like":
 					msg.content = likeListing(msg.username, msg.listing_name);
 					break;
-				case "follow":
+				case "notification.follow":
 					msg.content = gotFollowed(msg.username);
 					break;
-				case "order":
+				case "notification.uploadListing":
+					msg.content = uploadListing(msg.username, msg.listing_name);
+					break;
+				case "notification.order":
 					msg.content = receivedOrder(msg.username, msg.listing_name);
 					break;
 			}
@@ -39,11 +41,7 @@ export default function MessageIcon({ message, messageActive, onMessageIconClick
 					message.map((msg, index) => {
 						mes_type_helper(message);
 						return (
-							<ItemCard
-								key={`${msg.username}-${index}`}
-								src={"https://github.com/shadcn.png"}
-								timing={msg.timing}
-							>
+							<ItemCard key={`${msg.username}-${index}`} src={msg.image} timing={msg.timing}>
 								{msg.content}
 							</ItemCard>
 						);

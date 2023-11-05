@@ -20,11 +20,17 @@ import { Input } from "@/components/ui/input";
 
 import debounce from "@/lib/utils";
 
-export default function Tree({ treeData, onChangeFilter, filter, isDesignerSpecific }) {
+export default function Tree({
+	treeData,
+	onChangeFilter,
+	filter,
+	isDesigner,
+	isMenswear,
+	isWomenswear,
+}) {
 	const [searchInput, setSearchInput] = useState("");
 	const [initialDesignerData, setInitialDesignerData] = useState(true);
 	const [openedAccordion, setOpenedAccordion] = useState([]);
-
 	const { data: designerData, refetch: fetchDesigners } = useQuery({
 		queryKey: ["designer", { keyword: searchInput }],
 		queryFn: (obj) =>
@@ -143,26 +149,28 @@ export default function Tree({ treeData, onChangeFilter, filter, isDesignerSpeci
 
 	return (
 		<Accordion type="multiple" value={openedAccordion} onValueChange={onOpenAccordion}>
-			<AccordionItem value="item-1">
-				<AccordionTrigger>Department</AccordionTrigger>
-				<AccordionContent className="space-y-3">
-					{treeData?.Department.map((department) => (
-						<div className="flex items-center space-x-2" key={department}>
-							<Checkbox
-								id={department}
-								checked={isChecked("department", department)}
-								onCheckedChange={() => onCheck("department", department)}
-							/>
-							<label
-								htmlFor={department}
-								className="ml-2 text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-							>
-								{department}
-							</label>
-						</div>
-					))}
-				</AccordionContent>
-			</AccordionItem>
+			{!isMenswear && !isWomenswear && (
+				<AccordionItem value="item-1">
+					<AccordionTrigger>Department</AccordionTrigger>
+					<AccordionContent className="space-y-3">
+						{treeData?.Department.map((department) => (
+							<div className="flex items-center space-x-2" key={department}>
+								<Checkbox
+									id={department}
+									checked={isChecked("department", department)}
+									onCheckedChange={() => onCheck("department", department)}
+								/>
+								<label
+									htmlFor={department}
+									className="ml-2 text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+								>
+									{department}
+								</label>
+							</div>
+						))}
+					</AccordionContent>
+				</AccordionItem>
+			)}
 			<AccordionItem value="item-3">
 				<AccordionTrigger>Category</AccordionTrigger>
 				{Object.keys(treeData?.Category ?? []).map((department) => (
@@ -276,7 +284,7 @@ export default function Tree({ treeData, onChangeFilter, filter, isDesignerSpeci
 					<AccordionContent className="text-sm">Please select category first</AccordionContent>
 				)}
 			</AccordionItem>
-			{!isDesignerSpecific && (
+			{!isDesigner && (
 				<AccordionItem value="item-5">
 					<AccordionTrigger>Designers</AccordionTrigger>
 					<AccordionContent>

@@ -11,7 +11,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 
 import LZString from "lz-string";
 
-export default function Shop({ designer, treeFromDesigner }) {
+export default function Shop({ isMenswear, isWomenswear, designer, treeData }) {
 	const { data: OriginTreeData } = useQuery({
 		queryKey: ["tree"],
 		queryFn: () => getTree({ uri: "/tree" }),
@@ -19,13 +19,17 @@ export default function Shop({ designer, treeFromDesigner }) {
 	});
 
 	const [filter, setFilter] = useState({});
-	const [tree, setTree] = useState(OriginTreeData?.data || treeFromDesigner);
+	const [tree, setTree] = useState(OriginTreeData?.data || treeData);
 
 	useEffect(() => {
 		if (designer) {
 			setFilter((prev) => ({ ...prev, designers: [designer] }));
+		} else if (isMenswear) {
+			onChangeFilter({ department: ["Menswear"] });
+		} else if (isWomenswear) {
+			onChangeFilter({ department: ["Womenswear"] });
 		}
-	}, [designer]);
+	}, [designer, isMenswear, isWomenswear]);
 
 	const createQueryStr = (pageParam, restFilter) => {
 		if (!pageParam && Object.keys(restFilter).length === 0) return "";
@@ -51,7 +55,8 @@ export default function Shop({ designer, treeFromDesigner }) {
 			getProducts({
 				uri: `/listing${createQueryStr(pageParam, restFilter.queryKey[1])}`,
 			}),
-		getNextPageParam: (lastPage, pages) => lastPage?.data[lastPage.data.length - 1]?.sort,
+		getNextPageParam: (lastPage, pages) =>
+			lastPage?.data?.result[lastPage.data.result.length - 1]?.sort,
 		refetchOnWindowFocus: false,
 	});
 
@@ -106,11 +111,15 @@ export default function Shop({ designer, treeFromDesigner }) {
 			<h6 className="my-4 p-2 text-sm font-semibold md:px-6">
 				{productData?.pages?.[0]?.data?.total} Listings
 			</h6>
-			<FilterSection filter={filter} setFilter={setFilter} />
-			<div className="p-2 md:flex md:px-6">
-				<div className="no-scrollbar hidden md:mr-10 md:inline-block md:h-[calc(100dvh-132px)] md:w-1/5 md:overflow-y-scroll">
+			{!designer && !isMenswear && !isWomenswear && (
+				<FilterSection filter={filter} setFilter={setFilter} />
+			)}
+			<div className="relative p-2 md:flex md:px-6">
+				<div className="no-scrollbar sticky top-0 hidden md:mr-10 md:inline-block md:h-[calc(100dvh-50px)] md:w-1/5 md:overflow-y-scroll">
 					<Tree
-						isDesignerSpecific={designer ? true : false}
+						isDesigner={designer ? true : false}
+						isMenswear={isMenswear}
+						isWomenswear={isWomenswear}
 						treeData={tree}
 						onChangeFilter={onChangeFilter}
 						filter={filter}
@@ -119,7 +128,7 @@ export default function Shop({ designer, treeFromDesigner }) {
 				<div className="relative grid grid-cols-2 gap-2 md:w-4/5 md:grid-cols-4">
 					{(productData?.pages ?? []).map((page) => {
 						const pageData = page.data.result || [];
-						if (pageData.length === 0)
+						if (productData.pages[0].data.result.length === 0)
 							return (
 								<div key={"noresultsfound"} className="absolute">
 									<p className="text-xl font-semibold">Sorry, no results found.</p>
