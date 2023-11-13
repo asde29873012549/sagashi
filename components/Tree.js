@@ -301,7 +301,7 @@ export default function Tree({
 											<CommandItem
 												key={`${designer}-${index}`}
 												className="cursor-pointer"
-												onSelect={onDesignerSelect}
+												onSelect={() => onDesignerSelect(designer)}
 											>
 												{designer}
 											</CommandItem>

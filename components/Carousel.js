@@ -1,7 +1,7 @@
 import { Fragment, useState, useRef } from "react";
 
 import Image from "next/image";
-import { BsChevronCompactLeft, BsChevronCompactRight } from "react-icons/bs";
+import { ChevronRight, ChevronLeft } from "lucide-react";
 
 import CarouselDots from "./CarouselDots.js";
 
@@ -125,11 +125,11 @@ export default function Carousel({ primary_image, secondary_images, className })
 				</div>
 				{/* Left Arrow */}
 				<div className="absolute left-5 top-[50%] -translate-x-0 translate-y-[-50%] cursor-pointer rounded-full bg-black/20 p-2 text-2xl text-white md:hidden">
-					<BsChevronCompactLeft onClick={prevSlide} size={30} />
+					<ChevronLeft onClick={prevSlide} size={30} />
 				</div>
 				{/* Right Arrow */}
 				<div className="absolute right-5 top-[50%] -translate-x-0 translate-y-[-50%] cursor-pointer rounded-full bg-black/20 p-2 text-2xl text-white md:hidden">
-					<BsChevronCompactRight onClick={nextSlide} size={30} />
+					<ChevronRight onClick={nextSlide} size={30} />
 				</div>
 			</div>
 			<CarouselDots currentImage={currentImage} slides={slides} />

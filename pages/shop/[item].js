@@ -73,7 +73,7 @@ export default function ListingItem({ dehydratedState }) {
 					secondary_images={secondaryImages}
 				/>
 				<div className="flex flex-col px-3 md:absolute md:w-full md:flex-row md:justify-between">
-					<div className="items-between flex flex-col justify-center md:w-1/3">
+					<div className="items-between flex flex-col justify-center md:w-1/4">
 						<div className="text-xl font-semibold">{productData.designer}</div>
 						<div className="mb-6 text-base">{productData.name}</div>
 						<div className="flex">

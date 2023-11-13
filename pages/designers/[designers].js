@@ -7,7 +7,7 @@ import Shop from "../shop/index";
 import { dehydrate, QueryClient, useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import getSingleDesigner from "@/lib/queries/fetchQuery";
 import getRelatedDesigner from "@/lib/queries/fetchQuery";
-import { BsChevronCompactLeft, BsChevronCompactRight } from "react-icons/bs";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import getTree from "@/lib/queries/fetchQuery";
 
 import { useRouter } from "next/router";
@@ -98,11 +98,11 @@ export default function SingleDesignerPage() {
 				<section className="no-scrollbar relative flex overflow-scroll">
 					{/* Left Arrow */}
 					<div className="left-1 top-[50%] z-2 hidden -translate-x-0 translate-y-[-50%] cursor-pointer rounded-full bg-black/20 p-2 text-2xl text-white md:absolute md:left-5">
-						<BsChevronCompactLeft size={30} />
+						<ChevronLeft size={30} />
 					</div>
 					{/* Right Arrow */}
 					<div className="right-1 top-[50%] z-2 hidden -translate-x-0 translate-y-[-50%] cursor-pointer rounded-full bg-black/20 p-2 text-2xl text-white md:absolute  md:right-5">
-						<BsChevronCompactRight size={30} />
+						<ChevronRight size={30} />
 					</div>
 					{relatedDesignerData?.data.map((obj, index) => (
 						<DesignerCard
@@ -115,7 +115,7 @@ export default function SingleDesignerPage() {
 					))}
 				</section>
 				<section className="mt-16 md:mt-28">
-					<Shop designer={designerData?.data[0].name} treeFromDesigner={OriginTreeData?.data} />
+					<Shop designer={designerData?.data[0].name} treeData={OriginTreeData?.data} />
 				</section>
 			</section>
 		</main>

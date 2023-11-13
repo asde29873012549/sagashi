@@ -3,15 +3,15 @@ import { signOut, useSession } from "next-auth/react";
 import Logo from "./Logo";
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
-import { LuShoppingCart, LuUser } from "react-icons/lu";
+import { ShoppingCart, User, Search as SearchIcon } from "lucide-react";
 import MessageIcon from "./MessageIcon";
-import { LuMessageCircle } from "react-icons/lu";
 import MenuBar from "./MenuBar";
-import { LuSearch } from "react-icons/lu";
 import Search from "./Search";
 
 import { toggleRegisterForm } from "../redux/userSlice";
 import { useDispatch } from "react-redux";
+import { useQuery } from "@tanstack/react-query";
+import getNotification from "@/lib/queries/fetchQuery";
 
 dotenv.config();
 
@@ -22,10 +22,23 @@ export default function Header() {
 	const [notification, setNotification] = useState([]);
 	const [messageActive, setMessageActive] = useState(false);
 	const dispatch = useDispatch();
-	const { data: session } = useSession();
+	const { data: session, status } = useSession();
 	const onToggleRegisterForm = () => dispatch(toggleRegisterForm());
+	const [message, setMessage] = useState([]);
 
 	const user = session?.user?.username ?? "";
+
+	const { data: notificationData, refetch } = useQuery({
+		queryKey: ["notification"],
+		queryFn: () =>
+			getNotification({
+				uri: "/notification",
+			}),
+		refetchOnWindowFocus: false,
+		onSuccess: (data) => {
+			setMessage((prev) => (data?.data ? [...data.data, ...prev] : [...prev]));
+		},
+	});
 
 	useEffect(() => {
 		if (user) {
@@ -35,11 +48,14 @@ export default function Header() {
 
 			eventSource.onmessage = (event) => {
 				const newNotification = JSON.parse(event.data);
+				setMessage((prev) => [newNotification, ...prev]);
 				setNotification((prev) => [newNotification, ...prev]);
 				setMessageActive(true);
 			};
+
+			refetch();
 		}
-	}, [user]);
+	}, [user, refetch]);
 
 	const isUsingMobile = () => {
 		if (typeof window !== "undefined") return window.innerWidth < 768; //&& navigator.maxTouchPoints > 0;
@@ -59,14 +75,16 @@ export default function Header() {
 				<div className="top-0 z-[19] hidden w-full bg-background md:relative md:flex md:h-20 md:items-center md:justify-between md:px-9 md:py-1 md:shadow-none">
 					<MenuBar />
 					<div className="flex w-1/6 justify-between">
-						<Link className="mr-2 inline-block hover:cursor-pointer" href="/sell">
+						<Link className="mr-2 inline-block w-1/4 hover:cursor-pointer" href="/sell">
 							SELL
 						</Link>
-						<Link className="inline-block hover:cursor-pointer" href="/shop">
+						<Link className="inline-block w-1/4 hover:cursor-pointer" href="/shop">
 							SHOP
 						</Link>
 						<div
-							className="inline-block hover:cursor-pointer"
+							className={`${
+								status === "loading" ? "invisible opacity-0" : "inline-block"
+							} w-1/3 hover:cursor-pointer`}
 							onClick={session ? onLogout : onToggleRegisterForm}
 						>
 							{session ? "LOGOUT" : "LOGIN"}
@@ -77,24 +95,26 @@ export default function Header() {
 						<div className="flex w-fit space-x-6">
 							<div className="inline-block" style={{ height: "28px" }}>
 								<Search>
-									<LuSearch className="mx-1 h-7 w-7" />
+									<SearchIcon className="mx-1 h-7 w-7" />
 								</Search>
 							</div>
 							{session && (
 								<MessageIcon
-									message={notification}
+									onlineNotification={notification}
 									messageActive={messageActive}
 									onMessageIconClick={onMessageIconClick}
+									message={message}
+									offlineNotification={notificationData?.data ?? []}
 								/>
 							)}
 							{session && (
 								<Link href={"/shoppingBag"}>
-									<LuShoppingCart className="h-7 w-7 hover:cursor-pointer" />
+									<ShoppingCart className="h-7 w-7 hover:cursor-pointer" />
 								</Link>
 							)}
 							{session && (
 								<Link className="inline-block hover:cursor-pointer" href="/user">
-									<LuUser className="h-7 w-7" />
+									<User className="h-7 w-7" />
 								</Link>
 							)}
 						</div>
@@ -104,3 +124,15 @@ export default function Header() {
 		)
 	);
 }
+
+/*
+<Popover>
+								<PopoverTrigger className="inline-block hover:cursor-pointer">
+									<User className="h-7 w-7" />
+								</PopoverTrigger>
+								<PopoverContent className="w-20 h-fit box-border">
+									<div className="p-2 hover:cursor-pointer text-sm font-semibold text-foreground hover:bg-gray-100">Profile</div>
+									<div className="p-2 hover:cursor-pointer text-sm font-semibold text-foreground hover:bg-gray-100">Edit</div>
+								</PopoverContent>
+							  </Popover>
+*/

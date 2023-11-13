@@ -3,10 +3,9 @@ import { signOut, useSession } from "next-auth/react";
 import Logo from "./Logo";
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
-import { LuShoppingCart, LuUser } from "react-icons/lu";
+import { ShoppingCart, User, Search as SearchIcon } from "lucide-react";
 import MessageIcon from "./MessageIcon";
 import MenuBar from "./MenuBar";
-import { LuSearch } from "react-icons/lu";
 import Search from "./Search";
 
 import { toggleRegisterForm } from "../redux/userSlice";
@@ -63,17 +62,17 @@ export default function MobileHeader() {
 							</div>
 							<div className="inline-block hover:cursor-pointer" style={{ height: "28px" }}>
 								<Search>
-									<LuSearch className="mx-1 h-7 w-7" />
+									<SearchIcon className="mx-1 h-7 w-7" />
 								</Search>
 							</div>
 							{session && (
 								<Link href={"/shoppingBag"}>
-									<LuShoppingCart className="h-7 w-7 hover:cursor-pointer" />
+									<ShoppingCart className="h-7 w-7 hover:cursor-pointer" />
 								</Link>
 							)}
 							{session && (
 								<Link className="inline-block hover:cursor-pointer" href="/user/mobile">
-									<LuUser className="h-7 w-7" />
+									<User className="h-7 w-7" />
 								</Link>
 							)}
 						</div>

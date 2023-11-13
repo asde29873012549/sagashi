@@ -22,8 +22,9 @@ export default function Home() {
 	});
 
 	const { data: newArrivalsProductData } = useQuery({
-		queryKey: ["products", "newArraivals"],
-		queryFn: () => getNewArrivalsProducts({ uri: "/listing?newArrivals=true" }),
+		queryKey: ["products", "newArrivals"],
+		queryFn: () =>
+			getNewArrivalsProducts({ uri: "/listing", method: "POST", body: { newArrivals: true } }),
 	});
 
 	return (

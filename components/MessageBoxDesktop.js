@@ -2,7 +2,7 @@ import * as dotenv from "dotenv";
 import Message from "./Message";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
-import { RxCross2 } from "react-icons/rx";
+import { X as Xicon } from "lucide-react";
 import { motion } from "framer-motion";
 import socketInitializer from "@/lib/socketio/socketInitializer";
 import socket from "@/lib/socketio/client";
@@ -74,7 +74,7 @@ export default function MessageBoxDesktop({ isOpen, onCloseMessageBox }) {
 						<div className="ml-2 w-9/12 overflow-hidden text-ellipsis whitespace-nowrap text-sm font-semibold">
 							Yellow Le Bob Artichaut Bucket Hat Bucket Hat Bucket Hat
 						</div>
-						<RxCross2 className="h-5 w-5 hover:cursor-pointer " onClick={onCloseMessageBox} />
+						<Xicon className="h-5 w-5 hover:cursor-pointer " onClick={onCloseMessageBox} />
 					</div>
 				</header>
 				<main

@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Separator } from "./ui/separator";
-import { PiHeart, PiHeartFill } from "react-icons/pi";
+import { Heart } from "lucide-react";
 import { getDateDistance } from "@/lib/utils";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import createLike from "@/lib/queries/fetchQuery";
@@ -51,8 +51,12 @@ export default function ListingCard({ src, prod_id, product_data, lastProductEle
 				method: "POST",
 				body: {
 					receiver_name: product_data?.seller_name,
-					notification_type: "1",
+					type: "notification.like",
 					link: `/shop/${prod_id}`,
+					image: src,
+					content: {
+						listing_name: product_data?.name,
+					},
 				},
 			}),
 	});
@@ -93,19 +97,18 @@ export default function ListingCard({ src, prod_id, product_data, lastProductEle
 	}, [likedListing, user]);
 
 	const onLike = async () => {
-		/*
-		setLiked((prev) => {
-			const likeOrUnLike = prev.includes(prod_id) ? prev.filter((id) => id !== prod_id) : [...prev, prod_id]
-			//console.log(likeOrUnLike)
-			localStorage.setItem("likedListing", JSON.stringify(likeOrUnLike));
-			return likeOrUnLike;
-		});
-		*/
+		let isPreviouslyLiked = false;
 
+		// modify the liked state
 		setLiked((prev) =>
 			prev.includes(prod_id) ? prev.filter((id) => id !== prod_id) : [...prev, prod_id],
 		);
 		const currLikedListing = safeParse(localStorage.getItem("likedListing"));
+
+		// check if a listing is previously liked by getting like data from local storage
+		if (currLikedListing.includes(prod_id)) isPreviouslyLiked = true;
+
+		// set local storage data according to the current listing has been liked or not
 		localStorage.setItem(
 			"likedListing",
 			JSON.stringify(
@@ -116,7 +119,12 @@ export default function ListingCard({ src, prod_id, product_data, lastProductEle
 		);
 
 		try {
-			await Promise.allSettled([likeMutate(), notificationMutate()]);
+			// only call notification api if the listing is not previously liked
+			if (isPreviouslyLiked) {
+				await Promise.allSettled([likeMutate()]);
+			} else {
+				await Promise.allSettled([likeMutate(), notificationMutate()]);
+			}
 		} catch (err) {
 			console.log(err);
 		}
@@ -156,11 +164,31 @@ export default function ListingCard({ src, prod_id, product_data, lastProductEle
 			<div className="flex items-center justify-between text-sm text-foreground">
 				<div className="before:content-['$']">{product_data.price}</div>
 				{liked.includes(prod_id) ? (
-					<PiHeartFill onClick={onLike} className="h-5 w-5 fill-red-700 hover:cursor-pointer" />
+					<FilledHeart onClick={onLike} className="h-5 w-5 fill-red-700 hover:cursor-pointer" />
 				) : (
-					<PiHeart onClick={onLike} className="h-5 w-5 hover:cursor-pointer" />
+					<Heart onClick={onLike} className="h-5 w-5 hover:cursor-pointer" />
 				)}
 			</div>
 		</div>
+	);
+}
+
+function FilledHeart({ onClick }) {
+	return (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			width="20"
+			height="20"
+			viewBox="0 0 24 24"
+			fill="#B91C1C"
+			stroke="#B91C1C"
+			strokeWidth="1"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+			className="lucide lucide-heart hover:cursor-pointer"
+			onClick={onClick}
+		>
+			<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+		</svg>
 	);
 }

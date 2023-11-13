@@ -12,11 +12,15 @@ import CountryInfo from "../../components/User/CountryInfo";
 import About from "../../components/User/About";
 import SheetWrapper from "@/components/User/Sheets/SheetWrapper";
 
+import { useSession } from "next-auth/react";
 import { useState } from "react";
+import Link from "next/link";
 
 export default function User() {
 	const [displayFeature, setDisplayFeature] = useState(<ProfileInfo />);
 	const [feature, setFeature] = useState("My Profile");
+	const { data: session } = useSession();
+	const user = session?.user?.username ?? "";
 
 	const onProfileClick = () => {
 		setDisplayFeature(<ProfileInfo />);
@@ -54,13 +58,13 @@ export default function User() {
 
 	return (
 		<div className="w-screen px-20 py-5">
-			<header className="flex justify-between pb-8">
+			<header className="flex items-center justify-between pb-8">
 				<div className="flex items-center space-x-4 ">
 					<Avatar className="mr-8 h-40 w-40 text-base">
 						<AvatarImage src="https://github.com/shadcn.png" />
 						<AvatarFallback>CN</AvatarFallback>
 					</Avatar>
-					<div className="text-xl font-semibold">Noah</div>
+					<div className="text-xl font-semibold">{user}</div>
 					<div className="h-14 ">
 						<Separator orientation="vertical" />
 					</div>
@@ -71,13 +75,9 @@ export default function User() {
 					<div>0 Followers</div>
 				</div>
 
-				<SheetWrapper
-					trigger={<div className="text-base underline">Change Password</div>}
-					feature="Change Password"
-					sheet="ChangePassword"
-					side="right"
-					className="w-5/12"
-				/>
+				<Link href={`/user/public/${user}`}>
+					<Button className="bg-sky-900 hover:bg-sky-950">View Public Profile</Button>
+				</Link>
 			</header>
 			<Separator />
 			<div className="mt-5  flex">
@@ -118,6 +118,21 @@ export default function User() {
 						<p>Privacy Policy</p>
 						<hr className="h-px w-0 border-foreground transition-all duration-300 ease-in-out group-hover:w-full" />
 					</Button>
+					<SheetWrapper
+						trigger={
+							<div
+								onClick={onAboutClick}
+								className="group flex inline-flex w-fit flex-col items-center justify-center px-4 py-2 text-sm font-medium text-primary"
+							>
+								<p>Change Password</p>
+								<hr className="h-px w-0 border-foreground transition-all duration-300 ease-in-out group-hover:w-full" />
+							</div>
+						}
+						feature="Change Password"
+						sheet="ChangePassword"
+						side="right"
+						className="w-5/12"
+					/>
 				</div>
 				<div className="flex w-4/5 flex-col space-y-4">
 					<div className="text-2xl font-bold tracking-wider">{feature}</div>

@@ -9,7 +9,7 @@ import ComboBox from "../../components/ui/comboBox";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { GiCancel } from "react-icons/gi";
+import { XCircle } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import ImageUploadCard from "../../components/ui/image-upload-card";
 import { useDispatch } from "react-redux";
@@ -393,7 +393,7 @@ export default function Sell() {
 							onClick={() => onCancelTag(tag.id)}
 						>
 							#{tag.value}
-							<GiCancel className="ml-1" />
+							<XCircle className="ml-1" />
 						</Button>
 					))}
 				</div>

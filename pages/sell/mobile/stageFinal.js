@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import ComboBox from "@/components/ui/comboBox";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { GiCancel } from "react-icons/gi";
+import { XCircle } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
 import { useRef, Fragment } from "react";
@@ -173,7 +173,7 @@ export default function MobileLastInfo() {
 								onClick={() => onCancelTag(tag.id)}
 							>
 								#{tag.value}
-								<GiCancel className="ml-1" />
+								<XCircle className="ml-1" />
 							</Button>
 						))}
 					</div>

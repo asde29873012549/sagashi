@@ -1,4 +1,4 @@
-import { GiCancel } from "react-icons/gi";
+import { XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
@@ -34,7 +34,7 @@ export default function OderItem() {
 					</div>
 				</div>
 				<div className="flex w-1/12 flex-col items-end justify-between text-sm">
-					<GiCancel />
+					<XCircle />
 					<div className="flex flex-col items-end">
 						<div className="ml-1 line-through before:content-['$']">48000</div>
 						<div className="flex items-center">

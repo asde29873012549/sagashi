@@ -33,21 +33,21 @@ export default function Footer() {
 				<h1 className="mb-2 space-y-2 text-lg font-bold md:text-xl">Customer Service</h1>
 				<Button
 					variant="ghost"
-					className="h-fit w-fit p-0 py-1 hover:bg-transparent hover:underline focus:bg-transparent"
+					className="h-fit w-fit p-0 py-1 font-normal hover:bg-transparent hover:underline focus:bg-transparent"
 					onClick={onInfoClick}
 				>
 					ORDER & DELIVERY
 				</Button>
 				<Button
 					variant="ghost"
-					className="h-fit w-fit p-0 py-1 hover:bg-transparent hover:underline focus:bg-transparent"
+					className="h-fit w-fit p-0 py-1 font-normal hover:bg-transparent hover:underline focus:bg-transparent"
 					onClick={onInfoClick}
 				>
 					RETURN & REFUND
 				</Button>
 				<Button
 					variant="ghost"
-					className="h-fit w-fit p-0 py-1 hover:bg-transparent hover:underline focus:bg-transparent"
+					className="h-fit w-fit p-0 py-1 font-normal hover:bg-transparent hover:underline focus:bg-transparent"
 					onClick={onInfoClick}
 				>
 					CONTACT US
@@ -58,28 +58,28 @@ export default function Footer() {
 				<h1 className="mb-2 space-y-2 text-lg font-bold md:text-xl">Information</h1>
 				<Button
 					variant="ghost"
-					className="h-fit w-fit p-0 py-1 hover:bg-transparent hover:underline focus:bg-transparent"
+					className="h-fit w-fit p-0 py-1 font-normal hover:bg-transparent hover:underline focus:bg-transparent"
 					onClick={onInfoClick}
 				>
 					ABOUT
 				</Button>
 				<Button
 					variant="ghost"
-					className="h-fit w-fit p-0 py-1 hover:bg-transparent hover:underline focus:bg-transparent"
+					className="h-fit w-fit p-0 py-1 font-normal hover:bg-transparent hover:underline focus:bg-transparent"
 					onClick={onInfoClick}
 				>
 					FAQs
 				</Button>
 				<Button
 					variant="ghost"
-					className="h-fit w-fit p-0 py-1 hover:bg-transparent hover:underline focus:bg-transparent"
+					className="h-fit w-fit p-0 py-1 font-normal hover:bg-transparent hover:underline focus:bg-transparent"
 					onClick={onInfoClick}
 				>
 					TERMS & CONDITIONS
 				</Button>
 				<Button
 					variant="ghost"
-					className="h-fit w-fit p-0 py-1 hover:bg-transparent hover:underline focus:bg-transparent"
+					className="h-fit w-fit p-0 py-1 font-normal hover:bg-transparent hover:underline focus:bg-transparent"
 					onClick={onInfoClick}
 				>
 					PRIVACY POLICY
