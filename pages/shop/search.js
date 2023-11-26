@@ -7,16 +7,18 @@ import reformTree from "@/lib/tree/reformTree";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import FilterSection from "@/components/FilterSection";
-import { useState, useRef, useCallback, useEffect } from "react";
-
-import LZString from "lz-string";
+import { useState, useRef, useCallback } from "react";
+import { useRouter } from "next/router";
 
 export default function ShopSearch({ treeData }) {
+	const router = useRouter();
 	const { data: OriginTreeData } = useQuery({
 		queryKey: ["tree"],
 		queryFn: () => getTree({ uri: "/tree" }),
 		refetchOnWindowFocus: false,
 	});
+
+	const keyword = router.query.keyword;
 
 	const [filter, setFilter] = useState({});
 	const [tree, setTree] = useState(OriginTreeData?.data || treeData);
@@ -29,27 +31,26 @@ export default function ShopSearch({ treeData }) {
 		if (pageParam) {
 			filts.cursor = pageParam;
 		}
-		//const restStr = JSON.stringify(filts);
 
-		return filts; //"?filter=" + LZString.compressToEncodedURIComponent(restStr);
+		return filts;
 	};
 
 	const {
-		data: productData,
+		data: searchResult,
 		fetchNextPage,
 		hasNextPage,
 		isFetchingNextPage,
 	} = useInfiniteQuery({
-		queryKey: ["products", filter],
+		queryKey: ["products", filter, keyword],
 		queryFn: ({ pageParam = "", ...restFilter }) =>
 			getProducts({
-				uri: "/search",
+				uri: `/search?keyword=${keyword}`,
 				method: "POST",
 				body: createBody(pageParam, restFilter.queryKey[1]),
 			}),
 		getNextPageParam: (lastPage, pages) =>
 			// check if there is a next page by checking the sort property of elastic search result
-			lastPage?.data?.result[lastPage.data.result.length - 1]?.sort,
+			lastPage?.data?.result[lastPage.data.result?.length - 1]?.sort,
 		refetchOnWindowFocus: false,
 	});
 
@@ -76,7 +77,6 @@ export default function ShopSearch({ treeData }) {
 		setFilter(filter);
 		const department = filter.department ? [...filter.department] : null;
 		const category = filter.subCategory ? {} : null;
-		//const subCategory = filter.subCategory ? [...filter.subCategory] : null;
 
 		if (filter.subCategory?.some((obj) => obj.dept === "Menswear")) {
 			category.Menswear = [
@@ -102,7 +102,7 @@ export default function ShopSearch({ treeData }) {
 	return (
 		<>
 			<h6 className="my-4 p-2 text-sm font-semibold md:px-6">
-				{productData?.pages?.[0]?.data?.total} Listings
+				{searchResult?.pages?.[0]?.data?.total} Listings
 			</h6>
 			<FilterSection filter={filter} setFilter={setFilter} />
 			<div className="relative p-2 md:flex md:px-6">
@@ -110,9 +110,9 @@ export default function ShopSearch({ treeData }) {
 					<Tree treeData={tree} onChangeFilter={onChangeFilter} filter={filter} />
 				</div>
 				<div className="relative grid grid-cols-2 gap-2 md:w-4/5 md:grid-cols-4">
-					{(productData?.pages ?? []).map((page) => {
+					{(searchResult?.pages ?? []).map((page) => {
 						const pageData = page.data.result || [];
-						if (productData.pages[0].data.result.length === 0)
+						if (searchResult.pages[0].data.result.length === 0)
 							return (
 								<div key={"noresultsfound"} className="absolute">
 									<p className="text-xl font-semibold">Sorry, no results found.</p>
@@ -129,7 +129,7 @@ export default function ShopSearch({ treeData }) {
 								product_data={obj}
 								className="w-full"
 								lastProductElement={
-									productData?.pages?.[0]?.data?.result.length === index + 1
+									searchResult?.pages?.[0]?.data?.result.length === index + 1
 										? lastProductElement
 										: null
 								}
@@ -155,17 +155,13 @@ export default function ShopSearch({ treeData }) {
 	);
 }
 
-export async function getStaticProps() {
+export async function getServerSideProps({ query }) {
 	const queryClient = new QueryClient();
+	const keyword = query.keyword;
 
 	await queryClient.prefetchQuery({
 		queryKey: ["tree"],
 		queryFn: () => getTree({ uri: "/tree", sever: true }),
-	});
-
-	await queryClient.prefetchQuery({
-		queryKey: ["products", {}],
-		queryFn: () => getProducts({ uri: "/listing", sever: true }),
 	});
 
 	return {

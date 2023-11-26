@@ -3,13 +3,14 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import MyItem from "./MyItemSheet";
 import MyProfile from "./EditProfileSheet";
-import MyAddress from "./EditAddressSheet";
+import MyAddress from "./AddAddressSheet";
 import MyLanguage from "./EditLanguageSheet";
 import MyCountry from "./EditCountrySheet";
 import ContactUs from "./ContactUsForm";
 import ChangePassword from "./ChangePasswordSheet";
 
 export default function SheetWrapper({
+	user,
 	trigger,
 	feature,
 	sheet,
@@ -18,17 +19,19 @@ export default function SheetWrapper({
 }) {
 	const [open, setOpen] = useState(false);
 
-	const onCancel = () => {
-		setOpen(false);
+	const featureActionMap = {
+		"My Profile": `/user/${user}/info`,
+		"My Address": `/user/${user}/shippingAddress`,
+		"My Country": `/user/${user}/info`,
 	};
 
 	const sheets = {
-		MyItem: <MyItem />,
-		MyProfile: <MyProfile />,
-		MyAddress: <MyAddress />,
-		MyLanguage: <MyLanguage />,
-		MyCountry: <MyCountry />,
-		ContactUs: <ContactUs setOpen={setOpen} />,
+		MyItem: <MyItem setOpen={setOpen} uri={featureActionMap[feature]} />,
+		MyProfile: <MyProfile setOpen={setOpen} uri={featureActionMap[feature]} />,
+		MyAddress: <MyAddress setOpen={setOpen} uri={featureActionMap[feature]} user={user} />,
+		MyLanguage: <MyLanguage setOpen={setOpen} uri={featureActionMap[feature]} />,
+		MyCountry: <MyCountry setOpen={setOpen} uri={featureActionMap[feature]} />,
+		ContactUs: <ContactUs setOpen={setOpen} uri={featureActionMap[feature]} />,
 		ChangePassword: <ChangePassword />,
 	};
 
@@ -39,14 +42,6 @@ export default function SheetWrapper({
 				<SheetHeader>
 					<SheetTitle>{feature}</SheetTitle>
 					{sheets[sheet]}
-					{sheet !== "MyItem" && sheet !== "ContactUs" && (
-						<div className="absolute bottom-0 right-0 w-full px-6">
-							<Button className="mb-4 w-full">SAVE</Button>
-							<Button variant="destructive" className="mb-4 w-full" onClick={onCancel}>
-								CANCEL
-							</Button>
-						</div>
-					)}
 				</SheetHeader>
 			</SheetContent>
 		</Sheet>

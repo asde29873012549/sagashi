@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import ComboBox from "@/components/ui/comboBox";
+import DesignerComboBox from "@/components/DesignerComboBox";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { XCircle } from "lucide-react";
@@ -137,7 +137,7 @@ export default function MobileLastInfo() {
 			<main className="relative h-full p-4">
 				<SaveDraftBtn className="h-fit w-fit p-0 text-sky-900 hover:underline" tags={tags} />
 				<div className="font-semibold">Designers</div>
-				<ComboBox
+				<DesignerComboBox
 					ref={childStateRef}
 					data={designerData?.pages ?? []}
 					fetchNextPage={fetchNextPage}

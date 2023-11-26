@@ -5,7 +5,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import ComboBox from "../../components/ui/comboBox";
+import DesignerComboBox from "../../components/DesignerComboBox";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -321,7 +321,7 @@ export default function Sell() {
 					</SelectContent>
 				</Select>
 				<div className="col-span-1 mt-8 text-3xl font-semibold">Designers</div>
-				<ComboBox
+				<DesignerComboBox
 					ref={childStateRef}
 					data={designerData?.pages ?? []}
 					fetchNextPage={fetchNextPage}

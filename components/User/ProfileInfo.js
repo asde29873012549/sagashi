@@ -1,18 +1,22 @@
-export default function ProfileInfo({ sheet = "" }) {
+export default function ProfileInfo({ sheet = "", userData }) {
 	return (
 		<div className="flex items-center justify-between">
-			<div className="flex w-5/6 items-center justify-between md:w-2/5">
-				<div className="w-fit">
-					<div>NAME</div>
-					<div>EMAIL</div>
-					<div>DATE OF BIRTH</div>
-					<div>GENDER</div>
+			<div className="flex w-5/6 flex-col md:w-2/5">
+				<div className="flex justify-between">
+					<div className="w-fit">NAME</div>
+					<div className="w-fit text-info">{userData.data.fullname}</div>
 				</div>
-				<div className="w-fit text-info">
-					<div>Noah</div>
-					<div className="truncate">12345@gmail.com</div>
-					<div>1997/05/31</div>
-					<div>MALE</div>
+				<div className="flex justify-between">
+					<div className="w-fit">EMAIL</div>
+					<div className="w-fit text-info">{userData.data.email}</div>
+				</div>
+				<div className="flex justify-between">
+					<div className="w-fit">DATE OF BIRTH</div>
+					<div className="w-fit text-info">{userData.data.birth_date}</div>
+				</div>
+				<div className="flex justify-between">
+					<div className="w-fit">GENDER</div>
+					<div className="w-fit text-info">{userData.data.gender}</div>
 				</div>
 			</div>
 			{sheet}

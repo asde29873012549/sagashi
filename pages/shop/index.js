@@ -7,9 +7,7 @@ import reformTree from "@/lib/tree/reformTree";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import FilterSection from "@/components/FilterSection";
-import { useState, useRef, useCallback, useEffect } from "react";
-
-import LZString from "lz-string";
+import { useState, useRef, useCallback } from "react";
 
 export default function Shop({ isMenswear, isWomenswear, designer, user, treeData }) {
 	const { data: OriginTreeData } = useQuery({
@@ -18,31 +16,30 @@ export default function Shop({ isMenswear, isWomenswear, designer, user, treeDat
 		refetchOnWindowFocus: false,
 	});
 
-	const [filter, setFilter] = useState({});
-	const [tree, setTree] = useState(OriginTreeData?.data || treeData);
-
-	useEffect(() => {
-		if (designer) {
-			setFilter((prev) => ({ ...prev, designers: [designer] }));
-		} else if (isMenswear) {
-			onChangeFilter({ department: ["Menswear"] });
+	const initialFilterState = () => {
+		if (isMenswear) {
+			return { department: ["Menswear"] };
 		} else if (isWomenswear) {
-			onChangeFilter({ department: ["Womenswear"] });
+			return { department: ["Womenswear"] };
+		} else if (designer) {
+			return { designers: [designer] };
+		} else {
+			return {};
 		}
-	}, [designer, isMenswear, isWomenswear]);
-
-	const createQueryStr = (pageParam, restFilter) => {
-		if (!pageParam && Object.keys(restFilter).length === 0) return "";
-
-		const filts = { ...restFilter };
-
-		if (pageParam) {
-			filts.cursor = pageParam;
-		}
-		const restStr = JSON.stringify(filts);
-
-		return "?filter=" + LZString.compressToEncodedURIComponent(restStr);
 	};
+
+	const initialTreeState = () => {
+		if (isMenswear) {
+			return reformTree(OriginTreeData?.data, { department: ["Menswear"] });
+		} else if (isWomenswear) {
+			return reformTree(OriginTreeData?.data, { department: ["Womenswear"] });
+		} else {
+			return OriginTreeData?.data || treeData;
+		}
+	};
+
+	const [filter, setFilter] = useState(initialFilterState());
+	const [tree, setTree] = useState(initialTreeState());
 
 	const createBody = (pageParam, restFilter) => {
 		if (!pageParam && Object.keys(restFilter).length === 0) return {};
@@ -52,9 +49,8 @@ export default function Shop({ isMenswear, isWomenswear, designer, user, treeDat
 		if (pageParam) {
 			filts.cursor = pageParam;
 		}
-		//const restStr = JSON.stringify(filts);
 
-		return filts; //"?filter=" + LZString.compressToEncodedURIComponent(restStr);
+		return filts;
 	};
 
 	const {

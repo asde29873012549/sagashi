@@ -11,19 +11,28 @@ import LanguageInfo from "../../components/User/LanguageInfo";
 import CountryInfo from "../../components/User/CountryInfo";
 import About from "../../components/User/About";
 import SheetWrapper from "@/components/User/Sheets/SheetWrapper";
+import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
+import getUser from "@/lib/queries/fetchQuery";
+import { getToken } from "next-auth/jwt";
+import generalFetch from "@/lib/queries/fetchQuery";
 
-import { useSession } from "next-auth/react";
 import { useState } from "react";
 import Link from "next/link";
 
-export default function User() {
-	const [displayFeature, setDisplayFeature] = useState(<ProfileInfo />);
+const JWT_TOKEN_SECRET = process.env.JWT_TOKEN_SECRET;
+
+export default function User({ user }) {
+	const { data: userData } = useQuery({
+		queryKey: ["userData"],
+		queryFn: () => getUser({ uri: `/user/${user}/info` }),
+		refetchOnWindowFocus: false,
+	});
+
+	const [displayFeature, setDisplayFeature] = useState(<ProfileInfo userData={userData} />);
 	const [feature, setFeature] = useState("My Profile");
-	const { data: session } = useSession();
-	const user = session?.user?.username ?? "";
 
 	const onProfileClick = () => {
-		setDisplayFeature(<ProfileInfo />);
+		setDisplayFeature(<ProfileInfo userData={userData} />);
 		setFeature("My Profile");
 	};
 
@@ -33,7 +42,7 @@ export default function User() {
 	};
 
 	const onMyAddressClick = () => {
-		setDisplayFeature(<AddressInfo />);
+		setDisplayFeature(<AddressInfo userData={userData} />);
 		setFeature("My Address");
 	};
 
@@ -61,7 +70,7 @@ export default function User() {
 			<header className="flex items-center justify-between pb-8">
 				<div className="flex items-center space-x-4 ">
 					<Avatar className="mr-8 h-40 w-40 text-base">
-						<AvatarImage src="https://github.com/shadcn.png" />
+						<AvatarImage src={userData?.data.avatar} />
 						<AvatarFallback>CN</AvatarFallback>
 					</Avatar>
 					<div className="text-xl font-semibold">{user}</div>
@@ -72,7 +81,7 @@ export default function User() {
 					<div className="h-14">
 						<Separator orientation="vertical" />
 					</div>
-					<div>0 Followers</div>
+					<div>{userData?.data.follower_count ?? 0} Followers</div>
 				</div>
 
 				<Link href={`/user/public/${user}`}>
@@ -122,7 +131,7 @@ export default function User() {
 						trigger={
 							<div
 								onClick={onAboutClick}
-								className="group flex inline-flex w-fit flex-col items-center justify-center px-4 py-2 text-sm font-medium text-primary"
+								className="group inline-flex w-fit flex-col items-center justify-center px-4 py-2 text-sm font-medium text-primary"
 							>
 								<p>Change Password</p>
 								<hr className="h-px w-0 border-foreground transition-all duration-300 ease-in-out group-hover:w-full" />
@@ -140,9 +149,10 @@ export default function User() {
 						<div>{displayFeature}</div>
 						{feature !== "My Items" && feature !== "Contact Us" && (
 							<SheetWrapper
+								user={userData}
 								trigger={
 									<div className="mt-10 flex h-10 w-36 items-center justify-center rounded-md bg-sky-900 text-background hover:bg-sky-950">
-										Edit
+										{feature === "My Address" ? "Add" : "Edit"}
 									</div>
 								}
 								feature={feature}
@@ -156,4 +166,23 @@ export default function User() {
 			</div>
 		</div>
 	);
+}
+
+export async function getServerSideProps({ req }) {
+	const queryClient = new QueryClient();
+	const token = await getToken({ req, secret: JWT_TOKEN_SECRET });
+	const username = token.username;
+	const accessToken = token.accessToken;
+
+	await queryClient.prefetchQuery({
+		queryKey: ["userData"],
+		queryFn: () => getUser({ uri: `/user/${username}/info`, server: true, token: accessToken }),
+	});
+
+	return {
+		props: {
+			dehydratedState: dehydrate(queryClient),
+			user: username,
+		},
+	};
 }

@@ -20,7 +20,6 @@ import { useDispatch } from "react-redux";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { genericError } from "@/lib/userMessage";
-import { is } from "date-fns/locale";
 
 const JWT_TOKEN_SECRET = process.env.JWT_TOKEN_SECRET;
 
