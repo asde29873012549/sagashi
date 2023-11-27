@@ -9,31 +9,37 @@ import { personalInfoUpdateSuccess, genericError } from "@/lib/userMessage";
 import ComboBox from "@/components/ui/comboBox";
 import region from "../../../lib/countries";
 
-export default function AddAddressSheet({ setOpen, uri }) {
+export default function EditAddressSheet({ setOpen, uri, addressData, setFeature }) {
 	const queryClient = useQueryClient();
 	const [countries, setCountries] = useState({});
-	const [country, setCountry] = useState("");
-	const [city, setCity] = useState("");
-	const [postalCode, setPostalCode] = useState("");
-	const [address, setAddress] = useState("");
+	const [country, setCountry] = useState(addressData.country);
+	const [city, setCity] = useState(addressData.city);
+	const [postalCode, setPostalCode] = useState(addressData.postal_code);
+	const [address, setAddress] = useState(addressData.address);
 	const { toast } = useToast();
 
-	useEffect((lang = "en") => {
-		const countryName = new Intl.DisplayNames([lang], { type: "region" });
-		const country = {};
-		region.forEach((r) => {
-			let name = countryName.of(r);
-			country[r] = name;
-		});
-		setCountries(country);
-	}, []);
+	useEffect(
+		(lang = "en") => {
+			const countryName = new Intl.DisplayNames([lang], { type: "region" });
+			const country = {};
+			region.forEach((r) => {
+				let name = countryName.of(r);
+				country[r] = name;
+			});
+			setCountries(country);
+
+			return () => setFeature("My Address");
+		},
+		[setFeature],
+	);
 
 	const { mutateAsync: mutateAddress } = useMutation({
 		mutationFn: () =>
 			generalFetch({
 				uri,
-				method: "POST",
+				method: "PUT",
 				body: {
+					id: addressData.id,
 					address,
 					city,
 					country,
@@ -70,7 +76,7 @@ export default function AddAddressSheet({ setOpen, uri }) {
 					<ComboBox
 						data={Object.values(countries) || []}
 						className="w-60"
-						defaultValue="Select your country..."
+						defaultValue={country}
 						fallBackValue="Sorry, no country found"
 						onSelect={setCountry}
 					/>

@@ -14,7 +14,6 @@ import SheetWrapper from "@/components/User/Sheets/SheetWrapper";
 import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
 import getUser from "@/lib/queries/fetchQuery";
 import { getToken } from "next-auth/jwt";
-import generalFetch from "@/lib/queries/fetchQuery";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -30,6 +29,9 @@ export default function User({ user }) {
 
 	const [displayFeature, setDisplayFeature] = useState(<ProfileInfo userData={userData} />);
 	const [feature, setFeature] = useState("My Profile");
+	const [open, setOpen] = useState(false);
+
+	const [addressData, setAddressData] = useState(null);
 
 	const onProfileClick = () => {
 		setDisplayFeature(<ProfileInfo userData={userData} />);
@@ -42,7 +44,14 @@ export default function User({ user }) {
 	};
 
 	const onMyAddressClick = () => {
-		setDisplayFeature(<AddressInfo userData={userData} />);
+		setDisplayFeature(
+			<AddressInfo
+				userData={userData}
+				setFeature={setFeature}
+				setAddressData={setAddressData}
+				setOpen={setOpen}
+			/>,
+		);
 		setFeature("My Address");
 	};
 
@@ -63,6 +72,7 @@ export default function User({ user }) {
 
 	const onAboutClick = () => {
 		setDisplayFeature(<About />);
+		setFeature("About");
 	};
 
 	return (
@@ -119,14 +129,18 @@ export default function User({ user }) {
 						<p>About</p>
 						<hr className="h-px w-0 border-foreground transition-all duration-300 ease-in-out group-hover:w-full" />
 					</Button>
-					<Button variant="link" onClick={onAboutClick} className="group flex w-fit flex-col">
-						<p>Terms & Conditions</p>
-						<hr className="h-px w-0 border-foreground transition-all duration-300 ease-in-out group-hover:w-full" />
-					</Button>
-					<Button variant="link" onClick={onAboutClick} className="group flex w-fit flex-col">
-						<p>Privacy Policy</p>
-						<hr className="h-px w-0 border-foreground transition-all duration-300 ease-in-out group-hover:w-full" />
-					</Button>
+					<Link href="/info/terms&conditions">
+						<Button variant="link" className="group flex w-fit flex-col">
+							<p>Terms & Conditions</p>
+							<hr className="h-px w-0 border-foreground transition-all duration-300 ease-in-out group-hover:w-full" />
+						</Button>
+					</Link>
+					<Link href="/info/privacypolicy">
+						<Button variant="link" className="group flex w-fit flex-col">
+							<p>Privacy Policy</p>
+							<hr className="h-px w-0 border-foreground transition-all duration-300 ease-in-out group-hover:w-full" />
+						</Button>
+					</Link>
 					<SheetWrapper
 						trigger={
 							<div
@@ -144,21 +158,27 @@ export default function User({ user }) {
 					/>
 				</div>
 				<div className="flex w-4/5 flex-col space-y-4">
-					<div className="text-2xl font-bold tracking-wider">{feature}</div>
+					<div className="text-2xl font-bold tracking-wider">
+						{feature === "Edit Address" ? "My Address" : feature}
+					</div>
 					<div>
 						<div>{displayFeature}</div>
 						{feature !== "My Items" && feature !== "Contact Us" && (
 							<SheetWrapper
 								user={userData}
+								addressData={addressData}
 								trigger={
 									<div className="mt-10 flex h-10 w-36 items-center justify-center rounded-md bg-sky-900 text-background hover:bg-sky-950">
-										{feature === "My Address" ? "Add" : "Edit"}
+										{feature === "My Address" || feature === "Edit Address" ? "Add" : "Edit"}
 									</div>
 								}
 								feature={feature}
+								setFeature={setFeature}
 								sheet={feature.split(" ").join("")}
 								side="right"
 								className="w-5/12"
+								open={open}
+								setOpen={setOpen}
 							/>
 						)}
 					</div>

@@ -3,13 +3,20 @@ import DatePicker from "../../DatePicker";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useState, Fragment } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { personalInfoUpdateSuccess, genericError } from "@/lib/userMessage";
+import { useToast } from "@/components/ui/use-toast";
+import generalFetch from "@/lib/queries/fetchQuery";
+import { Button } from "@/components/ui/button";
 
-export default function EditProfileSheet() {
+export default function EditProfileSheet({ setOpen, uri, user }) {
+	const queryClient = useQueryClient();
+	const { toast } = useToast();
 	const [formVal, setFormVal] = useState({
-		name: "",
-		email: "",
-		birth: "",
-		gender: "PreferNotToTell",
+		name: user?.data.fullname ?? "",
+		email: user?.data.email ?? "",
+		birth: user?.data.birth_date ?? "",
+		gender: user?.data.gender ?? "PreferNotToTell",
 	});
 
 	const onNameChange = (e) => {
@@ -22,6 +29,41 @@ export default function EditProfileSheet() {
 
 	const onRadioGroupSelect = (e) => {
 		setFormVal({ ...formVal, gender: e });
+	};
+
+	const { mutateAsync: mutateProfile } = useMutation({
+		mutationFn: () =>
+			generalFetch({
+				uri,
+				method: "PUT",
+				body: {
+					fullname: formVal.name,
+					email: formVal.email,
+					birth_date: formVal.birth,
+					gender: formVal.gender,
+				},
+			}),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["userData"] });
+			setOpen(false);
+			toast({
+				title: personalInfoUpdateSuccess.title,
+				description: personalInfoUpdateSuccess.desc,
+				status: personalInfoUpdateSuccess.status,
+			});
+		},
+		onError: (err) => {
+			console.log(err);
+			toast({
+				title: "Failed !",
+				description: genericError,
+				status: "fail",
+			});
+		},
+	});
+
+	const onCancel = () => {
+		setOpen(false);
 	};
 
 	return (
@@ -60,6 +102,14 @@ export default function EditProfileSheet() {
 						</div>
 					</RadioGroup>
 				</div>
+			</div>
+			<div className="absolute bottom-0 right-0 w-full px-6">
+				<Button className="mb-4 w-full" onClick={mutateProfile}>
+					SAVE
+				</Button>
+				<Button variant="destructive" className="mb-4 w-full" onClick={onCancel}>
+					CANCEL
+				</Button>
 			</div>
 		</Fragment>
 	);
