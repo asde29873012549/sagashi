@@ -20,6 +20,7 @@ export default async function handler(req, res) {
 		res.end();
 		return;
 	}
+
 	const httpServer = res.socket.server;
 	const io = new Server(httpServer, {
 		transports: ["websocket", "polling"],
@@ -37,30 +38,31 @@ export default async function handler(req, res) {
 		const listingOwner = socket.handshake.query.listingOwner;
 		const productId = socket.handshake.query.productId;
 		const clientId = socket.handshake.query.user;
-		let chatroom_id = "";
+		let chatroom_id = new Set();
 
 		if (!users.includes(clientId)) {
 			users.push(clientId);
 		}
 
 		if (listingOwner !== clientId) {
-			chatroom_id = `${productId}-${listingOwner}-${clientId}`;
-			socket.join(chatroom_id);
+			chatroom_id.add(`${productId}-${listingOwner}-${clientId}`);
+			socket.join(`${productId}-${listingOwner}-${clientId}`);
 
 			if (!activeRoom[productId]) {
-				activeRoom[productId] = [chatroom_id];
+				activeRoom[productId] = chatroom_id;
 			} else {
-				activeRoom[productId].push(chatroom_id);
+				chatroom_id.forEach((chat_id) => {
+					activeRoom[productId].add(chat_id);
+				});
 			}
-			//console.log(activeRoom, "44");
 		} else {
+			chatroom_id = activeRoom[productId];
 			activeRoom[productId].forEach((chatroom) => {
 				socket.join(chatroom);
 			});
-			//console.log(activeRoom, "55");
 		}
 
-		io.emit("client-new", chatroom_id);
+		io.emit("client-new", Array.from(chatroom_id));
 
 		console.log(`A client connected. ID: ${clientId}-${socket.id}`);
 

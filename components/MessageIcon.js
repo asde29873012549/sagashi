@@ -1,43 +1,26 @@
 import { MessageCircle } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import ItemCard from "./ItemCard";
-import { likeListing, gotFollowed, receivedOrder, uploadListing } from "@/lib/msg_template";
+import { received_message } from "@/lib/msg_template";
 import { useState } from "react";
 
 export default function MessageIcon({
-	/*message,*/ messageActive,
+	user,
+	messageActive,
 	onMessageIconClick,
-	onlineNotification,
-	offlineNotification,
+	onlineMessage,
+	offlineMessage,
 }) {
 	const [isOpen, setIsOpen] = useState(false);
-	const mes_type_helper = (msg) => {
-		let content = "";
-		switch (msg.type) {
-			case "notification.like":
-				content = likeListing(
-					msg.username || msg.sender_name,
-					msg.listing_name || msg.content.listing_name,
-				);
-				break;
-			case "notification.follow":
-				content = gotFollowed(msg.username || msg.sender_name);
-				break;
-			case "notification.uploadListing":
-				content = uploadListing(
-					msg.username || msg.sender_name,
-					msg.listing_name || msg.content.listing_name,
-				);
-				break;
-			case "notification.order":
-				content = receivedOrder(
-					msg.username || msg.sender_name,
-					msg.listing_name || msg.content.listing_name,
-				);
-				break;
-		}
 
-		return content;
+	const mes_type_helper_online = (msg) => {
+		const sender = msg.sender_name === user ? "You" : msg.sender_name;
+		return received_message(sender, msg.text);
+	};
+
+	const mes_type_helper_offline = (msg) => {
+		const sender = msg.last_sent_user_name === user ? "You" : msg.last_sent_user_name;
+		return received_message(sender, msg.last_message);
 	};
 
 	const onOpenMessageIcon = () => {
@@ -54,7 +37,7 @@ export default function MessageIcon({
 				{/* Notification Circle */}
 				<div
 					className={`absolute right-[1px] z-50 mb-3 h-2.5 w-2.5 rounded-full bg-red-700 
-					${!onlineNotification.length || !messageActive ? "md:hidden" : ""}`} // Hide on desktop if no new message
+					${!onlineMessage.length || !messageActive ? "md:hidden" : ""}`} // Hide on desktop if no new message
 				></div>
 
 				{/* Message Icon */}
@@ -62,41 +45,37 @@ export default function MessageIcon({
 			</PopoverTrigger>
 
 			<PopoverContent
-				className={`mr-4 max-h-[70dvh] ${
-					onlineNotification.length > 0 ? "" : "mr-1"
-				} overflow-y-scroll`}
+				className={`mr-4 max-h-[70dvh] ${onlineMessage.length > 0 ? "" : "mr-1"} overflow-y-scroll`}
 			>
-				{onlineNotification.map((msg, index) => {
-					const content = mes_type_helper(msg);
+				{onlineMessage.map((msg, index) => {
+					const content = mes_type_helper_online(msg);
 					return (
 						<ItemCard
 							key={`${msg.created_at}-${index}-online`}
 							src={msg.image}
 							timing={msg.created_at || msg.createdAt}
-							link={msg.link}
 							setIsOpen={setIsOpen}
 						>
 							{content}
 						</ItemCard>
 					);
 				})}
-				{offlineNotification &&
-					offlineNotification.length > 0 &&
-					offlineNotification.map((msg, index) => {
-						const content = mes_type_helper(msg);
+				{offlineMessage &&
+					offlineMessage.length > 0 &&
+					offlineMessage.map((msg, index) => {
+						const content = mes_type_helper_offline(msg);
 						return (
 							<ItemCard
 								key={`${msg.created_at}-${index}-offline`}
 								src={msg.image}
 								timing={msg.created_at || msg.createdAt}
-								link={msg.link}
 								setIsOpen={onRouteToNotification}
 							>
 								{content}
 							</ItemCard>
 						);
 					})}
-				{!onlineNotification.length && !offlineNotification.length && (
+				{!onlineMessage.length && !offlineMessage.length && (
 					<div className="flex h-6 w-60 items-center justify-center text-gray-500">
 						No new message
 					</div>
@@ -105,32 +84,3 @@ export default function MessageIcon({
 		</Popover>
 	);
 }
-
-/*
-<Popover>
-			<PopoverTrigger className="relative">
-				<div className="absolute right-[2px] z-50 mb-3 h-2.5 w-2.5 rounded-full bg-red-700 md:hidden"></div>
-				<MessageCircle className="h-7 w-7 md:hidden" />
-			</PopoverTrigger>
-			<PopoverContent className="mr-1 max-h-[80%]">
-				{message.length > 0 ? (
-					message.map((msg, index) => {
-						mes_type_helper(message);
-						return (
-							<ItemCard
-								key={`${msg.username}-${index}`}
-								src={"https://github.com/shadcn.png"}
-								postTime={"3 min"}
-							>
-								{msg.content}
-							</ItemCard>
-						);
-					})
-				) : (
-					<div className="flex h-6 w-60 items-center justify-center text-gray-500">
-						No new message
-					</div>
-				)}
-			</PopoverContent>
-		</Popover>
-*/

@@ -4,7 +4,7 @@ import Logo from "./Logo";
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
 import { ShoppingCart, User, Search as SearchIcon } from "lucide-react";
-import MessageIcon from "./MessageIcon";
+import MessageIcon from "./NotificationHeartIcon";
 import MenuBar from "./MenuBar";
 import Search from "./Search";
 

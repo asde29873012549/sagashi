@@ -304,7 +304,9 @@ export default function Tree({
 												onSelect={() => onDesignerSelect(designer)}
 											>
 												<span>{designer}</span>
-												{filter.designers?.includes(designer) && <Check size={16} color="#0c4a6e" />}
+												{filter.designers?.includes(designer) && (
+													<Check size={16} color="#0c4a6e" />
+												)}
 											</CommandItem>
 									  ))
 									: designerData?.data.map((obj) => (

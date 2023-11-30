@@ -6,6 +6,7 @@ import MyItem from "../../components/User/Sheets/MyItemSheet";
 import ContactUs from "../../components/User/Sheets/ContactUsForm";
 
 import ProfileInfo from "../../components/User/ProfileInfo";
+import Messages from "../../components/User/Messages";
 import AddressInfo from "../../components/User/AddressInfo";
 import LanguageInfo from "../../components/User/LanguageInfo";
 import CountryInfo from "../../components/User/CountryInfo";
@@ -27,6 +28,8 @@ export default function User({ user }) {
 		refetchOnWindowFocus: false,
 	});
 
+	const hasNotEditButtonFeature = ["My Items", "Contact Us", "About", "Messages"];
+
 	const [displayFeature, setDisplayFeature] = useState(<ProfileInfo userData={userData} />);
 	const [feature, setFeature] = useState("My Profile");
 	const [open, setOpen] = useState(false);
@@ -36,6 +39,11 @@ export default function User({ user }) {
 	const onProfileClick = () => {
 		setDisplayFeature(<ProfileInfo userData={userData} />);
 		setFeature("My Profile");
+	};
+
+	const onMessagesClick = () => {
+		setDisplayFeature(<Messages user={user} />);
+		setFeature("Messages");
 	};
 
 	const onMyItemsClick = () => {
@@ -105,6 +113,10 @@ export default function User({ user }) {
 						<p>Profile</p>
 						<hr className="h-px w-0 border-foreground transition-all duration-300 ease-in-out group-hover:w-full" />
 					</Button>
+					<Button variant="link" onClick={onMessagesClick} className="group flex w-fit flex-col">
+						<p>Messages</p>
+						<hr className="h-px w-0 border-foreground transition-all duration-300 ease-in-out group-hover:w-full" />
+					</Button>
 					<Button variant="link" onClick={onMyItemsClick} className="group flex w-fit flex-col">
 						<p>My Items</p>
 						<hr className="h-px w-0 border-foreground transition-all duration-300 ease-in-out group-hover:w-full" />
@@ -163,7 +175,7 @@ export default function User({ user }) {
 					</div>
 					<div>
 						<div>{displayFeature}</div>
-						{feature !== "My Items" && feature !== "Contact Us" && (
+						{!hasNotEditButtonFeature.includes(feature) && (
 							<SheetWrapper
 								user={userData}
 								addressData={addressData}

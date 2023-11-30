@@ -4,6 +4,7 @@ import Logo from "./Logo";
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
 import { ShoppingCart, User, Search as SearchIcon } from "lucide-react";
+import NotificationHeartIcon from "./NotificationHeartIcon";
 import MessageIcon from "./MessageIcon";
 import MenuBar from "./MenuBar";
 import Search from "./Search";
@@ -12,6 +13,7 @@ import { toggleRegisterForm } from "../redux/userSlice";
 import { useDispatch } from "react-redux";
 import { useQuery } from "@tanstack/react-query";
 import getNotification from "@/lib/queries/fetchQuery";
+import getMessages from "@/lib/queries/fetchQuery";
 
 dotenv.config();
 
@@ -19,25 +21,32 @@ const homepage = process.env.NEXT_PUBLIC_SERVER_DOMAIN;
 const NOTIFICATION_SERVER = process.env.NEXT_PUBLIC_NOTIFICATION_SERVER;
 
 export default function Header() {
-	const [notification, setNotification] = useState([]);
+	const [onlineNotification, setOnlineNotification] = useState([]);
+	const [onlineMessage, setOnlineMessage] = useState([]);
+	const [notificationActive, setNotificationActive] = useState(false);
 	const [messageActive, setMessageActive] = useState(false);
 	const dispatch = useDispatch();
 	const { data: session, status } = useSession();
 	const onToggleRegisterForm = () => dispatch(toggleRegisterForm());
-	const [message, setMessage] = useState([]);
 
 	const user = session?.user?.username ?? "";
 
-	const { data: notificationData, refetch } = useQuery({
+	const { data: notificationData, refetch: notificationRefetch } = useQuery({
 		queryKey: ["notification"],
 		queryFn: () =>
 			getNotification({
 				uri: "/notification",
 			}),
 		refetchOnWindowFocus: false,
-		onSuccess: (data) => {
-			setMessage((prev) => (data?.data ? [...data.data, ...prev] : [...prev]));
-		},
+	});
+
+	const { data: messageData, refetch: messageRefetch } = useQuery({
+		queryKey: ["messageList"],
+		queryFn: () =>
+			getMessages({
+				uri: "/message",
+			}),
+		refetchOnWindowFocus: false,
 	});
 
 	useEffect(() => {
@@ -48,14 +57,18 @@ export default function Header() {
 
 			eventSource.onmessage = (event) => {
 				const newNotification = JSON.parse(event.data);
-				setMessage((prev) => [newNotification, ...prev]);
-				setNotification((prev) => [newNotification, ...prev]);
-				setMessageActive(true);
+				if (newNotification.type === "notification.message") {
+					setOnlineMessage((prev) => [newNotification, ...prev]);
+					setMessageActive(true);
+				} else {
+					setOnlineNotification((prev) => [newNotification, ...prev]);
+					setNotificationActive(true);
+				}
 			};
 
-			refetch();
+			notificationRefetch();
 		}
-	}, [user, refetch]);
+	}, [user, notificationRefetch]);
 
 	const isUsingMobile = () => {
 		if (typeof window !== "undefined") return window.innerWidth < 768; //&& navigator.maxTouchPoints > 0;
@@ -63,6 +76,10 @@ export default function Header() {
 
 	const onLogout = () => {
 		signOut({ callbackUrl: homepage });
+	};
+
+	const onNotificationHeartIconClick = () => {
+		setNotificationActive(false);
 	};
 
 	const onMessageIconClick = () => {
@@ -99,12 +116,20 @@ export default function Header() {
 								</Search>
 							</div>
 							{session && (
+								<NotificationHeartIcon
+									onlineNotification={onlineNotification}
+									notificationActive={notificationActive}
+									onNotificationHeartIconClick={onNotificationHeartIconClick}
+									offlineNotification={notificationData?.data ?? []}
+								/>
+							)}
+							{session && (
 								<MessageIcon
-									onlineNotification={notification}
+									user={user}
+									onlineMessage={onlineMessage}
 									messageActive={messageActive}
 									onMessageIconClick={onMessageIconClick}
-									message={message}
-									offlineNotification={notificationData?.data ?? []}
+									offlineMessage={messageData?.data ?? []}
 								/>
 							)}
 							{session && (

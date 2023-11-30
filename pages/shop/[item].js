@@ -124,12 +124,14 @@ export default function ListingItem({ username, product_id }) {
 								onCloseMessageBox={onCloseMessageBox}
 							/>
 						)}
-						<Button
-							className="hidden h-12 w-full hover:border-2 hover:border-foreground hover:bg-background hover:text-foreground md:block md:w-4/5"
-							onClick={onCloseMessageBox}
-						>
-							MESSAGE SELLER
-						</Button>
+						{listingData?.data[0].seller_name !== username && (
+							<Button
+								className="hidden h-12 w-full hover:border-2 hover:border-foreground hover:bg-background hover:text-foreground md:block md:w-4/5"
+								onClick={onCloseMessageBox}
+							>
+								MESSAGE SELLER
+							</Button>
+						)}
 					</div>
 				</div>
 			</div>

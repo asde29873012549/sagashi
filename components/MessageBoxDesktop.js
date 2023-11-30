@@ -7,44 +7,75 @@ import { motion } from "framer-motion";
 import socketInitializer from "@/lib/socketio/socketInitializer";
 import socket from "@/lib/socketio/client";
 import { useState, useEffect } from "react";
+import { useToast } from "@/components/ui/use-toast";
+import { genericError } from "@/lib/userMessage";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
+import { useQuery } from "@tanstack/react-query";
+import getMessages from "@/lib/queries/fetchQuery";
+import createMessage from "@/lib/queries/fetchQuery";
 
 dotenv.config();
 
-const NEXT_PUBLIC_SERVER_DOMAIN = process.env.NEXT_PUBLIC_SERVER_DOMAIN;
-
-const listingOwner = "joy";
-const productId = 3;
-
 export default function MessageBoxDesktop({ wsData, isOpen, onCloseMessageBox }) {
 	const [val, setVal] = useState("");
+	const { toast } = useToast();
 	const [message, setMessages] = useState([]);
-	const [id, setId] = useState("");
+	const [id, setId] = useState([]);
+
+	const chatroom_id = `${wsData.product_id}-${wsData.listingOwner}-${wsData.username}`;
+
+	const { data: initialMessageData } = useQuery({
+		queryKey: ["messages", chatroom_id],
+		queryFn: () => getMessages({ uri: `/message/${chatroom_id}` }),
+		refetchOnWindowFocus: false,
+		onSuccess: (msgs) => {
+			setMessages(msgs.data.map((msg) => msg.text));
+		},
+	});
 
 	const onInput = (e) => {
 		setVal(e.target.value);
 	};
 
-	console.log(id, "id");
-
-	const onPressEnter = (e) => {
+	const onPressEnter = async (e) => {
 		if (e.keyCode === 13) {
-			// check the recipient should be who
+			// check who should be the recipient
 			let recipient;
-			let chatroom_id;
 
-			if (chatroom_id) {
-				const buyer = id?.split("-")[2];
-				recipient = buyer;
-				console.log(recipient, "recipient1");
-			} else {
-				recipient = id?.split("-")[1];
-				chatroom_id = `${productId}-${listingOwner}-${recipient}`;
-				console.log(recipient, "recipient2");
-			}
+			recipient = id[0]?.split("-")[2];
 
 			socket.emit("message", { message: val, recipient });
+			// add message to message lists
 			setMessages((m) => [...m, val]);
+			// clear input
 			setVal("");
+
+			// fetch message to database
+			try {
+				const res = createMessage({
+					uri: "/message",
+					method: "POST",
+					body: {
+						product_id: wsData.product_id,
+						seller_name: wsData.listingOwner,
+						buyer_name: wsData.username,
+						isFirstMessage: message.length === 0 ? true : false,
+						text: val,
+						isRead: true,
+					},
+				});
+
+				if (res.status === "fail") {
+					throw new Error();
+				}
+			} catch (error) {
+				toast({
+					title: "Failed !",
+					description: genericError,
+					status: "fail",
+				});
+			}
 		}
 	};
 
@@ -54,6 +85,11 @@ export default function MessageBoxDesktop({ wsData, isOpen, onCloseMessageBox })
 		socket.io.opts.query.user = wsData.username;
 		socket.io.opts.query.listingOwner = wsData.listingOwner;
 		socket.io.opts.query.productId = wsData.product_id;
+
+		return () => {
+			console.log("socket disconnectd");
+			socket.disconnect();
+		};
 	}, [wsData.username, wsData.listingOwner, wsData.product_id]);
 
 	useEffect(() => {
@@ -83,7 +119,7 @@ export default function MessageBoxDesktop({ wsData, isOpen, onCloseMessageBox })
 					</div>
 				</header>
 				<main
-					className={`relative flex h-[calc(100%-6.5rem)] w-full flex-col px-3 ${
+					className={`relative flex h-[calc(100%-6.5rem)] w-full flex-col overflow-scroll px-3 ${
 						message.length > 0 ? "items-end justify-start" : "items-center justify-center"
 					}`}
 				>
