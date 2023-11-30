@@ -17,7 +17,7 @@ import {
 	CommandList,
 } from "@/components/ui/command";
 import { Input } from "@/components/ui/input";
-
+import { Check } from "lucide-react";
 import debounce from "@/lib/utils";
 
 export default function Tree({
@@ -300,10 +300,11 @@ export default function Tree({
 									? treeData?.Designer?.map((designer, index) => (
 											<CommandItem
 												key={`${designer}-${index}`}
-												className="cursor-pointer"
+												className="cursor-pointer justify-between"
 												onSelect={() => onDesignerSelect(designer)}
 											>
-												{designer}
+												<span>{designer}</span>
+												{filter.designers?.includes(designer) && <Check size={16} color="#0c4a6e" />}
 											</CommandItem>
 									  ))
 									: designerData?.data.map((obj) => (

@@ -61,7 +61,7 @@ export default function User({ user }) {
 	};
 
 	const onMyCountryClick = () => {
-		setDisplayFeature(<CountryInfo />);
+		setDisplayFeature(<CountryInfo userData={userData} />);
 		setFeature("My Country");
 	};
 

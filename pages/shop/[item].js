@@ -8,9 +8,13 @@ import getSingleListing from "@/lib/queries/fetchQuery";
 import getRecentlyViwed from "@/lib/queries/fetchQuery";
 import { useRouter } from "next/router";
 
+import { getToken } from "next-auth/jwt";
+
 import { useState } from "react";
 
-export default function ListingItem({ dehydratedState }) {
+const JWT_TOKEN_SECRET = process.env.JWT_TOKEN_SECRET;
+
+export default function ListingItem({ username, product_id }) {
 	const router = useRouter();
 	const [isOpen, setIsOpen] = useState(false);
 
@@ -109,10 +113,17 @@ export default function ListingItem({ dehydratedState }) {
 						</Button>
 						<MessageBoxMobile
 							className="w-full md:hidden"
+							username={username}
 							isOpen={isOpen}
 							onCloseMessageBox={onCloseMessageBox}
 						/>
-						<MessageBoxDesktop isOpen={isOpen} onCloseMessageBox={onCloseMessageBox} />
+						{isOpen && (
+							<MessageBoxDesktop
+								wsData={{ username, product_id, listingOwner: listingData?.data[0].seller_name }}
+								isOpen={isOpen}
+								onCloseMessageBox={onCloseMessageBox}
+							/>
+						)}
 						<Button
 							className="hidden h-12 w-full hover:border-2 hover:border-foreground hover:bg-background hover:text-foreground md:block md:w-4/5"
 							onClick={onCloseMessageBox}
@@ -154,9 +165,11 @@ export default function ListingItem({ dehydratedState }) {
 	);
 }
 
-export async function getServerSideProps({ query }) {
+export async function getServerSideProps({ req, query }) {
 	const product_id = query.item;
 	const queryClient = new QueryClient();
+	const token = await getToken({ req, secret: JWT_TOKEN_SECRET });
+	const username = token?.username ?? null;
 
 	await queryClient.prefetchQuery({
 		queryKey: ["products", { id: product_id }],
@@ -166,6 +179,8 @@ export async function getServerSideProps({ query }) {
 	return {
 		props: {
 			dehydratedState: dehydrate(queryClient),
+			username,
+			product_id,
 		},
 		//revalidate: 60 * 10,
 	};

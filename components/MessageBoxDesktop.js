@@ -10,19 +10,21 @@ import { useState, useEffect } from "react";
 
 dotenv.config();
 
-const server_domain = process.env.NEXT_PUBLIC_SERVER_DOMAIN;
+const NEXT_PUBLIC_SERVER_DOMAIN = process.env.NEXT_PUBLIC_SERVER_DOMAIN;
 
 const listingOwner = "joy";
 const productId = 3;
 
-export default function MessageBoxDesktop({ isOpen, onCloseMessageBox }) {
+export default function MessageBoxDesktop({ wsData, isOpen, onCloseMessageBox }) {
 	const [val, setVal] = useState("");
 	const [message, setMessages] = useState([]);
-	const [id, setId] = useState([]);
+	const [id, setId] = useState("");
 
 	const onInput = (e) => {
 		setVal(e.target.value);
 	};
+
+	console.log(id, "id");
 
 	const onPressEnter = (e) => {
 		if (e.keyCode === 13) {
@@ -31,11 +33,13 @@ export default function MessageBoxDesktop({ isOpen, onCloseMessageBox }) {
 			let chatroom_id;
 
 			if (chatroom_id) {
-				const buyer = chatroom_id.split("-")[2];
+				const buyer = id?.split("-")[2];
 				recipient = buyer;
+				console.log(recipient, "recipient1");
 			} else {
-				recipient = localStorage.getItem("user");
+				recipient = id?.split("-")[1];
 				chatroom_id = `${productId}-${listingOwner}-${recipient}`;
+				console.log(recipient, "recipient2");
 			}
 
 			socket.emit("message", { message: val, recipient });
@@ -46,10 +50,11 @@ export default function MessageBoxDesktop({ isOpen, onCloseMessageBox }) {
 
 	useEffect(() => {
 		socketInitializer(setMessages, setId);
-		socket.io.opts.query.user = localStorage && localStorage.getItem("user");
-		socket.io.opts.query.listingOwner = listingOwner;
-		socket.io.opts.query.productId = productId;
-	}, []);
+
+		socket.io.opts.query.user = wsData.username;
+		socket.io.opts.query.listingOwner = wsData.listingOwner;
+		socket.io.opts.query.productId = wsData.product_id;
+	}, [wsData.username, wsData.listingOwner, wsData.product_id]);
 
 	useEffect(() => {
 		if (isOpen) {

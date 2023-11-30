@@ -20,7 +20,6 @@ export default async function handler(req, res) {
 		res.end();
 		return;
 	}
-
 	const httpServer = res.socket.server;
 	const io = new Server(httpServer, {
 		transports: ["websocket", "polling"],
@@ -61,7 +60,7 @@ export default async function handler(req, res) {
 			//console.log(activeRoom, "55");
 		}
 
-		io.emit("client-new", users);
+		io.emit("client-new", chatroom_id);
 
 		console.log(`A client connected. ID: ${clientId}-${socket.id}`);
 

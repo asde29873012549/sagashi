@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import FilterSection from "@/components/FilterSection";
 import { useState, useRef, useCallback } from "react";
 
-export default function Shop({ isMenswear, isWomenswear, designer, user, treeData }) {
+export default function Shop({ isMenswear, isWomenswear, isNewArrival, designer, user, treeData }) {
 	const { data: OriginTreeData } = useQuery({
 		queryKey: ["tree"],
 		queryFn: () => getTree({ uri: "/tree" }),
@@ -23,6 +23,8 @@ export default function Shop({ isMenswear, isWomenswear, designer, user, treeDat
 			return { department: ["Womenswear"] };
 		} else if (designer) {
 			return { designers: [designer] };
+		} else if (isNewArrival) {
+			return { newArrivals: true };
 		} else {
 			return {};
 		}

@@ -7,11 +7,13 @@ export default function FilterSection({ filter = {}, setFilter }) {
 	const filterKeys = Object.keys(filter);
 
 	filterKeys.forEach((key) => {
-		const temp = filter[key].map((item) => {
-			if (item.cat) return { ...item, key };
-			return { name: item, key };
-		});
-		filterArray = [...filterArray, ...temp];
+		if (key !== "newArrivals") {
+			const temp = filter[key].map((item) => {
+				if (item.cat) return { ...item, key };
+				return { name: item, key };
+			});
+			filterArray = [...filterArray, ...temp];
+		}
 	});
 
 	const nameFormatter = (obj) => {
