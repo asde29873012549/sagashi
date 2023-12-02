@@ -122,9 +122,13 @@ export default function ListingItem({ username, product_id }) {
 								wsData={{ username, product_id, listingOwner: listingData?.data[0].seller_name }}
 								isOpen={isOpen}
 								onCloseMessageBox={onCloseMessageBox}
+								image={productData.primary_image}
+								listing_name={productData.name}
+								listing_designer={productData.designer}
+								date={productData.updated_at}
 							/>
 						)}
-						{listingData?.data[0].seller_name !== username && (
+						{username && (
 							<Button
 								className="hidden h-12 w-full hover:border-2 hover:border-foreground hover:bg-background hover:text-foreground md:block md:w-4/5"
 								onClick={onCloseMessageBox}

@@ -22,7 +22,7 @@ const NOTIFICATION_SERVER = process.env.NEXT_PUBLIC_NOTIFICATION_SERVER;
 
 export default function Header() {
 	const [onlineNotification, setOnlineNotification] = useState([]);
-	const [onlineMessage, setOnlineMessage] = useState([]);
+	const [chatroom, setChatroom] = useState([]);
 	const [notificationActive, setNotificationActive] = useState(false);
 	const [messageActive, setMessageActive] = useState(false);
 	const dispatch = useDispatch();
@@ -40,14 +40,19 @@ export default function Header() {
 		refetchOnWindowFocus: false,
 	});
 
-	const { data: messageData, refetch: messageRefetch } = useQuery({
-		queryKey: ["messageList"],
+	const { data: chatroomList } = useQuery({
+		queryKey: ["chatroomList"],
 		queryFn: () =>
 			getMessages({
 				uri: "/message",
 			}),
 		refetchOnWindowFocus: false,
+		onSuccess: (initialChatroomList) => {
+			setChatroom(initialChatroomList.data);
+		},
 	});
+
+	console.log("chatroomList", chatroomList);
 
 	useEffect(() => {
 		if (user) {
@@ -58,7 +63,14 @@ export default function Header() {
 			eventSource.onmessage = (event) => {
 				const newNotification = JSON.parse(event.data);
 				if (newNotification.type === "notification.message") {
-					setOnlineMessage((prev) => [newNotification, ...prev]);
+					setChatroom((prev) => {
+						return prev.map((c) => {
+							if (c.chatroom_id === newNotification.chatroom_id) {
+								return { ...c, createdAt: newNotification.created_at, text: newNotification.text };
+							}
+							return c;
+						});
+					});
 					setMessageActive(true);
 				} else {
 					setOnlineNotification((prev) => [newNotification, ...prev]);
@@ -126,10 +138,10 @@ export default function Header() {
 							{session && (
 								<MessageIcon
 									user={user}
-									onlineMessage={onlineMessage}
+									chatroom={chatroom}
+									//offlineChatroom={chatroomList?.data ?? []}
 									messageActive={messageActive}
 									onMessageIconClick={onMessageIconClick}
-									offlineMessage={messageData?.data ?? []}
 								/>
 							)}
 							{session && (

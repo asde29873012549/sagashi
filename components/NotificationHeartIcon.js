@@ -40,16 +40,12 @@ export default function MessageIcon({
 		return content;
 	};
 
-	const onOpenMessageIcon = () => {
+	const onToggleMessageIcon = () => {
 		setIsOpen((o) => !o);
 	};
 
-	const onRouteToNotification = () => {
-		setIsOpen(false);
-	};
-
 	return (
-		<Popover open={isOpen} onOpenChange={onOpenMessageIcon}>
+		<Popover open={isOpen} onOpenChange={onToggleMessageIcon}>
 			<PopoverTrigger className="relative flex">
 				{/* Notification Circle */}
 				<div
@@ -74,7 +70,7 @@ export default function MessageIcon({
 							src={msg.image}
 							timing={msg.created_at || msg.createdAt}
 							link={msg.link}
-							setIsOpen={setIsOpen}
+							setIsOpen={onToggleMessageIcon}
 						>
 							{content}
 						</ItemCard>
@@ -90,14 +86,14 @@ export default function MessageIcon({
 								src={msg.image}
 								timing={msg.created_at || msg.createdAt}
 								link={msg.link}
-								setIsOpen={onRouteToNotification}
+								setIsOpen={onToggleMessageIcon}
 							>
 								{content}
 							</ItemCard>
 						);
 					})}
 				{!onlineNotification.length && !offlineNotification.length && (
-					<div className="flex h-6 w-60 items-center justify-center text-gray-500">
+					<div className="flex h-14 w-60 items-center justify-center text-gray-500">
 						No new message
 					</div>
 				)}

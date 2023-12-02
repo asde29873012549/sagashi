@@ -35,6 +35,7 @@ export default async function handler(req, res) {
 
 	// Event handler for client connections
 	io.on("connection", (socket) => {
+		console.log(socket.handshake.query);
 		const listingOwner = socket.handshake.query.listingOwner;
 		const productId = socket.handshake.query.productId;
 		const clientId = socket.handshake.query.user;
@@ -51,27 +52,29 @@ export default async function handler(req, res) {
 			if (!activeRoom[productId]) {
 				activeRoom[productId] = chatroom_id;
 			} else {
-				chatroom_id.forEach((chat_id) => {
+				chatroom_id?.forEach((chat_id) => {
 					activeRoom[productId].add(chat_id);
 				});
 			}
 		} else {
 			chatroom_id = activeRoom[productId];
-			activeRoom[productId].forEach((chatroom) => {
+			console.log("activeRoom", activeRoom, productId);
+			activeRoom[productId]?.forEach((chatroom) => {
 				socket.join(chatroom);
 			});
 		}
 
+		console.log(chatroom_id, "this isa lso alwasys have things");
 		io.emit("client-new", Array.from(chatroom_id));
 
 		console.log(`A client connected. ID: ${clientId}-${socket.id}`);
 
 		// Event handler for receiving messages from the client
-		socket.on("message", ({ message, recipient }) => {
-			console.log("Received message:", message, recipient);
+		socket.on("message", ({ message, client }) => {
+			console.log("Received message:", message, client);
 
 			socket
-				.to(`${productId}-${listingOwner}-${recipient}`)
+				.to(`${productId}-${listingOwner}-${client}`)
 				.emit("getMessage", { message, sender: clientId });
 		});
 

@@ -18,10 +18,13 @@ import { getToken } from "next-auth/jwt";
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 const JWT_TOKEN_SECRET = process.env.JWT_TOKEN_SECRET;
 
 export default function User({ user }) {
+	const router = useRouter();
+	const { dept, chatroom_id } = router.query;
 	const { data: userData } = useQuery({
 		queryKey: ["userData"],
 		queryFn: () => getUser({ uri: `/user/${user}/info` }),
@@ -30,8 +33,10 @@ export default function User({ user }) {
 
 	const hasNotEditButtonFeature = ["My Items", "Contact Us", "About", "Messages"];
 
-	const [displayFeature, setDisplayFeature] = useState(<ProfileInfo userData={userData} />);
-	const [feature, setFeature] = useState("My Profile");
+	const [displayFeature, setDisplayFeature] = useState(
+		dept ? <Messages user={user} chatroom_id={chatroom_id} /> : <ProfileInfo userData={userData} />,
+	);
+	const [feature, setFeature] = useState(dept ? dept : "My Profile");
 	const [open, setOpen] = useState(false);
 
 	const [addressData, setAddressData] = useState(null);
@@ -42,7 +47,7 @@ export default function User({ user }) {
 	};
 
 	const onMessagesClick = () => {
-		setDisplayFeature(<Messages user={user} />);
+		setDisplayFeature(<Messages user={user} chatroom_id={chatroom_id} />);
 		setFeature("Messages");
 	};
 
