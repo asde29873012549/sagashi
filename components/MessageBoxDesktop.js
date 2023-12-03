@@ -80,7 +80,7 @@ export default function MessageBoxDesktop({
 						image,
 						isFirstMessage: message.length === 0 ? true : false,
 						text: val,
-						isRead: true,
+						isRead: false,
 					},
 				});
 
@@ -150,8 +150,8 @@ export default function MessageBoxDesktop({
 			>
 				{message.length > 0 ? (
 					message.map((msg, index) => {
-						const ISOdate = msg.createdAt || msg.created_at;
-						const prevDate = message[index - 1]?.createdAt || message[index - 1]?.created_at;
+						const ISOdate = msg.created_at;
+						const prevDate = message[index - 1]?.created_at;
 						const currDate = parseISODate(ISOdate || null);
 						return (
 							<div key={`${msg.text}-${index}`} className="w-full">

@@ -11,6 +11,8 @@ import getMessage from "@/lib/queries/fetchQuery";
 import createMessage from "@/lib/queries/fetchQuery";
 import { received_message } from "@/lib/msg_template";
 import { genericError } from "@/lib/userMessage";
+import { useSelector } from "react-redux";
+import { messageSelector } from "@/redux/messageSlice";
 
 import socket from "@/lib/socketio/client";
 import socketInitializer from "@/lib/socketio/socketInitializer";
@@ -24,12 +26,13 @@ export default function Messages({ user, chatroom_id: chatroom_id_from_url }) {
 	const [onlineMessage, setOnlineMessage] = useState([]);
 	const [offlineMessage, setOfflineMessage] = useState([]);
 	const [currentTab, setCurrentTab] = useState(
-		(chatroom_id_from_url?.split("-")[1] ?? "") === user ? "buy" : "sell",
+		(chatroom_id_from_url?.split("-")[1] ?? "") === user ? "sell" : "buy",
 	);
 	const currentActiveChatroom_id = useRef(chatroom_id_from_url || null);
 	const currentChatroom_avatar = useRef(null);
 	const sellContainer = useRef();
-	const buyContainer = useRef();
+	const maiContainer = useRef();
+	const lastMessage = useSelector(messageSelector).lastMessage;
 
 	const { data: chatroomList } = useQuery({
 		queryKey: ["chatroomList", currentTab],
@@ -84,16 +87,20 @@ export default function Messages({ user, chatroom_id: chatroom_id_from_url }) {
 	useEffect(() => {
 		if (currentTab === "sell" && sellContainer.current) {
 			sellContainer.current.scrollTop = sellContainer.current.scrollHeight;
-		} else if (currentTab === "buy" && buyContainer.current) {
-			buyContainer.current.scrollTop = buyContainer.current.scrollHeight;
+		} else if (currentTab === "buy" && maiContainer.current) {
+			maiContainer.current.scrollTop = maiContainer.current.scrollHeight;
 		}
-	}, [onlineMessage]);
+	}, [onlineMessage, currentTab]);
 
 	const offlineChatroom = chatroomList?.data ?? [];
 
-	const mes_type_helper_offline = (msg) => {
+	const mes_type_helper = (msg) => {
 		const sender = msg.last_sent_user_name === user ? "You" : msg.last_sent_user_name;
-		return received_message(sender, msg.last_message, msg.updatedAt);
+		return received_message(
+			sender,
+			onlineMessage[onlineMessage.length - 1]?.text || msg?.text,
+			msg?.updated_at,
+		);
 	};
 
 	const onInput = (e) => {
@@ -142,7 +149,7 @@ export default function Messages({ user, chatroom_id: chatroom_id_from_url }) {
 						isFirstMessage: onlineMessage.length === 0 && offlineMessage.length === 0,
 						image: currentChatroom_avatar.current,
 						text: val,
-						isRead: true,
+						isRead: false,
 					},
 				});
 
@@ -191,12 +198,14 @@ export default function Messages({ user, chatroom_id: chatroom_id_from_url }) {
 					{offlineChatroom &&
 						offlineChatroom.length > 0 &&
 						offlineChatroom.map((msg, index) => {
-							const content = mes_type_helper_offline(msg);
+							const content = mes_type_helper(msg);
 							return (
 								<ItemCard
 									key={`message-${msg.created_at}-${index}-offline`}
 									src={msg.chatroom_avatar}
 									setIsOpen={() => onOpenChatroom(msg.id, msg.chatroom_avatar)}
+									read_at={msg.read_at}
+									chatroom_id_from_url={chatroom_id_from_url}
 								>
 									{content}
 								</ItemCard>
@@ -216,8 +225,8 @@ export default function Messages({ user, chatroom_id: chatroom_id_from_url }) {
 					>
 						{offlineMessage.length > 0 ? (
 							offlineMessage.map((msg, index) => {
-								const ISOdate = msg.createdAt;
-								const prevDate = offlineMessage[index - 1]?.createdAt;
+								const ISOdate = msg.created_at;
+								const prevDate = offlineMessage[index - 1]?.created_at;
 								const currDate = parseISODate(ISOdate || null);
 								return (
 									<div key={`${msg.text}-${index}`} className="w-full">
@@ -281,12 +290,14 @@ export default function Messages({ user, chatroom_id: chatroom_id_from_url }) {
 					{offlineChatroom &&
 						offlineChatroom.length > 0 &&
 						offlineChatroom.map((msg, index) => {
-							const content = mes_type_helper_offline(msg);
+							const content = mes_type_helper(msg);
 							return (
 								<ItemCard
 									key={`message-${msg.created_at}-${index}-offline`}
 									src={msg.chatroom_avatar}
 									setIsOpen={() => onOpenChatroom(msg.id, msg.chatroom_avatar)}
+									read_at={msg.read_at}
+									chatroom_id_from_url={chatroom_id_from_url}
 								>
 									{content}
 								</ItemCard>
@@ -294,7 +305,6 @@ export default function Messages({ user, chatroom_id: chatroom_id_from_url }) {
 						})}
 				</aside>
 				<div
-					ref={buyContainer}
 					className={`relative flex h-[500px] grow flex-col overflow-scroll rounded-lg border-2 border-sky-900 ${
 						onlineMessage.length > 0 || offlineMessage.length > 0
 							? "items-start"
@@ -303,13 +313,12 @@ export default function Messages({ user, chatroom_id: chatroom_id_from_url }) {
 				>
 					<div
 						className="flex h-[calc(100%-56px)] w-full flex-col overflow-y-scroll px-3 py-2"
-						ref={buyContainer}
+						ref={maiContainer}
 					>
 						{offlineMessage.length > 0 ? (
 							offlineMessage.map((msg, index) => {
-								const ISOdate = msg.createdAt || msg.created_at;
-								const prevDate =
-									offlineMessage[index - 1]?.createdAt || offlineMessage[index - 1]?.created_at;
+								const ISOdate = msg.created_at;
+								const prevDate = offlineMessage[index - 1]?.created_at;
 								const currDate = parseISODate(ISOdate || null);
 								return (
 									<div key={`${msg.text}-${index}`} className="w-full">
@@ -374,7 +383,7 @@ export default function Messages({ user, chatroom_id: chatroom_id_from_url }) {
 					{offlineChatroom &&
 						offlineChatroom.length > 0 &&
 						offlineChatroom.map((msg, index) => {
-							const content = mes_type_helper_offline(msg);
+							const content = mes_type_helper(msg);
 							return (
 								<ItemCard
 									key={`message-${msg.created_at}-${index}-offline`}

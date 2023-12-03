@@ -3,20 +3,36 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import ItemCard from "./ItemCard";
 import { received_message } from "@/lib/msg_template";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import getMessages from "@/lib/queries/fetchQuery";
 
-export default function MessageIcon({ user, messageActive, onMessageIconClick, chatroom }) {
+export default function MessageIcon({
+	user,
+	messageActive,
+	onMessageIconClick,
+	chatroom,
+	setChatroom,
+}) {
 	const [isOpen, setIsOpen] = useState(false);
+
+	const { data: chatroomList, refetch: fetchChatroomList } = useQuery({
+		queryKey: ["chatroomList"],
+		queryFn: () =>
+			getMessages({
+				uri: "/message",
+			}),
+		refetchOnWindowFocus: false,
+		onSuccess: (initialChatroomList) => {
+			setChatroom(initialChatroomList.data);
+		},
+	});
 
 	const mes_type_helper = (msg) => {
 		const sender =
-			msg.last_sent_user_name === user || msg.sender_name === user
+			msg.sender_name === user || msg.last_sent_user_name === user
 				? "You"
-				: msg.last_sent_user_name || msg.sender_name;
-		return received_message(
-			sender,
-			msg.last_message || msg.text,
-			msg.updatedAt || msg.createdAt || msg.created_at,
-		);
+				: msg.sender_name || msg.last_sent_user_name;
+		return received_message(sender, msg.text, msg.created_at || msg.updated_at);
 	};
 
 	const onToggleMessageIcon = () => {
@@ -25,7 +41,7 @@ export default function MessageIcon({ user, messageActive, onMessageIconClick, c
 
 	return (
 		<Popover open={isOpen} onOpenChange={onToggleMessageIcon}>
-			<PopoverTrigger className="relative flex">
+			<PopoverTrigger className="relative flex" onClick={fetchChatroomList}>
 				{/* Notification Circle */}
 				<div
 					className={`absolute right-[1px] z-50 mb-3 h-2.5 w-2.5 rounded-full bg-red-700 
@@ -45,10 +61,12 @@ export default function MessageIcon({ user, messageActive, onMessageIconClick, c
 						const content = mes_type_helper(msg);
 						return (
 							<ItemCard
-								key={`${msg.updatedAt || msg.createdAt || msg.created_at}-${index}-offline`}
+								key={`${msg.updated_at || msg.created_at}-${index}-msg`}
 								src={msg.chatroom_avatar || msg.image}
 								link={msg.link}
 								setIsOpen={onToggleMessageIcon}
+								read_at={msg.read_at}
+								message_id={msg.last_message || ""}
 							>
 								{content}
 							</ItemCard>

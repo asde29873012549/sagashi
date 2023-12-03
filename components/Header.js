@@ -11,9 +11,9 @@ import Search from "./Search";
 
 import { toggleRegisterForm } from "../redux/userSlice";
 import { useDispatch } from "react-redux";
+import { setHasSeen, setLastMessage } from "@/redux/messageSlice";
 import { useQuery } from "@tanstack/react-query";
 import getNotification from "@/lib/queries/fetchQuery";
-import getMessages from "@/lib/queries/fetchQuery";
 
 dotenv.config();
 
@@ -40,20 +40,6 @@ export default function Header() {
 		refetchOnWindowFocus: false,
 	});
 
-	const { data: chatroomList } = useQuery({
-		queryKey: ["chatroomList"],
-		queryFn: () =>
-			getMessages({
-				uri: "/message",
-			}),
-		refetchOnWindowFocus: false,
-		onSuccess: (initialChatroomList) => {
-			setChatroom(initialChatroomList.data);
-		},
-	});
-
-	console.log("chatroomList", chatroomList);
-
 	useEffect(() => {
 		if (user) {
 			const eventSource = new EventSource(`${NOTIFICATION_SERVER}/events`, {
@@ -63,10 +49,14 @@ export default function Header() {
 			eventSource.onmessage = (event) => {
 				const newNotification = JSON.parse(event.data);
 				if (newNotification.type === "notification.message") {
+					// if received new message, reset the hasSeen state to false to make the indicator dot on the item card to show
+					dispatch(setHasSeen(false));
+					dispatch(setLastMessage(newNotification.text));
+
 					setChatroom((prev) => {
 						return prev.map((c) => {
 							if (c.chatroom_id === newNotification.chatroom_id) {
-								return { ...c, createdAt: newNotification.created_at, text: newNotification.text };
+								return { ...c, created_at: newNotification.created_at, text: newNotification.text };
 							}
 							return c;
 						});
@@ -139,7 +129,7 @@ export default function Header() {
 								<MessageIcon
 									user={user}
 									chatroom={chatroom}
-									//offlineChatroom={chatroomList?.data ?? []}
+									setChatroom={setChatroom}
 									messageActive={messageActive}
 									onMessageIconClick={onMessageIconClick}
 								/>

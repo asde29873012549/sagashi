@@ -68,7 +68,7 @@ export default function MessageIcon({
 						<ItemCard
 							key={`${msg.created_at}-${index}-online`}
 							src={msg.image}
-							timing={msg.created_at || msg.createdAt}
+							timing={msg.created_at}
 							link={msg.link}
 							setIsOpen={onToggleMessageIcon}
 						>
@@ -84,7 +84,7 @@ export default function MessageIcon({
 							<ItemCard
 								key={`${msg.created_at}-${index}-offline`}
 								src={msg.image}
-								timing={msg.created_at || msg.createdAt}
+								timing={msg.created_at}
 								link={msg.link}
 								setIsOpen={onToggleMessageIcon}
 							>
