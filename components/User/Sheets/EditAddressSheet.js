@@ -8,6 +8,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { personalInfoUpdateSuccess, genericError } from "@/lib/userMessage";
 import ComboBox from "@/components/ui/comboBox";
 import region from "../../../lib/countries";
+import * as DOMPurify from "dompurify";
 
 export default function EditAddressSheet({ setOpen, uri, addressData, setFeature }) {
 	const queryClient = useQueryClient();
@@ -40,10 +41,10 @@ export default function EditAddressSheet({ setOpen, uri, addressData, setFeature
 				method: "PUT",
 				body: {
 					id: addressData.id,
-					address,
-					city,
+					address: DOMPurify.sanitize(address),
+					city: DOMPurify.sanitize(city),
 					country,
-					postal_code: postalCode,
+					postal_code: DOMPurify.sanitize(postalCode),
 				},
 			}),
 		onSuccess: () => {

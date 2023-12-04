@@ -17,6 +17,7 @@ import { messageSelector } from "@/redux/messageSlice";
 import socket from "@/lib/socketio/client";
 import socketInitializer from "@/lib/socketio/socketInitializer";
 import socketEventCleaner from "@/lib/socketio/socketEventCleaner";
+import * as DOMPurify from "dompurify";
 
 import { parseISODate, timeDifference } from "@/lib/utils";
 
@@ -148,7 +149,7 @@ export default function Messages({ user, chatroom_id: chatroom_id_from_url }) {
 						buyer_name: recipient,
 						isFirstMessage: onlineMessage.length === 0 && offlineMessage.length === 0,
 						image: currentChatroom_avatar.current,
-						text: val,
+						text: DOMPurify.sanitize(val),
 						isRead: false,
 					},
 				});

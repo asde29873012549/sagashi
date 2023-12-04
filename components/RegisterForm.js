@@ -9,6 +9,7 @@ import { userSelector, toggleRegisterForm } from "../redux/userSlice";
 import { useSelector, useDispatch } from "react-redux";
 
 import { useState } from "react";
+import * as DOMPurify from "dompurify";
 
 export default function RegisterForm() {
 	const dispatch = useDispatch();
@@ -28,7 +29,7 @@ export default function RegisterForm() {
 
 	const onSignIn = async () => {
 		const result = await signIn("credentials", {
-			username: formInput.username,
+			username: DOMPurify.sanitize(formInput.username),
 			password: formInput.password,
 			redirect: false,
 		});

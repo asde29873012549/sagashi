@@ -8,6 +8,7 @@ import { personalInfoUpdateSuccess, genericError } from "@/lib/userMessage";
 import { useToast } from "@/components/ui/use-toast";
 import generalFetch from "@/lib/queries/fetchQuery";
 import { Button } from "@/components/ui/button";
+import * as DOMPurify from "dompurify";
 
 export default function EditProfileSheet({ setOpen, uri, user }) {
 	const queryClient = useQueryClient();
@@ -37,8 +38,8 @@ export default function EditProfileSheet({ setOpen, uri, user }) {
 				uri,
 				method: "PUT",
 				body: {
-					fullname: formVal.name,
-					email: formVal.email,
+					fullname: DOMPurify.sanitize(formVal.name),
+					email: DOMPurify.sanitize(formVal.email),
 					birth_date: formVal.birth,
 					gender: formVal.gender,
 				},

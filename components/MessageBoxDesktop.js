@@ -14,6 +14,7 @@ import { genericError } from "@/lib/userMessage";
 import { useQuery } from "@tanstack/react-query";
 import getMessages from "@/lib/queries/fetchQuery";
 import createMessage from "@/lib/queries/fetchQuery";
+import * as DOMPurify from "dompurify";
 
 import { getDateDistance, parseISODate, timeDifference } from "@/lib/utils";
 
@@ -79,7 +80,7 @@ export default function MessageBoxDesktop({
 						buyer_name: wsData.username === wsData.listingOwner ? client : wsData.username,
 						image,
 						isFirstMessage: message.length === 0 ? true : false,
-						text: val,
+						text: DOMPurify.sanitize(val),
 						isRead: false,
 					},
 				});

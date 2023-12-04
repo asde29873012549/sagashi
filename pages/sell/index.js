@@ -34,6 +34,8 @@ import getAllDesigners from "@/lib/queries/fetchQuery";
 import createDraft from "@/lib/queries/fetchQuery";
 import { genericError, saveDraftSuccess, uploadSuccess, submitEmptyDraft } from "@/lib/userMessage";
 
+import * as DOMPurify from "dompurify";
+
 export default function Sell() {
 	const router = useRouter();
 	const [tags, setTags] = useState([]);
@@ -182,9 +184,9 @@ export default function Sell() {
 			if (key === "photos") {
 				Object.values(formInput[key]).forEach((photo) => formData.append("photo", photo));
 			} else if (key === "tags" && tags.length > 0) {
-				formData.append("tags", tags.map((obj) => obj.value).join("&"));
+				formData.append("tags", DOMPurify.sanitize(tags.map((obj) => obj.value).join("&")));
 			} else {
-				formData.append(key, formInput[key]);
+				formData.append(key, DOMPurify.sanitize(formInput[key]));
 			}
 		});
 
@@ -204,9 +206,9 @@ export default function Sell() {
 			if (key === "photos") {
 				Object.values(formInput[key]).forEach((photo) => formData.append("photo", photo));
 			} else if (key === "tags" && tags.length > 0) {
-				formData.append("tags", tags.map((obj) => obj.value).join("&"));
+				formData.append("tags", DOMPurify.sanitize(tags.map((obj) => obj.value).join("&")));
 			} else {
-				formData.append(key, formInput[key]);
+				formData.append(key, DOMPurify.sanitize(formInput[key]));
 			}
 		});
 

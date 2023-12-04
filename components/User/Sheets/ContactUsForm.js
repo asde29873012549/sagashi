@@ -15,13 +15,26 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
+import * as DOMPurify from "dompurify";
 
 const formSchema = z.object({
-	username: z.string().min(1, { message: "username cannot be empty" }),
-	orderNumber: z.string(),
-	email: z.string().email({ message: "email is invalid" }),
-	subject: z.string().min(1, { message: "subject cannot be empty" }),
-	message: z.string().min(1, { message: "message cannot be empty" }),
+	username: z
+		.string()
+		.min(1, { message: "username cannot be empty" })
+		.refine((val) => DOMPurify.sanitize(val)),
+	orderNumber: z.string().refine((val) => DOMPurify.sanitize(val)),
+	email: z
+		.string()
+		.email({ message: "email is invalid" })
+		.refine((val) => DOMPurify.sanitize(val)),
+	subject: z
+		.string()
+		.min(1, { message: "subject cannot be empty" })
+		.refine((val) => DOMPurify.sanitize(val)),
+	message: z
+		.string()
+		.min(1, { message: "message cannot be empty" })
+		.refine((val) => DOMPurify.sanitize(val)),
 });
 
 export default function ContactUsForm({ setOpen, rows }) {

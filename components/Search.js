@@ -11,6 +11,8 @@ import { Separator } from "@/components/ui/separator";
 import { useState, useCallback, useMemo, useRef } from "react";
 import { useRouter } from "next/router";
 
+import * as DOMPurify from "dompurify";
+
 import debounce from "@/lib/utils";
 
 export default function Search({ children }) {
@@ -126,7 +128,7 @@ export default function Search({ children }) {
 													key={`${keyword}-${index}-desginer`}
 													onClick={onClickGuideKeyword}
 												>
-													<div dangerouslySetInnerHTML={{ __html: keyword }} />
+													<div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(keyword) }} />
 												</DropDownItem>
 											);
 										})}
@@ -142,7 +144,9 @@ export default function Search({ children }) {
 														key={`${keyword}-${index}-popular`}
 														onClick={onClickGuideKeyword}
 													>
-														<div dangerouslySetInnerHTML={{ __html: keyword }} />
+														<div
+															dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(keyword) }}
+														/>
 													</DropDownItem>
 												);
 											})}
