@@ -18,6 +18,6 @@ export function DropDownGroup({ children, title }) {
 	);
 }
 
-export function DropDown({ children }) {
-	return <div className="!mt-0 px-2 pb-1">{children}</div>;
+export function DropDown({ children, className = "" }) {
+	return <div className={`!mt-0 px-2 pb-0 ${className}`}>{children}</div>;
 }

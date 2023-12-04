@@ -49,14 +49,14 @@ export default function ItemCard({
 						// I still want the background to be gray if the user navigate to the User Message section to show which itemCard is currently selected
 					} ${read_at && hasSeen && !chatroom_id_from_url ? "" : "bg-slate-100"}`}
 				>
-					<div className="flex">
-						<div className="mr-2 flex shrink-0 items-center">
-							<Avatar className="h-14 w-14">
+					<div className="flex w-full">
+						<div className="mr-2 w-2/12 items-center">
+							<Avatar className="aspect-square w-full">
 								<AvatarImage src={src} />
 								<AvatarFallback>CN</AvatarFallback>
 							</Avatar>
 						</div>
-						<div>
+						<div style={{ width: "77%" }}>
 							<div className="ml-1 line-clamp-2 w-full whitespace-break-spaces px-2">
 								{children}
 							</div>
@@ -66,8 +66,10 @@ export default function ItemCard({
 								</div>
 							)}
 						</div>
+						{!read_at && !hasSeen && (
+							<Dot strokeWidth={5} color="#4932f5" className="h-full shrink-0 self-center" />
+						)}
 					</div>
-					{!read_at && !hasSeen && <Dot strokeWidth={5} color="#4932f5" className="shrink-0" />}
 				</AlertDescription>
 			</Alert>
 		</Link>
