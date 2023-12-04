@@ -11,8 +11,6 @@ import getMessage from "@/lib/queries/fetchQuery";
 import createMessage from "@/lib/queries/fetchQuery";
 import { received_message } from "@/lib/msg_template";
 import { genericError } from "@/lib/userMessage";
-import { useSelector } from "react-redux";
-import { messageSelector } from "@/redux/messageSlice";
 
 import socket from "@/lib/socketio/client";
 import socketInitializer from "@/lib/socketio/socketInitializer";
@@ -33,7 +31,7 @@ export default function Messages({ user, chatroom_id: chatroom_id_from_url }) {
 	const currentChatroom_avatar = useRef(null);
 	const sellContainer = useRef();
 	const maiContainer = useRef();
-	const lastMessage = useSelector(messageSelector).lastMessage;
+	const lastMessageRef = useRef();
 
 	const { data: chatroomList } = useQuery({
 		queryKey: ["chatroomList", currentTab],
@@ -87,11 +85,13 @@ export default function Messages({ user, chatroom_id: chatroom_id_from_url }) {
 
 	useEffect(() => {
 		if (currentTab === "sell" && sellContainer.current) {
-			sellContainer.current.scrollTop = sellContainer.current.scrollHeight;
+			sellContainer.current.scrollTop =
+				sellContainer.current.scrollHeight - sellContainer.current.clientHeight;
 		} else if (currentTab === "buy" && maiContainer.current) {
-			maiContainer.current.scrollTop = maiContainer.current.scrollHeight;
+			maiContainer.current.scrollTop =
+				maiContainer.current.scrollHeight - maiContainer.current.clientHeight;
 		}
-	}, [onlineMessage, currentTab]);
+	}, [offlineMessage, onlineMessage, currentTab]);
 
 	const offlineChatroom = chatroomList?.data ?? [];
 
@@ -196,8 +196,7 @@ export default function Messages({ user, chatroom_id: chatroom_id_from_url }) {
 				<aside
 					className={`relative box-content flex h-[500px] w-[400px] shrink-0 flex-col items-center justify-start overflow-scroll rounded-lg border-2 border-sky-900`}
 				>
-					{offlineChatroom &&
-						offlineChatroom.length > 0 &&
+					{offlineChatroom && offlineChatroom.length > 0 ? (
 						offlineChatroom.map((msg, index) => {
 							const content = mes_type_helper(msg);
 							return (
@@ -211,7 +210,12 @@ export default function Messages({ user, chatroom_id: chatroom_id_from_url }) {
 									{content}
 								</ItemCard>
 							);
-						})}
+						})
+					) : (
+						<div className="flex h-14 w-full items-center justify-center text-sm text-info">
+							No Message Available
+						</div>
+					)}
 				</aside>
 				<div
 					className={`relative flex h-[500px] grow flex-col overflow-scroll rounded-lg border-2 border-sky-900 ${
@@ -270,6 +274,7 @@ export default function Messages({ user, chatroom_id: chatroom_id_from_url }) {
 								);
 							})}
 					</div>
+					<span className="invisible opacity-0" ref={lastMessageRef}></span>
 					<footer className="absolute bottom-0 w-full rounded-lg bg-background p-2">
 						<Input
 							className="h-10 w-full rounded-lg border-slate-800 text-base placeholder:text-slate-400"
@@ -288,8 +293,7 @@ export default function Messages({ user, chatroom_id: chatroom_id_from_url }) {
 				<aside
 					className={`relative box-content flex h-[500px] w-[400px] shrink-0 flex-col items-center justify-start overflow-scroll rounded-lg border-2 border-sky-900`}
 				>
-					{offlineChatroom &&
-						offlineChatroom.length > 0 &&
+					{offlineChatroom && offlineChatroom.length > 0 ? (
 						offlineChatroom.map((msg, index) => {
 							const content = mes_type_helper(msg);
 							return (
@@ -303,7 +307,12 @@ export default function Messages({ user, chatroom_id: chatroom_id_from_url }) {
 									{content}
 								</ItemCard>
 							);
-						})}
+						})
+					) : (
+						<div className="flex h-14 w-full items-center justify-center text-sm text-info">
+							No Message Available
+						</div>
+					)}
 				</aside>
 				<div
 					className={`relative flex h-[500px] grow flex-col overflow-scroll rounded-lg border-2 border-sky-900 ${
@@ -362,6 +371,7 @@ export default function Messages({ user, chatroom_id: chatroom_id_from_url }) {
 								);
 							})}
 					</div>
+					<span className="invisible opacity-0" ref={lastMessageRef}></span>
 					<footer className="absolute bottom-0 w-full rounded-lg bg-background p-2">
 						<Input
 							className="h-10 w-full rounded-lg border-slate-800 text-base placeholder:text-slate-400"

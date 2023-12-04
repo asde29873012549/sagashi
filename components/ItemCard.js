@@ -39,7 +39,7 @@ export default function ItemCard({
 	};
 
 	return (
-		<Link href={link || ""} onClick={onToggleSelect}>
+		<Link href={link || ""} onClick={onToggleSelect} scroll={false}>
 			<Alert>
 				<AlertDescription
 					className={`flex w-[400px] cursor-pointer items-center justify-between rounded-md p-4 hover:bg-slate-100 ${
@@ -47,7 +47,7 @@ export default function ItemCard({
 						// use chatroom_id_from_url to check if this itemCard is in the User's page Message section
 						// because although hasSeen will turn off the gray background and the dot in the Header MessageIcon part
 						// I still want the background to be gray if the user navigate to the User Message section to show which itemCard is currently selected
-					} ${read_at && hasSeen && !chatroom_id_from_url ? "" : "bg-slate-100"}`}
+					} ${!read_at && !hasSeen && !chatroom_id_from_url ? "bg-slate-100" : ""}`}
 				>
 					<div className="flex w-full">
 						<div className="mr-2 w-2/12 items-center">

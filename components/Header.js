@@ -55,8 +55,17 @@ export default function Header() {
 
 					setChatroom((prev) => {
 						return prev.map((c) => {
-							if (c.chatroom_id === newNotification.chatroom_id) {
-								return { ...c, created_at: newNotification.created_at, text: newNotification.text };
+							console.log(c, "cccccccc", newNotification);
+							if (
+								c.id ===
+								`${newNotification.listing_id}-${newNotification.seller_name}-${newNotification.buyer_name}`
+							) {
+								return {
+									...c,
+									created_at: newNotification.created_at,
+									text: newNotification.text,
+									read_at: null,
+								};
 							}
 							return c;
 						});

@@ -120,9 +120,10 @@ export default function MessageBoxDesktop({
 
 	useEffect(() => {
 		if (messageBoxContainer.current) {
-			messageBoxContainer.current.scrollTop = messageBoxContainer.current.scrollHeight;
+			messageBoxContainer.current.scrollTop =
+				messageBoxContainer.current.scrollHeight - messageBoxContainer.current.clientHeight;
 		}
-	});
+	}, [message]);
 
 	return (
 		<motion.div

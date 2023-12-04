@@ -105,7 +105,14 @@ export default function Search({ children }) {
 					{(guideKeyword.data || localRecentSearch.current) && (
 						<>
 							<Separator className="!mt-0" />
-							<DropDown>
+							<DropDown
+								className={
+									guideKeyword.data?.popular.length === 0 &&
+									guideKeyword.data?.designers.length === 0
+										? "!pb-0"
+										: ""
+								}
+							>
 								{!guideKeyword.data && localRecentSearch.current && (
 									<DropDownGroup title="Recently Search">
 										{safeParse(localRecentSearch.current).map((keyword, index) => {

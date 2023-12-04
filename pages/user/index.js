@@ -16,7 +16,7 @@ import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
 import getUser from "@/lib/queries/fetchQuery";
 import { getToken } from "next-auth/jwt";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
@@ -31,6 +31,14 @@ export default function User({ user }) {
 		refetchOnWindowFocus: false,
 	});
 
+	useEffect(() => {
+		console.log(chatroom_id, "chatroom_id");
+		if (chatroom_id) {
+			setDisplayFeature(<Messages user={user} chatroom_id={chatroom_id} />);
+			setFeature("Messages");
+		}
+	}, [chatroom_id]);
+
 	const hasNotEditButtonFeature = ["My Items", "Contact Us", "About", "Messages"];
 
 	const [displayFeature, setDisplayFeature] = useState(
@@ -44,6 +52,8 @@ export default function User({ user }) {
 	const onProfileClick = () => {
 		setDisplayFeature(<ProfileInfo userData={userData} />);
 		setFeature("My Profile");
+
+		chatroom_id && router.replace("/user");
 	};
 
 	const onMessagesClick = () => {
@@ -54,6 +64,8 @@ export default function User({ user }) {
 	const onMyItemsClick = () => {
 		setDisplayFeature(<MyItem />);
 		setFeature("My Items");
+
+		chatroom_id && router.replace("/user");
 	};
 
 	const onMyAddressClick = () => {
@@ -66,26 +78,36 @@ export default function User({ user }) {
 			/>,
 		);
 		setFeature("My Address");
+
+		chatroom_id && router.replace("/user");
 	};
 
 	const onMyLanguageClick = () => {
 		setDisplayFeature(<LanguageInfo />);
 		setFeature("My Language");
+
+		chatroom_id && router.replace("/user");
 	};
 
 	const onMyCountryClick = () => {
 		setDisplayFeature(<CountryInfo userData={userData} />);
 		setFeature("My Country");
+
+		chatroom_id && router.replace("/user");
 	};
 
 	const onContactUsClick = () => {
 		setDisplayFeature(<ContactUs rows="10" />);
 		setFeature("Contact Us");
+
+		chatroom_id && router.replace("/user");
 	};
 
 	const onAboutClick = () => {
 		setDisplayFeature(<About />);
 		setFeature("About");
+
+		chatroom_id && router.replace("/user");
 	};
 
 	return (

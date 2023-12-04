@@ -128,7 +128,7 @@ export default function ListingItem({ username, product_id }) {
 								date={productData.updated_at}
 							/>
 						)}
-						{username && (
+						{username !== listingData?.data[0].seller_name && (
 							<Button
 								className="hidden h-12 w-full hover:border-2 hover:border-foreground hover:bg-background hover:text-foreground md:block md:w-4/5"
 								onClick={onCloseMessageBox}
