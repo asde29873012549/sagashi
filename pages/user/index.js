@@ -32,17 +32,16 @@ export default function User({ user }) {
 	});
 
 	useEffect(() => {
-		console.log(chatroom_id, "chatroom_id");
 		if (chatroom_id) {
-			setDisplayFeature(<Messages user={user} chatroom_id={chatroom_id} />);
+			setDisplayFeature(<Messages user={user} />);
 			setFeature("Messages");
 		}
-	}, [chatroom_id]);
+	}, [chatroom_id, user]);
 
 	const hasNotEditButtonFeature = ["My Items", "Contact Us", "About", "Messages"];
 
 	const [displayFeature, setDisplayFeature] = useState(
-		dept ? <Messages user={user} chatroom_id={chatroom_id} /> : <ProfileInfo userData={userData} />,
+		dept ? <Messages user={user} /> : <ProfileInfo userData={userData} />,
 	);
 	const [feature, setFeature] = useState(dept ? dept : "My Profile");
 	const [open, setOpen] = useState(false);

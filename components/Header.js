@@ -55,7 +55,6 @@ export default function Header() {
 
 					setChatroom((prev) => {
 						return prev.map((c) => {
-							console.log(c, "cccccccc", newNotification);
 							if (
 								c.id ===
 								`${newNotification.listing_id}-${newNotification.seller_name}-${newNotification.buyer_name}`

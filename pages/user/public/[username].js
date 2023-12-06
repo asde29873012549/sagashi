@@ -63,32 +63,8 @@ export default function PublicUserProfile({ user, avatar }) {
 		},
 	});
 
-	const { mutateAsync: notificationMutate } = useMutation({
-		mutationFn: () =>
-			createNotification({
-				uri: "/notification",
-				method: "POST",
-				body: {
-					receiver_name: username,
-					type: "notification.follow",
-					link: `/user/public/${username}`,
-					image: publicUserData?.data.avatar,
-					content: {
-						username,
-					},
-				},
-			}),
-	});
-
 	const onFollow = async () => {
-		if (isFollow) {
-			await followMutate({ follow_user: username, user_image: avatar });
-		} else {
-			await Promise.allSettled([
-				followMutate({ follow_user: username, user_image: avatar }),
-				notificationMutate(),
-			]);
-		}
+		await followMutate({ follow_user: username, user_image: avatar });
 		setIsFollow((prev) => !prev);
 	};
 

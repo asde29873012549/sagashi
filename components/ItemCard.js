@@ -17,6 +17,7 @@ export default function ItemCard({
 	setIsOpen,
 	read_at,
 	message_id,
+	chatroom_id,
 	chatroom_id_from_url,
 }) {
 	const [isSelected, setIsSelected] = useState(false);
@@ -38,6 +39,8 @@ export default function ItemCard({
 			});
 	};
 
+	console.log("chatroom_id_from_url", chatroom_id_from_url, "chatroom_id", chatroom_id);
+
 	return (
 		<Link href={link || ""} onClick={onToggleSelect} scroll={false}>
 			<Alert>
@@ -47,7 +50,11 @@ export default function ItemCard({
 						// use chatroom_id_from_url to check if this itemCard is in the User's page Message section
 						// because although hasSeen will turn off the gray background and the dot in the Header MessageIcon part
 						// I still want the background to be gray if the user navigate to the User Message section to show which itemCard is currently selected
-					} ${!read_at && !hasSeen && !chatroom_id_from_url ? "bg-slate-100" : ""}`}
+					} ${
+						/*!read_at && !hasSeen && !*/ chatroom_id && chatroom_id === chatroom_id_from_url
+							? "bg-slate-100"
+							: ""
+					}`}
 				>
 					<div className="flex w-full">
 						<div className="mr-2 w-2/12 items-center">

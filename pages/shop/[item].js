@@ -147,6 +147,7 @@ export default function ListingItem({ username, product_id }) {
 						<ListingCard
 							key={`${index}-${obj.name}`}
 							src={obj.primary_image}
+							prod_id={obj.prod_id}
 							product_data={obj}
 							className="mb-4 w-[48%] shrink-0 md:w-1/6"
 						/>
@@ -161,6 +162,7 @@ export default function ListingItem({ username, product_id }) {
 						<ListingCard
 							key={`${obj.product_id}-${index}`}
 							src={obj.Product.primary_image}
+							prod_id={obj.product_id}
 							product_data={obj.Product}
 							className="mb-4 w-[48%] shrink-0 md:w-1/5"
 						/>

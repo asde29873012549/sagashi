@@ -5,7 +5,6 @@ import { Heart } from "lucide-react";
 import { getDateDistance } from "@/lib/utils";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import createLike from "@/lib/queries/fetchQuery";
-import createNotification from "@/lib/queries/fetchQuery";
 import { useToast } from "@/components/ui/use-toast";
 import { genericError } from "@/lib/userMessage";
 import getUserLikedListing from "@/lib/queries/fetchQuery";
@@ -41,23 +40,6 @@ export default function ListingCard({ src, prod_id, product_data, lastProductEle
 				status: "fail",
 			});
 		},
-	});
-
-	const { mutateAsync: notificationMutate } = useMutation({
-		mutationFn: () =>
-			createNotification({
-				uri: "/notification",
-				method: "POST",
-				body: {
-					receiver_name: product_data?.seller_name,
-					type: "notification.like",
-					link: `/shop/${prod_id}`,
-					image: src,
-					content: {
-						listing_name: product_data?.name,
-					},
-				},
-			}),
 	});
 
 	const { data: likedListing, refetch } = useQuery({
@@ -96,16 +78,11 @@ export default function ListingCard({ src, prod_id, product_data, lastProductEle
 	}, [likedListing, user]);
 
 	const onLike = async () => {
-		let isPreviouslyLiked = false;
-
 		// modify the liked state
 		setLiked((prev) =>
 			prev.includes(prod_id) ? prev.filter((id) => id !== prod_id) : [...prev, prod_id],
 		);
 		const currLikedListing = safeParse(localStorage.getItem("likedListing"));
-
-		// check if a listing is previously liked by getting like data from local storage
-		if (currLikedListing.includes(prod_id)) isPreviouslyLiked = true;
 
 		// set local storage data according to the current listing has been liked or not
 		localStorage.setItem(
@@ -118,12 +95,7 @@ export default function ListingCard({ src, prod_id, product_data, lastProductEle
 		);
 
 		try {
-			// only call notification api if the listing is not previously liked
-			if (isPreviouslyLiked) {
-				await Promise.allSettled([likeMutate()]);
-			} else {
-				await Promise.allSettled([likeMutate(), notificationMutate()]);
-			}
+			await likeMutate();
 		} catch (err) {
 			console.log(err);
 		}

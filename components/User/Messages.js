@@ -16,10 +16,12 @@ import socket from "@/lib/socketio/client";
 import socketInitializer from "@/lib/socketio/socketInitializer";
 import socketEventCleaner from "@/lib/socketio/socketEventCleaner";
 import * as DOMPurify from "dompurify";
+import { useRouter } from "next/router";
 
 import { parseISODate, timeDifference } from "@/lib/utils";
 
-export default function Messages({ user, chatroom_id: chatroom_id_from_url }) {
+export default function Messages({ user }) {
+	const { chatroom_id: chatroom_id_from_url } = useRouter().query;
 	const [val, setVal] = useState("");
 	const { toast } = useToast();
 	const [onlineMessage, setOnlineMessage] = useState([]);
@@ -205,6 +207,7 @@ export default function Messages({ user, chatroom_id: chatroom_id_from_url }) {
 									src={msg.chatroom_avatar}
 									setIsOpen={() => onOpenChatroom(msg.id, msg.chatroom_avatar)}
 									read_at={msg.read_at}
+									chatroom_id={msg.id}
 									chatroom_id_from_url={chatroom_id_from_url}
 								>
 									{content}
@@ -302,6 +305,7 @@ export default function Messages({ user, chatroom_id: chatroom_id_from_url }) {
 									src={msg.chatroom_avatar}
 									setIsOpen={() => onOpenChatroom(msg.id, msg.chatroom_avatar)}
 									read_at={msg.read_at}
+									chatroom_id={msg.id}
 									chatroom_id_from_url={chatroom_id_from_url}
 								>
 									{content}
