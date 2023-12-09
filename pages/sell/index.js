@@ -344,7 +344,7 @@ export default function Sell() {
 					<SelectTrigger className="h-12 w-auto">
 						<SelectValue placeholder="Color" />
 					</SelectTrigger>
-					<SelectContent>
+					<SelectContent className="h-60">
 						{colorData?.data.map((color) => (
 							<SelectItem key={color} value={color}>
 								{color}

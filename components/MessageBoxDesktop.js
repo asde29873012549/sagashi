@@ -10,11 +10,14 @@ import socket from "@/lib/socketio/client";
 import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { genericError } from "@/lib/userMessage";
+import { useDispatch } from "react-redux";
+import { setLastMessage } from "@/redux/messageSlice";
 
 import { useQuery } from "@tanstack/react-query";
 import getMessages from "@/lib/queries/fetchQuery";
+import readMessage from "@/lib/queries/fetchQuery";
 import createMessage from "@/lib/queries/fetchQuery";
-import * as DOMPurify from "dompurify";
+import DOMPurify from "dompurify";
 
 import { getDateDistance, parseISODate, timeDifference } from "@/lib/utils";
 
@@ -29,6 +32,7 @@ export default function MessageBoxDesktop({
 	listing_designer,
 	date,
 }) {
+	const dispatch = useDispatch();
 	const [val, setVal] = useState("");
 	const { toast } = useToast();
 	const [message, setMessages] = useState([]);
@@ -53,53 +57,89 @@ export default function MessageBoxDesktop({
 	const onPressEnter = async (e) => {
 		if (e.keyCode === 13) {
 			// check who should be the client
-			let client;
+			let client = null;
 
 			client = id[0]?.split("-")[2];
 
-			socket.emit("message", {
-				message: { created_at: new Date().toISOString(), text: val, sender_name: wsData.username },
-				client,
-			});
-			// add message to message lists
+			if (!client)
+				return toast({
+					title: "Failed !",
+					description: genericError,
+					status: "fail",
+				});
+
+			// optimistically add message to message lists
 			setMessages((m) => [
 				...m,
 				{ created_at: new Date().toISOString(), text: val, sender_name: wsData.username },
 			]);
-			// clear input
-			setVal("");
 
-			// fetch message to database
+			// then post message to database
+			let Message = null;
+
 			try {
-				const res = createMessage({
+				Message = await createMessage({
 					uri: "/message",
 					method: "POST",
 					body: {
 						product_id: wsData.product_id,
 						seller_name: wsData.listingOwner,
 						buyer_name: wsData.username === wsData.listingOwner ? client : wsData.username,
-						image,
 						isFirstMessage: message.length === 0 ? true : false,
+						image,
 						text: DOMPurify.sanitize(val),
 						isRead: false,
 					},
 				});
 
-				if (res.status === "fail") {
+				if (Message.status === "fail") {
 					throw new Error();
 				}
 			} catch (error) {
-				toast({
-					title: "Failed !",
+				console.log(error);
+				// remove message from message list if create-message api failed
+				setMessages((m) =>
+					m.filter((msg) => msg.text !== val && msg.sender_name !== wsData.username),
+				);
+
+				return toast({
+					title: "Message failed to deliver !",
 					description: genericError,
 					status: "fail",
 				});
 			}
+
+			socket.emit("message", {
+				message: {
+					created_at: new Date().toISOString(),
+					text: val,
+					sender_name: wsData.username,
+					message_id: Message.data?.id,
+				},
+				client,
+			});
+
+			// clear input
+			setVal("");
+
+			// set local user's last message state
+			dispatch(setLastMessage({ chatroom_id, text: val }));
 		}
 	};
 
 	useEffect(() => {
-		socketInitializer(setMessages, setId);
+		socketInitializer({
+			setter: setMessages,
+			setId,
+			fetchQuery: async (message_id) =>
+				await readMessage({
+					uri: "/message",
+					method: "PUT",
+					body: {
+						message_id,
+					},
+				}),
+		});
 
 		socket.io.opts.query.user = wsData.username;
 		socket.io.opts.query.listingOwner = wsData.listingOwner;

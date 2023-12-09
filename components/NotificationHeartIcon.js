@@ -71,6 +71,8 @@ export default function MessageIcon({
 							timing={msg.created_at}
 							link={msg.link}
 							setIsOpen={onToggleMessageIcon}
+							notification_id={msg.id}
+							// read_at={msg.read_at}
 						>
 							{content}
 						</ItemCard>
@@ -87,6 +89,8 @@ export default function MessageIcon({
 								timing={msg.created_at}
 								link={msg.link}
 								setIsOpen={onToggleMessageIcon}
+								notification_id={msg.id}
+								read_at={msg.read_at}
 							>
 								{content}
 							</ItemCard>

@@ -15,7 +15,7 @@ const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 
 export const authOptions = {
 	session: {
-		maxAge: 60 * 60 * 24 * 30,
+		maxAge: 60 * 60 * 24 * 30, // 30 days
 	},
 	providers: [
 		CredentialsProvider({

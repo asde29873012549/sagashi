@@ -10,8 +10,13 @@ import MenuBar from "./MenuBar";
 import Search from "./Search";
 
 import { toggleRegisterForm } from "../redux/userSlice";
-import { useDispatch } from "react-redux";
-import { setHasSeen, setLastMessage } from "@/redux/messageSlice";
+import { useDispatch, useSelector } from "react-redux";
+import {
+	setMessageReadStatus,
+	setLastMessage,
+	messageSelector,
+	setNotificationReadStatus,
+} from "@/redux/messageSlice";
 import { useQuery } from "@tanstack/react-query";
 import getNotification from "@/lib/queries/fetchQuery";
 
@@ -28,6 +33,7 @@ export default function Header() {
 	const dispatch = useDispatch();
 	const { data: session, status } = useSession();
 	const onToggleRegisterForm = () => dispatch(toggleRegisterForm());
+	const currentActiveChatroom = useSelector(messageSelector).currentActiveChatroom;
 
 	const user = session?.user?.username ?? "";
 
@@ -37,28 +43,45 @@ export default function Header() {
 			getNotification({
 				uri: "/notification",
 			}),
+		enabled: session ? true : false,
 		refetchOnWindowFocus: false,
+		onSuccess: (initialNotificationData) => {
+			// create global state for notification read status
+			dispatch(setNotificationReadStatus(initialNotificationData.data));
+		},
 	});
 
 	useEffect(() => {
+		let eventSource = null;
 		if (user) {
-			const eventSource = new EventSource(`${NOTIFICATION_SERVER}/events`, {
+			eventSource = new EventSource(`${NOTIFICATION_SERVER}/events`, {
 				withCredentials: true,
 			});
 
 			eventSource.onmessage = (event) => {
 				const newNotification = JSON.parse(event.data);
 				if (newNotification.type === "notification.message") {
-					// if received new message, reset the hasSeen state to false to make the indicator dot on the item card to show
-					dispatch(setHasSeen(false));
-					dispatch(setLastMessage(newNotification.text));
+					const newMessageChatroomId = `${newNotification.listing_id}-${newNotification.seller_name}-${newNotification.buyer_name}`;
+					// if received new message online
+					// check if current opened chatroom is the same as the chatroom id the new message belongs to
+					// if true, it means the user is currently in the chatroom, so we automatically set the message as read
+					// otherwise, it means the user is not in the chatroom, so we set the message read status as null
+					dispatch(
+						setMessageReadStatus({
+							chatroom_id: newMessageChatroomId,
+							read_at:
+								currentActiveChatroom === newMessageChatroomId ? new Date().toISOString() : null,
+						}),
+					);
+					// set message receiver's last message
+					dispatch(
+						setLastMessage({ chatroom_id: newMessageChatroomId, text: newNotification.text }),
+					);
 
+					// update chatroom list's last message and created_at
 					setChatroom((prev) => {
 						return prev.map((c) => {
-							if (
-								c.id ===
-								`${newNotification.listing_id}-${newNotification.seller_name}-${newNotification.buyer_name}`
-							) {
+							if (c.id === newMessageChatroomId) {
 								return {
 									...c,
 									created_at: newNotification.created_at,
@@ -69,16 +92,28 @@ export default function Header() {
 							return c;
 						});
 					});
+
+					// show message red dot, symbolizing new message
 					setMessageActive(true);
 				} else {
 					setOnlineNotification((prev) => [newNotification, ...prev]);
 					setNotificationActive(true);
+
+					// received new notification online, set read status as null
+					dispatch(
+						setNotificationReadStatus({
+							id: newNotification.id,
+							read_at: null,
+						}),
+					);
 				}
 			};
 
-			notificationRefetch();
+			// notificationRefetch();
 		}
-	}, [user, notificationRefetch]);
+
+		return () => eventSource && eventSource.close();
+	}, [user, notificationRefetch, currentActiveChatroom]);
 
 	const isUsingMobile = () => {
 		if (typeof window !== "undefined") return window.innerWidth < 768; //&& navigator.maxTouchPoints > 0;
@@ -128,9 +163,9 @@ export default function Header() {
 							{session && (
 								<NotificationHeartIcon
 									onlineNotification={onlineNotification}
+									offlineNotification={notificationData?.data ?? []}
 									notificationActive={notificationActive}
 									onNotificationHeartIconClick={onNotificationHeartIconClick}
-									offlineNotification={notificationData?.data ?? []}
 								/>
 							)}
 							{session && (
@@ -159,15 +194,3 @@ export default function Header() {
 		)
 	);
 }
-
-/*
-<Popover>
-								<PopoverTrigger className="inline-block hover:cursor-pointer">
-									<User className="h-7 w-7" />
-								</PopoverTrigger>
-								<PopoverContent className="w-20 h-fit box-border">
-									<div className="p-2 hover:cursor-pointer text-sm font-semibold text-foreground hover:bg-gray-100">Profile</div>
-									<div className="p-2 hover:cursor-pointer text-sm font-semibold text-foreground hover:bg-gray-100">Edit</div>
-								</PopoverContent>
-							  </Popover>
-*/

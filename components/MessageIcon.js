@@ -5,6 +5,9 @@ import { received_message } from "@/lib/msg_template";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import getMessages from "@/lib/queries/fetchQuery";
+import { useDispatch } from "react-redux";
+import { setMessageReadStatus } from "@/redux/messageSlice";
+import { set } from "date-fns";
 
 export default function MessageIcon({
 	user,
@@ -13,6 +16,7 @@ export default function MessageIcon({
 	chatroom,
 	setChatroom,
 }) {
+	const dispatch = useDispatch();
 	const [isOpen, setIsOpen] = useState(false);
 
 	const { data: chatroomList, refetch: fetchChatroomList } = useQuery({
@@ -24,6 +28,11 @@ export default function MessageIcon({
 		refetchOnWindowFocus: false,
 		onSuccess: (initialChatroomList) => {
 			setChatroom(initialChatroomList.data);
+			dispatch(
+				setMessageReadStatus(
+					initialChatroomList.data?.map((c) => ({ chatroom_id: c.id, read_at: c.read_at })),
+				),
+			);
 		},
 	});
 
@@ -61,12 +70,14 @@ export default function MessageIcon({
 						const content = mes_type_helper(msg);
 						return (
 							<ItemCard
+								user={user}
 								key={`${msg.updated_at || msg.created_at}-${index}-msg`}
 								src={msg.chatroom_avatar || msg.image}
 								link={msg.link}
 								setIsOpen={onToggleMessageIcon}
 								read_at={msg.read_at}
 								message_id={msg.last_message || ""}
+								chatroom_id={msg.id}
 							>
 								{content}
 							</ItemCard>
