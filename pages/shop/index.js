@@ -7,9 +7,11 @@ import reformTree from "@/lib/tree/reformTree";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import FilterSection from "@/components/FilterSection";
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
+import { useRouter } from "next/router";
 
 export default function Shop({ isMenswear, isWomenswear, isNewArrival, designer, user, treeData }) {
+	const { subCat, cat, dept } = useRouter().query;
 	const { data: OriginTreeData } = useQuery({
 		queryKey: ["tree"],
 		queryFn: () => getTree({ uri: "/tree" }),
@@ -25,6 +27,8 @@ export default function Shop({ isMenswear, isWomenswear, isNewArrival, designer,
 			return { designers: [designer] };
 		} else if (isNewArrival) {
 			return { newArrivals: true };
+		} else if (subCat && cat && dept) {
+			return { subCategory: [{ dept, cat, name: subCat }] };
 		} else {
 			return {};
 		}
@@ -42,6 +46,10 @@ export default function Shop({ isMenswear, isWomenswear, isNewArrival, designer,
 
 	const [filter, setFilter] = useState(initialFilterState());
 	const [tree, setTree] = useState(initialTreeState());
+
+	useEffect(() => {
+		subCat && cat && dept && setFilter({ subCategory: [{ dept, cat, name: subCat }] });
+	}, [subCat, cat, dept]);
 
 	const createBody = (pageParam, restFilter) => {
 		if (!pageParam && Object.keys(restFilter).length === 0) return {};
@@ -195,7 +203,7 @@ export async function getStaticProps() {
 
 	await queryClient.prefetchQuery({
 		queryKey: ["products", {}],
-		queryFn: () => getProducts({ uri: "/listing", sever: true }),
+		queryFn: () => getProducts({ uri: "/listing", method: "POST", body: {}, sever: true }),
 	});
 
 	return {

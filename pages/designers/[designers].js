@@ -1,20 +1,37 @@
+import * as dotenv from "dotenv";
 import Image from "next/image";
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import DesignerCard from "@/components/DesignerCard";
 import Shop from "../shop/index";
-import { dehydrate, QueryClient, useQuery, useInfiniteQuery } from "@tanstack/react-query";
+import {
+	dehydrate,
+	QueryClient,
+	useQuery,
+	useInfiniteQuery,
+	useMutation,
+} from "@tanstack/react-query";
 import getSingleDesigner from "@/lib/queries/fetchQuery";
 import getRelatedDesigner from "@/lib/queries/fetchQuery";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import getTree from "@/lib/queries/fetchQuery";
+import followDesigner from "@/lib/queries/fetchQuery";
+import getIsFollowDesigner from "@/lib/queries/fetchQuery";
+import { useToast } from "@/components/ui/use-toast";
+import { genericError } from "@/lib/userMessage";
+import { getToken } from "next-auth/jwt";
 
 import { useRouter } from "next/router";
+
+dotenv.config();
+
+const JWT_TOKEN_SECRET = process.env.JWT_TOKEN_SECRET;
 
 export default function SingleDesignerPage() {
 	const [designerIntroSecExpand, setDesignerIntroSecExpand] = useState(false);
 	const router = useRouter();
+	const { toast } = useToast();
 
 	const { data: OriginTreeData } = useQuery({
 		queryKey: ["tree"],
@@ -28,6 +45,17 @@ export default function SingleDesignerPage() {
 		refetchOnWindowFocus: false,
 	});
 
+	const { data: isFollowDesigner } = useQuery({
+		queryKey: ["designer", "follow", { id: router.query.designers }],
+		queryFn: ({ queryKey }) => getIsFollowDesigner({ uri: `/designer/isFollow/${queryKey[2].id}` }),
+		refetchOnWindowFocus: false,
+		onError: (err) => {
+			console.log(err);
+		},
+	});
+
+	const [isFollow, setIsFollow] = useState(isFollowDesigner?.data ? true : false);
+
 	const createTagsStr = (arr) => {
 		if (!arr || arr.length === 0) return "";
 		const str = encodeURI(JSON.stringify(arr));
@@ -40,6 +68,30 @@ export default function SingleDesignerPage() {
 			getRelatedDesigner({ uri: `/designer/relatedDesigners${createTagsStr(queryKey[1].tags)}` }),
 		refetchOnWindowFocus: false,
 	});
+
+	const { mutateAsync: followMutate } = useMutation({
+		mutationFn: () =>
+			followDesigner({
+				uri: "/designer",
+				method: "POST",
+				body: {
+					designer_id: router.query.designers,
+				},
+			}),
+		onError: () => {
+			setIsFollow((prev) => !prev);
+			toast({
+				title: "Failed !",
+				description: genericError,
+				status: "fail",
+			});
+		},
+	});
+
+	const onFollowDesigner = () => {
+		setIsFollow((prev) => !prev);
+		followMutate();
+	};
 
 	const onReadmore = (e) => {
 		e.preventDefault();
@@ -89,7 +141,13 @@ export default function SingleDesignerPage() {
 					></div>
 				</div>
 				<div className="flex w-full translate-y-14 justify-end px-8 md:w-3/12 md:translate-y-0 md:justify-end md:px-0">
-					<Button className="h-fit w-24  py-2">Follow</Button>
+					<Button
+						variant={isFollow ? "outline" : ""}
+						className="h-fit w-24  py-2"
+						onClick={onFollowDesigner}
+					>
+						{isFollow ? "Following" : "Follow"}
+					</Button>
 				</div>
 			</section>
 
@@ -122,19 +180,31 @@ export default function SingleDesignerPage() {
 	);
 }
 
-export async function getServerSideProps({ query }) {
+export async function getServerSideProps({ req, query }) {
 	const designer_id = query.designers;
 	const queryClient = new QueryClient();
+	const token = await getToken({ req, secret: JWT_TOKEN_SECRET });
+	const accessToken = token?.accessToken;
 
 	await queryClient.prefetchQuery({
 		queryKey: ["tree"],
-		queryFn: () => getTree({ uri: "/tree", sever: true }),
+		queryFn: () => getTree({ uri: "/tree", server: true }),
 	});
 
 	await queryClient.prefetchQuery({
 		queryKey: ["designer", { id: designer_id }],
 		queryFn: ({ queryKey }) =>
-			getSingleDesigner({ uri: `/designer/${queryKey[1].id}`, sever: true }),
+			getSingleDesigner({ uri: `/designer/${queryKey[1].id}`, server: true }),
+	});
+
+	await queryClient.prefetchQuery({
+		queryKey: ["designer", "follow", { id: designer_id }],
+		queryFn: ({ queryKey }) =>
+			getIsFollowDesigner({
+				uri: `/designer/isFollow/${queryKey[2].id}`,
+				server: true,
+				token: accessToken,
+			}),
 	});
 
 	return {

@@ -6,6 +6,7 @@ import {
 	NavigationMenuLink,
 	NavigationMenuList,
 	NavigationMenuTrigger,
+	navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -66,16 +67,17 @@ export default function NavBar() {
 												<Skeleton key={`${index}-${id}`} className="mx-5 my-2 h-8 w-44" />
 											))
 									: designerData?.data.map((obj) => (
-											<Link
-												key={obj.designer_id}
-												href={`/designers/${obj.designer_id}`}
-												className="group mx-5 my-2 flex w-60 translate-y-0 transform items-center font-light text-gray-600 transition-transform duration-300 ease-in-out hover:translate-y-0.5 hover:underline"
-											>
-												<span>{obj.Designer.name}</span>
-												<span className="hidden group-hover:block group-hover:text-cyan-700">
-													<Dot />
-												</span>
-											</Link>
+											<NavigationMenuLink key={obj.designer_id} asChild>
+												<Link
+													href={`/designers/${obj.designer_id}`}
+													className="group mx-5 my-2 flex w-60 translate-y-0 transform items-center font-light text-gray-600 transition-transform duration-300 ease-in-out hover:translate-y-0.5 hover:underline"
+												>
+													<span>{obj.Designer.name}</span>
+													<span className="hidden group-hover:block group-hover:text-cyan-700">
+														<Dot />
+													</span>
+												</Link>
+											</NavigationMenuLink>
 									  ))}
 							</div>
 						</NavigationMenuContent>
@@ -98,12 +100,17 @@ export default function NavBar() {
 												<div className="my-2 w-56 font-normal">{cat}</div>
 												<div className="flex flex-col">
 													{categoryData?.data.Menswear[cat].sub.map((subCat, index) => (
-														<div
-															className="my-1 flex translate-y-0 transform text-base font-light transition-transform duration-300 ease-in-out hover:translate-y-0.5 hover:cursor-pointer hover:underline"
-															key={`${index}-${subCat}`}
-														>
-															<span>{subCat.name}</span>
-														</div>
+														<NavigationMenuLink key={`${index}-${subCat}`} asChild>
+															<Link
+																href={`/shop?subCat=${encodeURIComponent(
+																	subCat.name,
+																)}&cat=${cat}&dept=Menswear`}
+															>
+																<div className="my-1 flex translate-y-0 transform text-base font-light transition-transform duration-300 ease-in-out hover:translate-y-0.5 hover:cursor-pointer hover:underline">
+																	<span>{subCat.name}</span>
+																</div>
+															</Link>
+														</NavigationMenuLink>
 													))}
 												</div>
 											</div>
@@ -129,12 +136,17 @@ export default function NavBar() {
 												<div className="my-2 w-56 font-normal">{cat}</div>
 												<div className="flex flex-col">
 													{categoryData?.data.Womenswear[cat].sub.map((subCat, index) => (
-														<div
-															className="my-1 flex translate-y-0 transform text-base font-light transition-transform duration-300 ease-in-out hover:translate-y-0.5 hover:cursor-pointer hover:underline"
-															key={`${index}-${subCat}`}
-														>
-															<span>{subCat.name}</span>
-														</div>
+														<NavigationMenuLink key={`${index}-${subCat}`} asChild>
+															<Link
+																href={`/shop?subCat=${encodeURIComponent(
+																	subCat.name,
+																)}&cat=${cat}&dept=Womenswear`}
+															>
+																<div className="my-1 flex translate-y-0 transform text-base font-light transition-transform duration-300 ease-in-out hover:translate-y-0.5 hover:cursor-pointer hover:underline">
+																	<span>{subCat.name}</span>
+																</div>
+															</Link>
+														</NavigationMenuLink>
 													))}
 												</div>
 											</div>
