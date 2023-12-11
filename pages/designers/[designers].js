@@ -186,26 +186,31 @@ export async function getServerSideProps({ req, query }) {
 	const token = await getToken({ req, secret: JWT_TOKEN_SECRET });
 	const accessToken = token?.accessToken;
 
-	await queryClient.prefetchQuery({
-		queryKey: ["tree"],
-		queryFn: () => getTree({ uri: "/tree", server: true }),
-	});
+	const fetchTree = async () =>
+		await queryClient.prefetchQuery({
+			queryKey: ["tree"],
+			queryFn: () => getTree({ uri: "/tree", server: true }),
+		});
 
-	await queryClient.prefetchQuery({
-		queryKey: ["designer", { id: designer_id }],
-		queryFn: ({ queryKey }) =>
-			getSingleDesigner({ uri: `/designer/${queryKey[1].id}`, server: true }),
-	});
+	const fetchDesigner = async () =>
+		await queryClient.prefetchQuery({
+			queryKey: ["designer", { id: designer_id }],
+			queryFn: ({ queryKey }) =>
+				getSingleDesigner({ uri: `/designer/${queryKey[1].id}`, server: true }),
+		});
 
-	await queryClient.prefetchQuery({
-		queryKey: ["designer", "follow", { id: designer_id }],
-		queryFn: ({ queryKey }) =>
-			getIsFollowDesigner({
-				uri: `/designer/isFollow/${queryKey[2].id}`,
-				server: true,
-				token: accessToken,
-			}),
-	});
+	const fetchIsFollowDesigner = async () =>
+		await queryClient.prefetchQuery({
+			queryKey: ["designer", "follow", { id: designer_id }],
+			queryFn: ({ queryKey }) =>
+				getIsFollowDesigner({
+					uri: `/designer/isFollow/${queryKey[2].id}`,
+					server: true,
+					token: accessToken,
+				}),
+		});
+
+	await Promise.allSettled([fetchTree(), fetchDesigner(), fetchIsFollowDesigner()]);
 
 	return {
 		props: {

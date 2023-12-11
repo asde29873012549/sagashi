@@ -3,11 +3,12 @@ import { signOut, useSession } from "next-auth/react";
 import Logo from "./Logo";
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
-import { ShoppingCart, User, Search as SearchIcon } from "lucide-react";
+import { User, Search as SearchIcon } from "lucide-react";
 import NotificationHeartIcon from "./NotificationHeartIcon";
 import MessageIcon from "./MessageIcon";
 import MenuBar from "./MenuBar";
 import Search from "./Search";
+import ShoppingCartIcon from "./ShoppingCartIcon";
 
 import { toggleRegisterForm } from "../redux/userSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -177,11 +178,7 @@ export default function Header() {
 									onMessageIconClick={onMessageIconClick}
 								/>
 							)}
-							{session && (
-								<Link href={"/shoppingBag"}>
-									<ShoppingCart className="h-7 w-7 hover:cursor-pointer" />
-								</Link>
-							)}
+							{session && <ShoppingCartIcon />}
 							{session && (
 								<Link className="inline-block hover:cursor-pointer" href="/user">
 									<User className="h-7 w-7" />

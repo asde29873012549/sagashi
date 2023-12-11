@@ -49,7 +49,8 @@ export default function Shop({ isMenswear, isWomenswear, isNewArrival, designer,
 
 	useEffect(() => {
 		subCat && cat && dept && setFilter({ subCategory: [{ dept, cat, name: subCat }] });
-	}, [subCat, cat, dept]);
+		designer && setFilter({ designers: [designer] });
+	}, [subCat, cat, dept, designer]);
 
 	const createBody = (pageParam, restFilter) => {
 		if (!pageParam && Object.keys(restFilter).length === 0) return {};
