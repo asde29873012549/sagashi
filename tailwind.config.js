@@ -92,6 +92,16 @@ module.exports = {
 					from: { opacity: 0 },
 					to: { opacity: 1 },
 				},
+				horizontalBounce: {
+					"0%, 100%": {
+						transform: "translateX(-25%)",
+						animationTimingFunction: "cubic-bezier(0.8, 0, 1, 1)",
+					},
+					"50%": {
+						transform: "translateX(0)",
+						animationTimingFunction: "cubic-bezier(0, 0, 0.2, 1)",
+					},
+				},
 			},
 			animation: {
 				"accordion-down": "accordion-down 0.2s ease-out",
@@ -99,6 +109,7 @@ module.exports = {
 				"slide-shoppingCart": "slide-shoppingCart 2s forwards",
 				svg: "drawLine 1s forwards",
 				opacityTransition: "opacityTransition 0.8s forwards",
+				horizontalBounce: "horizontalBounce 0.8s infinite",
 			},
 		},
 	},

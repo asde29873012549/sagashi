@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dot } from "lucide-react";
+import { MoveRight } from "lucide-react";
 
 //libs
 import getFeaturedDesigners from "@/lib/queries/fetchQuery";
@@ -48,37 +49,47 @@ export default function NavBar() {
 						<NavigationMenuTrigger className="font-light md:text-lg">
 							DESIGNERS
 						</NavigationMenuTrigger>
-						<NavigationMenuContent className="flex h-96 w-screen items-center px-9 py-7">
-							<Button
-								variant="ghost hover:bg-white"
-								className="text-lg font-normal md:w-60"
-								asChild
-							>
+						<NavigationMenuContent className="flex h-96 w-screen items-center px-9 py-5">
+							<NavigationMenuLink className="text-lg font-normal hover:bg-white md:w-60" asChild>
 								<Link href="/designers" className="hover:underline">
 									Designers A-Z
 								</Link>
-							</Button>
-							<div className="mx-auto my-0 flex h-5/6 w-10/12 flex-col flex-wrap text-lg">
-								{designerError && <span className="m-auto">{genericError}</span>}
-								{designerError
-									? Array(25)
-											.fill(1)
-											.map((id, index) => (
-												<Skeleton key={`${index}-${id}`} className="mx-5 my-2 h-8 w-44" />
-											))
-									: designerData?.data.map((obj) => (
-											<NavigationMenuLink key={obj.designer_id} asChild>
-												<Link
-													href={`/designers/${obj.designer_id}`}
-													className="group mx-5 my-2 flex w-60 translate-y-0 transform items-center font-light text-gray-600 transition-transform duration-300 ease-in-out hover:translate-y-0.5 hover:underline"
-												>
-													<span>{obj.Designer.name}</span>
-													<span className="hidden group-hover:block group-hover:text-cyan-700">
-														<Dot />
-													</span>
-												</Link>
-											</NavigationMenuLink>
-									  ))}
+							</NavigationMenuLink>
+							<div className="flex h-5/6 w-10/12 flex-col">
+								<div className="mx-5 mb-4 text-lg font-normal">Featured Designers</div>
+								<div className="mx-auto my-0 grid grid-cols-4 text-lg">
+									{designerError && <span className="m-auto">{genericError}</span>}
+									{designerError
+										? Array(25)
+												.fill(1)
+												.map((id, index) => (
+													<Skeleton key={`${index}-${id}`} className="mx-5 my-2 h-8 w-44" />
+												))
+										: designerData?.data.map((obj) => (
+												<NavigationMenuLink key={obj.designer_id} asChild>
+													<Link
+														href={`/designers/${obj.designer_id}`}
+														className="group mx-5 my-0.5 flex w-60 translate-y-0 transform items-center font-light text-gray-600 transition-transform duration-300 ease-in-out hover:translate-y-0.5 hover:underline"
+													>
+														<span>{obj.Designer.name}</span>
+														<span className="hidden group-hover:block group-hover:text-cyan-700">
+															<Dot />
+														</span>
+													</Link>
+												</NavigationMenuLink>
+										  ))}
+								</div>
+								<div className="mx-auto mt-4 grid w-full grid-cols-4 text-lg font-normal hover:cursor-pointer hover:underline">
+									<NavigationMenuLink asChild>
+										<Link
+											href="/designers"
+											className="col-start-4 mx-5 flex w-60 items-center space-x-3"
+										>
+											<span className="self-start">View All</span>
+											<MoveRight size={20} strokeWidth={1.5} className="animate-horizontalBounce" />
+										</Link>
+									</NavigationMenuLink>
+								</div>
 							</div>
 						</NavigationMenuContent>
 					</NavigationMenuItem>

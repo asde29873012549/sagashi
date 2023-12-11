@@ -27,7 +27,9 @@ export default function ListingItem({ username, product_id }) {
 	const [isOpen, setIsOpen] = useState(false);
 	const { toast } = useToast();
 	const [addToCart, setAddToCart] = useState("ADD TO CART");
+	// tracking if the api call to add cart item is success
 	const isAddShoppingCartApiSuccess = useRef(null);
+	// for tracking add to cart timeout id
 	let timeoutId = useRef(null);
 
 	const { data: listingData } = useQuery({
