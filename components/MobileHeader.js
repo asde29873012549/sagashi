@@ -66,7 +66,7 @@ export default function MobileHeader() {
 								</Search>
 							</div>
 							{session && (
-								<Link href={"/shoppingBag"}>
+								<Link href={"/shoppingCart"}>
 									<ShoppingCart className="h-7 w-7 hover:cursor-pointer" />
 								</Link>
 							)}

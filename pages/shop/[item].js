@@ -3,7 +3,13 @@ import { Button } from "@/components/ui/button";
 import ListingCard from "../../components/ListingCard";
 import MessageBoxMobile from "../../components/MessageBoxMobile";
 import MessageBoxDesktop from "../../components/MessageBoxDesktop";
-import { dehydrate, QueryClient, useQuery, useMutation } from "@tanstack/react-query";
+import {
+	dehydrate,
+	QueryClient,
+	useQuery,
+	useMutation,
+	useQueryClient,
+} from "@tanstack/react-query";
 import getSingleListing from "@/lib/queries/fetchQuery";
 import getRecentlyViwed from "@/lib/queries/fetchQuery";
 import addToShoppingCart from "@/lib/queries/fetchQuery";
@@ -23,6 +29,7 @@ const JWT_TOKEN_SECRET = process.env.JWT_TOKEN_SECRET;
 
 export default function ListingItem({ username, product_id }) {
 	const dispatch = useDispatch();
+	const queryClient = useQueryClient();
 	const router = useRouter();
 	const [isOpen, setIsOpen] = useState(false);
 	const { toast } = useToast();
@@ -38,7 +45,15 @@ export default function ListingItem({ username, product_id }) {
 		refetchOnWindowFocus: false,
 	});
 
-	const delayShowCartItem = () => setTimeout(() => dispatch(setShoppingCartItemCount()), 250);
+	const delayShowCartItem = () =>
+		setTimeout(
+			() =>
+				queryClient.setQueryData(["shoppingCart", "total"], (old) => ({
+					...old,
+					data: old.data + 1,
+				})),
+			250,
+		);
 
 	const { mutate: addShoppingCartMutate, isError } = useMutation({
 		mutationFn: () =>

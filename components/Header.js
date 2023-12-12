@@ -177,7 +177,7 @@ export default function Header() {
 								onMessageIconClick={onMessageIconClick}
 							/>
 						)}
-						{session && <ShoppingCartIcon />}
+						{session && <ShoppingCartIcon user={user} />}
 						{session && (
 							<Link className="inline-block hover:cursor-pointer" href="/user">
 								<User className="h-7 w-7" />
