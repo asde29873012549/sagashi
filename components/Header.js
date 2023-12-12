@@ -2,7 +2,7 @@ import * as dotenv from "dotenv";
 import { signOut, useSession } from "next-auth/react";
 import Logo from "./Logo";
 import Link from "next/link";
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { User, Search as SearchIcon } from "lucide-react";
 import NotificationHeartIcon from "./NotificationHeartIcon";
 import MessageIcon from "./MessageIcon";

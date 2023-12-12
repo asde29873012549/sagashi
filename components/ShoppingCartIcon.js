@@ -1,17 +1,9 @@
 import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
-import { useSelector } from "react-redux";
-import { shopSelector } from "@/redux/shopSlice";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import getShoppingCart from "@/lib/queries/fetchQuery";
-import { setShoppingCartItemCount } from "@/redux/shopSlice";
-import { useDispatch } from "react-redux";
 
 export default function ShoppingCartIcon({ user }) {
-	const queryClient = useQueryClient();
-	const dispatch = useDispatch();
-	const shoppingCartItemCount = useSelector(shopSelector).shoppingCartItemCount;
-
 	const { data: shoppingCartData } = useQuery({
 		queryKey: ["shoppingCart", "total"],
 		queryFn: () => getShoppingCart({ uri: `/user/${user}/shoppingCart/total` }),

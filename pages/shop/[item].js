@@ -16,10 +16,8 @@ import addToShoppingCart from "@/lib/queries/fetchQuery";
 import { ShoppingCart } from "lucide-react";
 import { useRouter } from "next/router";
 import { useToast } from "@/components/ui/use-toast";
-import { genericError, addShoppingCartSuccess } from "@/lib/userMessage";
+import { genericError } from "@/lib/userMessage";
 import CheckSvg from "@/components/checkSvg";
-import { useDispatch } from "react-redux";
-import { setShoppingCartItemCount } from "@/redux/shopSlice";
 
 import { getToken } from "next-auth/jwt";
 
@@ -28,7 +26,6 @@ import { useState, useRef } from "react";
 const JWT_TOKEN_SECRET = process.env.JWT_TOKEN_SECRET;
 
 export default function ListingItem({ username, product_id }) {
-	const dispatch = useDispatch();
 	const queryClient = useQueryClient();
 	const router = useRouter();
 	const [isOpen, setIsOpen] = useState(false);
