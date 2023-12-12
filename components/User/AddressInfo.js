@@ -17,7 +17,7 @@ export default function AddressInfo({ sheet = "", userData, setFeature, setAddre
 		refetchOnWindowFocus: false,
 	});
 
-	const { mutateAsync: mutateAddress } = useMutation({
+	const { mutate: mutateAddress } = useMutation({
 		mutationFn: (id) =>
 			generalFetch({
 				uri: `/user/${username}/shippingAddress/${id}`,

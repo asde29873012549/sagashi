@@ -14,7 +14,7 @@ export default function SaveDraft({ className, tags }) {
 	const { toast } = useToast();
 	const router = useRouter();
 
-	const { mutateAsync: draftMutate } = useMutation({
+	const { mutate: draftMutate } = useMutation({
 		mutationFn: (draft) =>
 			createDraft({ uri: "/listing/draft", method: "POST", body: draft, isFormData: true }),
 		onSuccess: () => {
@@ -65,7 +65,7 @@ export default function SaveDraft({ className, tags }) {
 		});
 
 		try {
-			await draftMutate(formData);
+			draftMutate(formData);
 		} catch (err) {
 			console.log(err);
 		}

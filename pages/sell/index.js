@@ -433,7 +433,7 @@ export async function getStaticProps() {
 
 	await queryClient.prefetchQuery({
 		queryKey: ["category"],
-		queryFn: () => getAllCategories({ uri: "/category", sever: true }),
+		queryFn: () => getAllCategories({ uri: "/category", server: true }),
 	});
 
 	return {

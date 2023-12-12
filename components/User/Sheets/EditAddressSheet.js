@@ -34,7 +34,7 @@ export default function EditAddressSheet({ setOpen, uri, addressData, setFeature
 		[setFeature],
 	);
 
-	const { mutateAsync: mutateAddress } = useMutation({
+	const { mutate: mutateAddress } = useMutation({
 		mutationFn: () =>
 			generalFetch({
 				uri,

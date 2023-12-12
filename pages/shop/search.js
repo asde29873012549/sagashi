@@ -161,7 +161,7 @@ export async function getServerSideProps({ query }) {
 
 	await queryClient.prefetchQuery({
 		queryKey: ["tree"],
-		queryFn: () => getTree({ uri: "/tree", sever: true }),
+		queryFn: () => getTree({ uri: "/tree", server: true }),
 	});
 
 	return {

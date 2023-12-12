@@ -29,7 +29,7 @@ export default function AddAddressSheet({ setOpen, uri }) {
 		setCountries(country);
 	}, []);
 
-	const { mutateAsync: mutateAddress } = useMutation({
+	const { mutate: mutateAddress } = useMutation({
 		mutationFn: () =>
 			generalFetch({
 				uri,

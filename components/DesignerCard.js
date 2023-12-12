@@ -1,18 +1,46 @@
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { Button } from "@/components/ui/button";
+import { useMutation } from "@tanstack/react-query";
+import followDesigner from "@/lib/queries/fetchQuery";
 
 import { useState } from "react";
+import { Skeleton } from "./ui/skeleton";
 
-export default function DesignerCard({ src, className, name, designer_id }) {
-	const [isFollow, setIsFollow] = useState(false);
-	const router = useRouter();
+export default function DesignerCard({
+	src,
+	className,
+	name,
+	designer_id,
+	isFollowed,
+	isLoadingFeaturedDesigner,
+}) {
+	const [isFollow, setIsFollow] = useState(null);
 
-	const onFollow = (e) => {
-		e.preventDefault();
-		setIsFollow((f) => !f);
+	const { mutate: followMutate } = useMutation({
+		mutationFn: () =>
+			followDesigner({
+				uri: "/designer",
+				method: "POST",
+				body: {
+					designer_id,
+				},
+			}),
+		onError: () => {
+			setIsFollow((prev) => !prev);
+			toast({
+				title: "Failed !",
+				description: genericError,
+				status: "fail",
+			});
+		},
+	});
+
+	const onFollow = () => {
+		setIsFollow((prev) => !prev);
+		followMutate();
 	};
+
 	return (
 		<div
 			className={`flex h-fit flex-col justify-center rounded-md border pb-4 drop-shadow-lg ${className}`}
@@ -28,13 +56,32 @@ export default function DesignerCard({ src, className, name, designer_id }) {
 				</Link>
 			</div>
 			<span className="m-auto mb-2 text-sm underline">1.3k listings</span>
-			<Button
-				onClick={onFollow}
-				variant={isFollow ? "outline" : "default"}
-				className="m-auto w-1/2"
-			>
-				{isFollow ? "Following" : "Follow"}
-			</Button>
+			{isLoadingFeaturedDesigner ? (
+				<Skeleton className="m-auto h-10 w-1/2" />
+			) : (
+				<Button
+					onClick={onFollow}
+					// for initail load, check the isFollowed state from API, after that, check the state of the local isFollow state
+					variant={
+						isFollow === null
+							? isFollowed
+								? "outline"
+								: "default"
+							: isFollow
+							? "outline"
+							: "default"
+					}
+					className="m-auto w-1/2"
+				>
+					{isFollow === null
+						? isFollowed
+							? "Following"
+							: "Follow"
+						: isFollow
+						? "Following"
+						: "Follow"}
+				</Button>
+			)}
 		</div>
 	);
 }

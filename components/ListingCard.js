@@ -20,7 +20,7 @@ export default function ListingCard({ src, prod_id, product_data, lastProductEle
 
 	const user = session?.user?.username ?? "";
 
-	const { mutateAsync: likeMutate } = useMutation({
+	const { mutate: likeMutate } = useMutation({
 		mutationFn: () =>
 			createLike({
 				uri: "/listing/like",
@@ -95,7 +95,7 @@ export default function ListingCard({ src, prod_id, product_data, lastProductEle
 		);
 
 		try {
-			await likeMutate();
+			likeMutate();
 		} catch (err) {
 			console.log(err);
 		}

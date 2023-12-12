@@ -240,7 +240,8 @@ export async function getServerSideProps({ req, query }) {
 
 	await queryClient.prefetchQuery({
 		queryKey: ["products", { id: product_id }],
-		queryFn: ({ queryKey }) => getSingleListing({ uri: `/listing/${queryKey[1].id}`, sever: true }),
+		queryFn: ({ queryKey }) =>
+			getSingleListing({ uri: `/listing/${queryKey[1].id}`, server: true }),
 	});
 
 	return {

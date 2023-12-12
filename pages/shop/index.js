@@ -199,12 +199,12 @@ export async function getStaticProps() {
 
 	await queryClient.prefetchQuery({
 		queryKey: ["tree"],
-		queryFn: () => getTree({ uri: "/tree", sever: true }),
+		queryFn: () => getTree({ uri: "/tree", server: true }),
 	});
 
 	await queryClient.prefetchQuery({
 		queryKey: ["products", {}],
-		queryFn: () => getProducts({ uri: "/listing", method: "POST", body: {}, sever: true }),
+		queryFn: () => getProducts({ uri: "/listing", method: "POST", body: {}, server: true }),
 	});
 
 	return {

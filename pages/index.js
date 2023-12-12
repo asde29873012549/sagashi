@@ -11,7 +11,7 @@ import getCurations from "@/lib/queries/fetchQuery";
 import getNewArrivalsProducts from "@/lib/queries/fetchQuery";
 
 export default function Home() {
-	const { data: designerData } = useQuery({
+	const { data: designerData, isFetching: isLoadingFeaturedDesigner } = useQuery({
 		queryKey: ["featuredDesingers"],
 		queryFn: () => getFeaturedDesigners({ uri: "/designer/featured" }),
 	});
@@ -32,7 +32,7 @@ export default function Home() {
 			<Banner />
 			<section className="flex w-screen flex-col p-3 md:p-8">
 				<h1 className="mt-10 text-2xl font-bold md:text-3xl">New In</h1>
-				<p className="mb-6">Freshly in boutiques for your best choice.</p>
+				<p className="mb-6">Explore the Latest and Greatest in Contemporary Chic.</p>
 				<main className="no-scrollbar flex  w-full items-center overflow-scroll">
 					{newArrivalsProductData?.data?.result.map((obj) => (
 						<ListingCard
@@ -58,15 +58,17 @@ export default function Home() {
 
 			<section className="flex w-screen flex-col p-3 md:p-8">
 				<h1 className="mt-10 text-2xl font-bold md:text-3xl">Featured Designers</h1>
-				<p className="mb-6">Boutiques from the popular designers.</p>
+				<p className="mb-6">The Epitome of Fashion, Curated for Connoisseurs.</p>
 				<main className="no-scrollbar flex w-full items-center overflow-scroll">
 					{designerData?.data.slice(0, 7).map((obj) => (
 						<DesignerCard
-							key={obj.Designer.name}
-							src={obj.Designer.logo}
-							designer_id={obj.designer_id}
+							key={obj.name}
+							src={obj.logo}
+							designer_id={obj.id}
+							isFollowed={obj.isFollow}
 							className="mb-4 mr-2 w-[65%] shrink-0 md:mr-4 md:w-1/5"
-							name={obj.Designer.name}
+							name={obj.name}
+							isLoadingFeaturedDesigner={isLoadingFeaturedDesigner}
 						/>
 					))}
 					<Button
@@ -115,12 +117,12 @@ export async function getStaticProps() {
 
 	await queryClient.prefetchQuery({
 		queryKey: ["featuredDesingers"],
-		queryFn: () => getFeaturedDesigners({ uri: "/designer/featured", sever: true }),
+		queryFn: () => getFeaturedDesigners({ uri: "/designer/featured", server: true }),
 	});
 
 	await queryClient.prefetchQuery({
 		queryKey: ["curations"],
-		queryFn: () => getCurations({ uri: "/listing/curation", sever: true }),
+		queryFn: () => getCurations({ uri: "/listing/curation", server: true }),
 	});
 
 	return {

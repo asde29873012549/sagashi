@@ -66,12 +66,12 @@ export default function NavBar() {
 													<Skeleton key={`${index}-${id}`} className="mx-5 my-2 h-8 w-44" />
 												))
 										: designerData?.data.map((obj) => (
-												<NavigationMenuLink key={obj.designer_id} asChild>
+												<NavigationMenuLink key={obj.id} asChild>
 													<Link
-														href={`/designers/${obj.designer_id}`}
+														href={`/designers/${obj.id}`}
 														className="group mx-5 my-0.5 flex w-60 translate-y-0 transform items-center font-light text-gray-600 transition-transform duration-300 ease-in-out hover:translate-y-0.5 hover:underline"
 													>
-														<span>{obj.Designer.name}</span>
+														<span>{obj.name}</span>
 														<span className="hidden group-hover:block group-hover:text-cyan-700">
 															<Dot />
 														</span>

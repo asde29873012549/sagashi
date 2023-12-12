@@ -12,7 +12,6 @@ import { getDateDistance } from "@/lib/utils";
 import Shop from "@/pages/shop/index";
 import getTree from "@/lib/queries/fetchQuery";
 import followUser from "@/lib/queries/fetchQuery";
-import createNotification from "@/lib/queries/fetchQuery";
 import getIsFollow from "@/lib/queries/fetchQuery";
 import { getToken } from "next-auth/jwt";
 import { activate } from "@/redux/loadingSlice";
