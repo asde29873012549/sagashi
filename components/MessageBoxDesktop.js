@@ -12,8 +12,9 @@ import { useToast } from "@/components/ui/use-toast";
 import { genericError } from "@/lib/userMessage";
 import { useDispatch } from "react-redux";
 import { setLastMessage } from "@/redux/messageSlice";
+import useInterSectionObserver from "@/lib/hooks/useIntersectionObserver";
 
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import getMessages from "@/lib/queries/fetchQuery";
 import readMessage from "@/lib/queries/fetchQuery";
 import createMessage from "@/lib/queries/fetchQuery";
@@ -32,27 +33,99 @@ export default function MessageBoxDesktop({
 	listing_designer,
 	date,
 }) {
+	const queryClient = useQueryClient();
 	const dispatch = useDispatch();
 	const [val, setVal] = useState("");
 	const { toast } = useToast();
-	const [message, setMessages] = useState([]);
 	const [id, setId] = useState([]);
 	const messageBoxContainer = useRef();
 
 	const chatroom_id = `${wsData.product_id}-${wsData.listingOwner}-${wsData.username}`;
 
-	useQuery({
+	const {
+		data: messageData,
+		fetchNextPage,
+		hasNextPage,
+		isFetchingNextPage,
+	} = useInfiniteQuery({
 		queryKey: ["messages", chatroom_id],
-		queryFn: () => getMessages({ uri: `/message/${chatroom_id}` }),
-		refetchOnWindowFocus: false,
-		onSuccess: (initialMessageData) => {
-			setMessages(initialMessageData.data);
+		queryFn: ({ pageParam = "" }) => {
+			const uri = `/message/${chatroom_id}` + (pageParam ? `?cursor=${pageParam}` : "");
+			return getMessages({ uri });
 		},
+		getNextPageParam: (lastPage, pages) => lastPage.data?.[lastPage.data.length - 1]?.id,
+		refetchOnWindowFocus: false,
+	});
+
+	const flattenMessageData = messageData?.pages?.map((pageObj) => pageObj.data).flat();
+
+	const lastMessageElement = useInterSectionObserver({
+		isFetchingNextPage,
+		hasNextPage,
+		fetchNextPage,
 	});
 
 	const onInput = (e) => {
 		setVal(e.target.value);
 	};
+
+	const { mutate: messageMutate } = useMutation({
+		mutationFn: (inputValue) =>
+			createMessage({
+				uri: "/message",
+				method: "POST",
+				body: {
+					product_id: wsData.product_id,
+					seller_name: wsData.listingOwner,
+					buyer_name: wsData.username === wsData.listingOwner ? client : wsData.username,
+					isFirstMessage: flattenMessageData?.length === 0 ? true : false,
+					image,
+					text: DOMPurify.sanitize(inputValue),
+					isRead: false,
+				},
+			}),
+		onMutate: async () => {
+			// Snapshot the previous value
+			const previousMessage = queryClient.getQueryData(["messages", chatroom_id]);
+
+			// clear input
+			setVal("");
+
+			// Optimistically update to the new value
+			queryClient.setQueryData(["messages", chatroom_id], (oldData) => {
+				const newData = oldData;
+				newData.pages[0].data.unshift({
+					created_at: new Date().toISOString(),
+					text: val,
+					sender_name: wsData.username,
+				});
+				return newData;
+			});
+			// Return a context object with the snapshotted value
+			return { previousMessage };
+		},
+		// If the mutation fails,
+		// use the context returned from onMutate to roll back
+		onError: (err, newTodo, context) => {
+			queryClient.setQueryData(["messages", chatroom_id], context.previousMessage);
+		},
+		onSuccess: () => {
+			const client = id[0]?.split("-")[2];
+			// if the mutation succeeds, emit message to ws server and proceed
+			socket.emit("message", {
+				message: {
+					created_at: new Date().toISOString(),
+					text: val,
+					sender_name: wsData.username,
+					message_id: Message.data?.id,
+				},
+				client,
+			});
+
+			// set local user's last message state
+			dispatch(setLastMessage({ chatroom_id, text: val }));
+		},
+	});
 
 	const onPressEnter = async (e) => {
 		if (e.keyCode === 13) {
@@ -68,68 +141,14 @@ export default function MessageBoxDesktop({
 					status: "fail",
 				});
 
-			// optimistically add message to message lists
-			setMessages((m) => [
-				...m,
-				{ created_at: new Date().toISOString(), text: val, sender_name: wsData.username },
-			]);
-
-			// then post message to database
-			let Message = null;
-
-			try {
-				Message = await createMessage({
-					uri: "/message",
-					method: "POST",
-					body: {
-						product_id: wsData.product_id,
-						seller_name: wsData.listingOwner,
-						buyer_name: wsData.username === wsData.listingOwner ? client : wsData.username,
-						isFirstMessage: message.length === 0 ? true : false,
-						image,
-						text: DOMPurify.sanitize(val),
-						isRead: false,
-					},
-				});
-
-				if (Message.status === "fail") {
-					throw new Error();
-				}
-			} catch (error) {
-				console.log(error);
-				// remove message from message list if create-message api failed
-				setMessages((m) =>
-					m.filter((msg) => msg.text !== val && msg.sender_name !== wsData.username),
-				);
-
-				return toast({
-					title: "Message failed to deliver !",
-					description: genericError,
-					status: "fail",
-				});
-			}
-
-			socket.emit("message", {
-				message: {
-					created_at: new Date().toISOString(),
-					text: val,
-					sender_name: wsData.username,
-					message_id: Message.data?.id,
-				},
-				client,
-			});
-
-			// clear input
-			setVal("");
-
-			// set local user's last message state
-			dispatch(setLastMessage({ chatroom_id, text: val }));
+			messageMutate(val);
 		}
 	};
 
 	useEffect(() => {
 		socketInitializer({
-			setter: setMessages,
+			queryClient,
+			chatroom_id,
 			setId,
 			fetchQuery: async (message_id) =>
 				await readMessage({
@@ -158,16 +177,9 @@ export default function MessageBoxDesktop({
 		}
 	}, [isOpen]);
 
-	useEffect(() => {
-		if (messageBoxContainer.current) {
-			messageBoxContainer.current.scrollTop =
-				messageBoxContainer.current.scrollHeight - messageBoxContainer.current.clientHeight;
-		}
-	}, [message]);
-
 	return (
 		<motion.div
-			className="fixed bottom-0 right-[8%] z-20 h-3/5 w-80 overflow-scroll rounded-t-lg bg-background shadow-lg"
+			className="fixed bottom-0 right-[8%] z-20 h-3/5 w-80 rounded-t-lg bg-background shadow-lg"
 			initial={{ opacity: 0, y: 20 }}
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.3 }}
@@ -185,40 +197,51 @@ export default function MessageBoxDesktop({
 				</div>
 			</header>
 			<main
-				ref={messageBoxContainer}
-				className={`relative flex h-[calc(100%-6.5rem)] w-full flex-col overflow-scroll px-3 ${
-					message.length > 0 ? "items-end justify-start" : "items-center justify-center"
+				className={`relative flex h-[calc(100%-6.5rem)] w-full flex-col overflow-scroll ${
+					flattenMessageData?.length > 0 ? "items-end justify-start" : "items-center justify-center"
 				}`}
 			>
-				{message.length > 0 ? (
-					message.map((msg, index) => {
-						const ISOdate = msg.created_at;
-						const prevDate = message[index - 1]?.created_at;
-						const currDate = parseISODate(ISOdate || null);
-						return (
-							<div key={`${msg.text}-${index}`} className="w-full">
-								{(timeDifference(ISOdate, prevDate) > 5 || index === 0) && (
-									<div className="mb-1 mt-4 flex w-full justify-center text-xs text-info">
-										{currDate}
-									</div>
-								)}
-								<Message selfMessage={msg.sender_name === wsData.username}>{msg.text}</Message>
+				<div
+					className="flex h-fit w-full flex-col-reverse overflow-scroll px-3"
+					ref={messageBoxContainer}
+				>
+					{flattenMessageData?.length > 0 ? (
+						flattenMessageData.map((msg, index) => {
+							const ISOdate = msg.created_at;
+							const prevDate = flattenMessageData[index - 1]?.created_at;
+							const currDate = parseISODate(ISOdate || null);
+							return (
+								<div key={`${msg.text}-${index}`} className="w-full">
+									{(timeDifference(prevDate, ISOdate) > 5 || index === 0) && (
+										<div className="mb-1 mt-4 flex w-full justify-center text-xs text-info">
+											{currDate}
+										</div>
+									)}
+									<Message
+										lastMessageElement={
+											index === flattenMessageData?.length - 1 ? lastMessageElement : null
+										}
+										selfMessage={msg.sender_name === wsData.username}
+									>
+										{msg.text}
+									</Message>
+								</div>
+							);
+						})
+					) : (
+						<div className="flex flex-col">
+							<Avatar className="mx-auto h-24 w-24">
+								<AvatarImage src={image} />
+								<AvatarFallback>CN</AvatarFallback>
+							</Avatar>
+							<div className="mt-2 flex flex-col items-center justify-center text-xs text-slate-400">
+								<div>{listing_designer}</div>
+								<div>{listing_name}</div>
+								<div>Listed {getDateDistance(date)}</div>
 							</div>
-						);
-					})
-				) : (
-					<div className="flex flex-col">
-						<Avatar className="mx-auto h-24 w-24">
-							<AvatarImage src={image} />
-							<AvatarFallback>CN</AvatarFallback>
-						</Avatar>
-						<div className="mt-2 flex flex-col items-center justify-center text-xs text-slate-400">
-							<div>{listing_designer}</div>
-							<div>{listing_name}</div>
-							<div>Listed {getDateDistance(date)}</div>
 						</div>
-					</div>
-				)}
+					)}
+				</div>
 			</main>
 			<footer className="fixed bottom-0 w-80 bg-background p-2">
 				<Input

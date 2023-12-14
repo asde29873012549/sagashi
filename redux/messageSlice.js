@@ -4,7 +4,7 @@ let initialState = {
 	isMessageReadMap: {},
 	isNotificationReadMap: {},
 	lastMessage: {},
-	currentActiveChatroom: "",
+	currentActiveChatroom: null,
 	currentTab: "sell",
 };
 

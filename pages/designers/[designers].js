@@ -5,13 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import DesignerCard from "@/components/DesignerCard";
 import Shop from "../shop/index";
-import {
-	dehydrate,
-	QueryClient,
-	useQuery,
-	useInfiniteQuery,
-	useMutation,
-} from "@tanstack/react-query";
+import { dehydrate, QueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import getSingleDesigner from "@/lib/queries/fetchQuery";
 import getRelatedDesigner from "@/lib/queries/fetchQuery";
 import { ChevronLeft, ChevronRight } from "lucide-react";

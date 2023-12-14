@@ -6,13 +6,14 @@ import Message from "@/components/Message";
 import { useState, useRef, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import ItemCard from "../ItemCard";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useInfiniteQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import getChatrooms from "@/lib/queries/fetchQuery";
-import getMessage from "@/lib/queries/fetchQuery";
+import getMessages from "@/lib/queries/fetchQuery";
 import createMessage from "@/lib/queries/fetchQuery";
 import { received_message } from "@/lib/msg_template";
 import { genericError } from "@/lib/userMessage";
 import readMessage from "@/lib/queries/fetchQuery";
+import useInterSectionObserver from "@/lib/hooks/useIntersectionObserver";
 
 import socket from "@/lib/socketio/client";
 import socketInitializer from "@/lib/socketio/socketInitializer";
@@ -31,11 +32,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { parseISODate, timeDifference } from "@/lib/utils";
 
 export default function Messages({ user }) {
+	const queryClient = useQueryClient();
 	const dispatch = useDispatch();
 	const { chatroom_id: chatroom_id_from_url } = useRouter().query;
 	const [val, setVal] = useState("");
 	const { toast } = useToast();
 	const [chatroomMessage, setChatroomMessage] = useState([]);
+	const [shouldBeInitialChatroomDisplay, setShouldBeInitialChatroomDisplay] = useState(true);
 	const lastMessageMap = useSelector(messageSelector).lastMessage;
 	const messageReadMap = useSelector(messageSelector).isMessageReadMap;
 	const currentActiveChatroom = useSelector(messageSelector).currentActiveChatroom;
@@ -67,19 +70,28 @@ export default function Messages({ user }) {
 
 	const {
 		data: messageData,
+		fetchNextPage,
+		hasNextPage,
+		isFetchingNextPage,
 		refetch: fetchMessageData,
-		isFetching: isMessageDataLoading,
-	} = useQuery({
+		isInitialLoading: isMessageDataLoading,
+	} = useInfiniteQuery({
 		queryKey: ["messages", currentActiveChatroom],
-		queryFn: () =>
-			getMessage({
-				uri: `/message/${currentActiveChatroom}`,
-			}),
-		refetchOnWindowFocus: false,
-		// enabled: chatroom_id_from_url ? true : false,
-		onSuccess: (initialMessageData) => {
-			setChatroomMessage(initialMessageData.data);
+		queryFn: ({ pageParam = "" }) => {
+			const uri = `/message/${currentActiveChatroom}` + (pageParam ? `?cursor=${pageParam}` : "");
+			return getMessages({ uri });
 		},
+		enabled: currentActiveChatroom ? true : false,
+		getNextPageParam: (lastPage, pages) => lastPage.data?.[lastPage.data.length - 1]?.id,
+		refetchOnWindowFocus: false,
+	});
+
+	const flattenMessageData = messageData?.pages?.map((pageObj) => pageObj.data).flat();
+
+	const lastMessageElement = useInterSectionObserver({
+		isFetchingNextPage,
+		hasNextPage,
+		fetchNextPage,
 	});
 
 	// There are two possible ways to initialize the websocket
@@ -94,7 +106,8 @@ export default function Messages({ user }) {
 		if (currentActiveChatroom) {
 			const [product_id, listingOwner, client] = currentActiveChatroom.split("-");
 			socketInitializer({
-				setter: setChatroomMessage,
+				queryClient,
+				chatroom_id: currentActiveChatroom,
 				fetchQuery: async (message_id) =>
 					await readMessage({
 						uri: "/message",
@@ -123,7 +136,7 @@ export default function Messages({ user }) {
 		}
 	}, [currentActiveChatroom]);
 
-	// scroll to bottom when new message is received
+	// scroll to bottom when switching charoom or tabs
 	useEffect(() => {
 		if (currentTab === "sell" && sellContainer.current) {
 			sellContainer.current.scrollTop =
@@ -132,7 +145,7 @@ export default function Messages({ user }) {
 			maiContainer.current.scrollTop =
 				maiContainer.current.scrollHeight - maiContainer.current.clientHeight;
 		}
-	}, [chatroomMessage, currentTab]);
+	}, [currentTab]);
 
 	const offlineChatroom = chatroomList?.data ?? [];
 
@@ -152,12 +165,70 @@ export default function Messages({ user }) {
 		setVal(e.target.value);
 	};
 
-	const onOpenChatroom = (chatroom_id, chatroom_avatar) => {
-		// currentActiveChatroom = chatroom_id;
+	const onOpenChatroom = (chatroom_avatar) => {
 		currentChatroom_avatar.current = chatroom_avatar;
-		setChatroomMessage([]);
 		fetchMessageData();
+		setShouldBeInitialChatroomDisplay(false);
 	};
+
+	const { mutate: messageMutate } = useMutation({
+		mutationFn: ({ val, product_id, listingOwner, recipient }) => {
+			return createMessage({
+				uri: "/message",
+				method: "POST",
+				body: {
+					product_id,
+					seller_name: listingOwner,
+					buyer_name: recipient,
+					isFirstMessage: flattenMessageData.length === 0,
+					image: currentChatroom_avatar.current,
+					text: DOMPurify.sanitize(val),
+					isRead: false,
+				},
+			});
+		},
+		onMutate: async () => {
+			// Snapshot the previous value
+			const previousMessage = queryClient.getQueryData(["messages", currentActiveChatroom]);
+
+			// clear input
+			setVal("");
+
+			// Optimistically update to the new value
+			queryClient.setQueryData(["messages", currentActiveChatroom], (oldData) => {
+				const newData = oldData;
+				newData.pages[0].data.unshift({
+					created_at: new Date().toISOString(),
+					text: val,
+					sender_name: user,
+				});
+				return newData;
+			});
+			// Return a context object with the snapshotted value
+			return { previousMessage };
+		},
+		// If the mutation fails,
+		// use the context returned from onMutate to roll back
+		onError: (err, newTodo, context) => {
+			queryClient.setQueryData(["messages", currentActiveChatroom], context.previousMessage);
+		},
+		onSuccess: (messageData) => {
+			const client = currentActiveChatroom?.split("-")[2];
+			// if the mutation succeeds, emit message to ws server and proceed
+			socket.emit("message", {
+				message: {
+					created_at: new Date().toISOString(),
+					text: val,
+					sender_name: user,
+					message_id: messageData.data?.id,
+				},
+				client,
+			});
+
+			// set local user's last message state
+			dispatch(setLastMessage({ currentActiveChatroom, text: val }));
+		},
+	});
 
 	const onPressEnter = async (e) => {
 		if (e.keyCode === 13) {
@@ -171,65 +242,13 @@ export default function Messages({ user }) {
 					status: "fail",
 				});
 
-			// optimistically add message to message lists
-			setChatroomMessage((m) => [
-				...m,
-				{ created_at: new Date().toISOString(), text: val, sender_name: user },
-			]);
-
-			// then post message to database
-			let message = null;
-
-			try {
-				message = await createMessage({
-					uri: "/message",
-					method: "POST",
-					body: {
-						product_id,
-						seller_name: listingOwner,
-						buyer_name: recipient,
-						isFirstMessage: chatroomMessage.length === 0,
-						image: currentChatroom_avatar.current,
-						text: DOMPurify.sanitize(val),
-						isRead: false,
-					},
-				});
-
-				if (message.status === "fail") {
-					throw new Error();
-				}
-			} catch (error) {
-				// remove message from message list if create-message api failed
-				setChatroomMessage((m) => m.filter((msg) => msg.text !== val && msg.sender_name !== user));
-
-				return toast({
-					title: "Message failed to deliver !",
-					description: genericError,
-					status: "fail",
-				});
-			}
-
-			socket.emit("message", {
-				message: {
-					created_at: new Date().toISOString(),
-					text: val,
-					sender_name: user,
-					message_id: message.data?.id,
-				},
-				client: recipient,
-			});
-
-			// clear input
-			setVal("");
-
-			// set local user's last message state
-			dispatch(setLastMessage({ chatroom_id: currentActiveChatroom, text: val }));
+			messageMutate({ val, product_id, listingOwner, recipient });
 		}
 	};
 
 	const onChangeTab = (tab) => {
 		dispatch(setCurrentTab(tab));
-		setChatroomMessage([]);
+		setShouldBeInitialChatroomDisplay(true);
 	};
 
 	return (
@@ -262,10 +281,10 @@ export default function Messages({ user }) {
 								<ItemCard
 									key={`message-${msg.created_at}-${index}-offline`}
 									src={msg.chatroom_avatar}
-									setIsOpen={() => onOpenChatroom(msg.id, msg.chatroom_avatar)}
+									setIsOpen={() => onOpenChatroom(msg.chatroom_avatar)}
 									read_at={!messageReadMap[msg.id] ? null : msg.read_at}
 									chatroom_id={msg.id}
-									chatroom_id_from_url={chatroom_id_from_url}
+									chatroom_id_from_url={currentActiveChatroom}
 								>
 									{content}
 								</ItemCard>
@@ -279,32 +298,16 @@ export default function Messages({ user }) {
 				</aside>
 				<div
 					className={`relative flex h-[500px] grow flex-col overflow-scroll rounded-lg border-2 border-sky-900 ${
-						chatroomMessage.length > 0 ? "items-start" : "items-center justify-center"
+						flattenMessageData?.length > 0 ? "items-start" : "items-center justify-center"
 					}`}
 				>
 					<div
-						className="flex h-[calc(100%-56px)] w-full flex-col overflow-y-scroll px-3 py-2"
+						className="mb-14 flex h-fit w-full flex-col-reverse overflow-y-scroll px-3 py-2"
 						ref={sellContainer}
 					>
 						{isMessageDataLoading ? (
 							<MessageLoadingSkeleton />
-						) : chatroomMessage.length > 0 ? (
-							chatroomMessage.map((msg, index) => {
-								const ISOdate = msg.created_at;
-								const prevDate = chatroomMessage[index - 1]?.created_at;
-								const currDate = parseISODate(ISOdate || null);
-								return (
-									<div key={`${msg.text}-${index}`} className="w-full">
-										{(timeDifference(ISOdate, prevDate) > 5 || index === 0) && (
-											<div className="mb-1 mt-4 flex w-full justify-center text-xs text-info">
-												{currDate}
-											</div>
-										)}
-										<Message selfMessage={msg.sender_name === user}>{msg.text}</Message>
-									</div>
-								);
-							})
-						) : (
+						) : shouldBeInitialChatroomDisplay ? (
 							<div className="flex flex-col">
 								<Avatar className="mx-auto h-24 w-24">
 									<AvatarImage src="https://github.com/shadcn.png" />
@@ -316,6 +319,30 @@ export default function Messages({ user }) {
 									<div>Listed 3 months ago</div>
 								</div>
 							</div>
+						) : (
+							flattenMessageData?.length > 0 &&
+							flattenMessageData.map((msg, index) => {
+								const ISOdate = msg.created_at;
+								const prevDate = flattenMessageData[index - 1]?.created_at;
+								const currDate = parseISODate(ISOdate || null);
+								return (
+									<div key={`${msg.text}-${index}`} className="w-full">
+										{(timeDifference(prevDate, ISOdate) > 5 || index === 0) && (
+											<div className="mb-1 mt-4 flex w-full justify-center text-xs text-info">
+												{currDate}
+											</div>
+										)}
+										<Message
+											lastMessageElement={
+												index === flattenMessageData?.length - 1 ? lastMessageElement : null
+											}
+											selfMessage={msg.sender_name === user}
+										>
+											{msg.text}
+										</Message>
+									</div>
+								);
+							})
 						)}
 					</div>
 					<span className="invisible opacity-0" ref={lastMessageRef}></span>
@@ -344,7 +371,7 @@ export default function Messages({ user }) {
 								<ItemCard
 									key={`message-${msg.created_at}-${index}-offline`}
 									src={msg.chatroom_avatar}
-									setIsOpen={() => onOpenChatroom(msg.id, msg.chatroom_avatar)}
+									setIsOpen={() => onOpenChatroom(msg.chatroom_avatar)}
 									read_at={!messageReadMap[msg.id] ? null : msg.read_at}
 									chatroom_id={msg.id}
 									chatroom_id_from_url={chatroom_id_from_url}
@@ -361,32 +388,16 @@ export default function Messages({ user }) {
 				</aside>
 				<div
 					className={`relative flex h-[500px] grow flex-col overflow-scroll rounded-lg border-2 border-sky-900 ${
-						chatroomMessage.length > 0 ? "items-start" : "items-center justify-center"
+						flattenMessageData?.length > 0 ? "items-start" : "items-center justify-center"
 					}`}
 				>
 					<div
-						className="flex h-[calc(100%-56px)] w-full flex-col overflow-y-scroll px-3 py-2"
+						className="mb-14 flex h-fit w-full flex-col-reverse overflow-y-scroll px-3 py-2"
 						ref={maiContainer}
 					>
 						{isMessageDataLoading ? (
 							<MessageLoadingSkeleton />
-						) : chatroomMessage.length > 0 ? (
-							chatroomMessage.map((msg, index) => {
-								const ISOdate = msg.created_at;
-								const prevDate = chatroomMessage[index - 1]?.created_at;
-								const currDate = parseISODate(ISOdate || null);
-								return (
-									<div key={`${msg.text}-${index}`} className="w-full">
-										{(timeDifference(ISOdate, prevDate) > 5 || index === 0) && (
-											<div className="mb-1 mt-4 flex w-full justify-center text-xs text-info">
-												{currDate}
-											</div>
-										)}
-										<Message selfMessage={msg.sender_name === user}>{msg.text}</Message>
-									</div>
-								);
-							})
-						) : (
+						) : shouldBeInitialChatroomDisplay ? (
 							<div className="flex flex-col">
 								<Avatar className="mx-auto h-24 w-24">
 									<AvatarImage src="https://github.com/shadcn.png" />
@@ -398,6 +409,30 @@ export default function Messages({ user }) {
 									<div>Listed 3 months ago</div>
 								</div>
 							</div>
+						) : (
+							flattenMessageData?.length > 0 &&
+							flattenMessageData.map((msg, index) => {
+								const ISOdate = msg.created_at;
+								const prevDate = flattenMessageData[index - 1]?.created_at;
+								const currDate = parseISODate(ISOdate || null);
+								return (
+									<div key={`${msg.text}-${index}`} className="w-full">
+										{(timeDifference(prevDate, ISOdate) > 5 || index === 0) && (
+											<div className="mb-1 mt-4 flex w-full justify-center text-xs text-info">
+												{currDate}
+											</div>
+										)}
+										<Message
+											lastMessageElement={
+												index === flattenMessageData?.length - 1 ? lastMessageElement : null
+											}
+											selfMessage={msg.sender_name === user}
+										>
+											{msg.text}
+										</Message>
+									</div>
+								);
+							})
 						)}
 					</div>
 					<span className="invisible opacity-0" ref={lastMessageRef}></span>
