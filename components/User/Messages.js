@@ -37,8 +37,9 @@ export default function Messages({ user }) {
 	const { chatroom_id: chatroom_id_from_url } = useRouter().query;
 	const [val, setVal] = useState("");
 	const { toast } = useToast();
-	const [chatroomMessage, setChatroomMessage] = useState([]);
-	const [shouldBeInitialChatroomDisplay, setShouldBeInitialChatroomDisplay] = useState(true);
+	const [shouldBeInitialChatroomDisplay, setShouldBeInitialChatroomDisplay] = useState(
+		chatroom_id_from_url ? false : true,
+	);
 	const lastMessageMap = useSelector(messageSelector).lastMessage;
 	const messageReadMap = useSelector(messageSelector).isMessageReadMap;
 	const currentActiveChatroom = useSelector(messageSelector).currentActiveChatroom;

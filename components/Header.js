@@ -116,10 +116,6 @@ export default function Header() {
 		return () => eventSource && eventSource.close();
 	}, [user, notificationRefetch, currentActiveChatroom]);
 
-	const isUsingMobile = () => {
-		if (typeof window !== "undefined") return window.innerWidth < 768; //&& navigator.maxTouchPoints > 0;
-	};
-
 	const onLogout = () => {
 		signOut({ callbackUrl: homepage });
 	};
@@ -133,59 +129,57 @@ export default function Header() {
 	};
 
 	return (
-		!isUsingMobile() && (
-			<div className="top-0 z-[19] hidden w-full bg-background md:sticky md:flex md:h-20 md:items-center md:justify-between md:px-9 md:py-1 md:shadow-none">
-				<MenuBar />
-				<div className="flex w-1/6 justify-between">
-					<Link className="mr-2 inline-block w-1/4 hover:cursor-pointer" href="/sell">
-						SELL
-					</Link>
-					<Link className="inline-block w-1/4 hover:cursor-pointer" href="/shop">
-						SHOP
-					</Link>
-					<div
-						className={`${
-							status === "loading" ? "invisible opacity-0" : "inline-block"
-						} w-1/3 hover:cursor-pointer`}
-						onClick={session ? onLogout : onToggleRegisterForm}
-					>
-						{session ? "LOGOUT" : "LOGIN"}
-					</div>
-				</div>
-				<Logo className="absolute m-auto w-[7vw]" />
-				<div className="text-md flex w-1/6 justify-end">
-					<div className="flex w-fit space-x-6">
-						<div className="inline-block" style={{ height: "28px" }}>
-							<Search>
-								<SearchIcon className="mx-1 h-7 w-7" />
-							</Search>
-						</div>
-						{session && (
-							<NotificationHeartIcon
-								onlineNotification={onlineNotification}
-								offlineNotification={notificationData?.data ?? []}
-								notificationActive={notificationActive}
-								onNotificationHeartIconClick={onNotificationHeartIconClick}
-							/>
-						)}
-						{session && (
-							<MessageIcon
-								user={user}
-								chatroom={chatroom}
-								setChatroom={setChatroom}
-								messageActive={messageActive}
-								onMessageIconClick={onMessageIconClick}
-							/>
-						)}
-						{session && <ShoppingCartIcon user={user} />}
-						{session && (
-							<Link className="inline-block hover:cursor-pointer" href="/user">
-								<User className="h-7 w-7" />
-							</Link>
-						)}
-					</div>
+		<div className="top-0 z-[19] hidden w-full bg-background md:sticky md:flex md:h-20 md:items-center md:justify-between md:px-9 md:py-1 md:shadow-none">
+			<MenuBar />
+			<div className="flex w-1/6 justify-between">
+				<Link className="mr-2 inline-block w-1/4 hover:cursor-pointer" href="/sell">
+					SELL
+				</Link>
+				<Link className="inline-block w-1/4 hover:cursor-pointer" href="/shop">
+					SHOP
+				</Link>
+				<div
+					className={`${
+						status === "loading" ? "invisible opacity-0" : "inline-block"
+					} w-1/3 hover:cursor-pointer`}
+					onClick={session ? onLogout : onToggleRegisterForm}
+				>
+					{session ? "LOGOUT" : "LOGIN"}
 				</div>
 			</div>
-		)
+			<Logo className="absolute m-auto w-[7vw]" />
+			<div className="text-md flex w-1/6 justify-end">
+				<div className="flex w-fit space-x-6">
+					<div className="inline-block" style={{ height: "28px" }}>
+						<Search>
+							<SearchIcon className="mx-1 h-7 w-7" />
+						</Search>
+					</div>
+					{session && (
+						<NotificationHeartIcon
+							onlineNotification={onlineNotification}
+							offlineNotification={notificationData?.data ?? []}
+							notificationActive={notificationActive}
+							onNotificationHeartIconClick={onNotificationHeartIconClick}
+						/>
+					)}
+					{session && (
+						<MessageIcon
+							user={user}
+							chatroom={chatroom}
+							setChatroom={setChatroom}
+							messageActive={messageActive}
+							onMessageIconClick={onMessageIconClick}
+						/>
+					)}
+					{session && <ShoppingCartIcon user={user} />}
+					{session && (
+						<Link className="inline-block hover:cursor-pointer" href="/user">
+							<User className="h-7 w-7" />
+						</Link>
+					)}
+				</div>
+			</div>
+		</div>
 	);
 }

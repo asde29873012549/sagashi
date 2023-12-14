@@ -50,7 +50,7 @@ export default function MessageIcon({
 				{/* Notification Circle */}
 				<div
 					className={`absolute right-[-2px] top-[0px] z-50 mb-3 h-2.5 w-2.5 rounded-full bg-red-700 
-					${!onlineNotification.length || !notificationActive ? "md:hidden" : ""}`} // Hide on desktop if no new message
+					${!onlineNotification?.length || !notificationActive ? "md:hidden" : ""}`} // Hide on desktop if no new message
 				></div>
 
 				{/* Message Icon */}
@@ -59,10 +59,10 @@ export default function MessageIcon({
 
 			<PopoverContent
 				className={`mr-4 max-h-[70dvh] ${
-					onlineNotification.length > 0 ? "" : "mr-1"
+					onlineNotification?.length > 0 ? "" : "mr-1"
 				} overflow-y-scroll`}
 			>
-				{onlineNotification.map((msg, index) => {
+				{onlineNotification?.map((msg, index) => {
 					const content = mes_type_helper(msg);
 					return (
 						<ItemCard
@@ -96,7 +96,7 @@ export default function MessageIcon({
 							</ItemCard>
 						);
 					})}
-				{!onlineNotification.length && !offlineNotification.length && (
+				{!onlineNotification?.length && !offlineNotification?.length && (
 					<div className="flex h-14 w-60 items-center justify-center text-gray-500">
 						No new message
 					</div>

@@ -108,7 +108,7 @@ export default function NavBar() {
 											))
 									: Object.keys(categoryData?.data.Menswear ?? {}).map((cat, index) => (
 											<div className="flex flex-col" key={`${index}-${cat}`}>
-												<div className="my-2 w-56 font-normal">{cat}</div>
+												<div className="my-2 w-52 font-normal">{cat}</div>
 												<div className="flex flex-col">
 													{categoryData?.data.Menswear[cat].sub.map((subCat, index) => (
 														<NavigationMenuLink key={`${index}-${subCat}`} asChild>
@@ -144,7 +144,7 @@ export default function NavBar() {
 											))
 									: Object.keys(categoryData?.data.Womenswear ?? {}).map((cat, index) => (
 											<div className="flex flex-col" key={`${index}-${cat}`}>
-												<div className="my-2 w-56 font-normal">{cat}</div>
+												<div className="my-2 w-44 font-normal">{cat}</div>
 												<div className="flex flex-col">
 													{categoryData?.data.Womenswear[cat].sub.map((subCat, index) => (
 														<NavigationMenuLink key={`${index}-${subCat}`} asChild>

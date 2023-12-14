@@ -184,9 +184,11 @@ export default function ListingItem({ username, product_id }) {
 						</Button>
 						<MessageBoxMobile
 							className="w-full md:hidden"
-							username={username}
-							isOpen={isOpen}
-							onCloseMessageBox={onCloseMessageBox}
+							wsData={{ username, product_id, listingOwner: listingData?.data[0].seller_name }}
+							image={productData.primary_image}
+							listing_name={productData.name}
+							listing_designer={productData.designer}
+							date={productData.updated_at}
 						/>
 						{isOpen && (
 							<MessageBoxDesktop

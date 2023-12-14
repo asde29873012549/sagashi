@@ -17,6 +17,9 @@ export default function ShoppingCart({ username }) {
 		refetchOnWindowFocus: false,
 	});
 
+	const subTotal = cartData?.data?.reduce((acc, obj) => Number(acc) + Number(obj.price), 0);
+	const DeleiveryFee = 60;
+
 	return (
 		<div className="relative flex flex-col p-8">
 			<div className="mb-4 text-2xl font-bold">SHOPPING CART</div>
@@ -31,16 +34,16 @@ export default function ShoppingCart({ username }) {
 						<div className="my-2 text-lg font-semibold">Summary</div>
 						<div className="flex w-full justify-between">
 							<div>SubTotal</div>
-							<div className="before:mr-1 before:content-['$']">40000</div>
+							<div className="before:mr-1 before:content-['$']">{subTotal}</div>
 						</div>
 						<div className="flex w-full justify-between">
 							<div>Delivery Fee</div>
-							<div className="before:mr-1 before:content-['$']">40</div>
+							<div className="before:mr-1 before:content-['$']">{DeleiveryFee}</div>
 						</div>
 						<Separator />
 						<div className="flex w-full justify-between">
 							<div>Total</div>
-							<div className="before:mr-1 before:content-['NTD']">40040</div>
+							<div className="before:mr-1 before:content-['NTD']">{subTotal + DeleiveryFee}</div>
 						</div>
 					</div>
 					<Button className="mt-4 w-full">Go to Checkout</Button>
