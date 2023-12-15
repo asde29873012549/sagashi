@@ -181,7 +181,6 @@ export default function Messages({ user }) {
 					product_id,
 					seller_name: listingOwner,
 					buyer_name: recipient,
-					isFirstMessage: flattenMessageData.length === 0,
 					image: currentChatroom_avatar.current,
 					text: DOMPurify.sanitize(val),
 					isRead: false,
@@ -414,11 +413,12 @@ export default function Messages({ user }) {
 							flattenMessageData?.length > 0 &&
 							flattenMessageData.map((msg, index) => {
 								const ISOdate = msg.created_at;
-								const prevDate = flattenMessageData[index - 1]?.created_at;
+								const prevDate = flattenMessageData[index + 1]?.created_at;
 								const currDate = parseISODate(ISOdate || null);
 								return (
 									<div key={`${msg.text}-${index}`} className="w-full">
-										{(timeDifference(prevDate, ISOdate) > 5 || index === 0) && (
+										{(timeDifference(ISOdate, prevDate) > 5 ||
+											index === flattenMessageData.length - 1) && (
 											<div className="mb-1 mt-4 flex w-full justify-center text-xs text-info">
 												{currDate}
 											</div>

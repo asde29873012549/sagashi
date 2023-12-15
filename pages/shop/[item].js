@@ -182,14 +182,16 @@ export default function ListingItem({ username, product_id }) {
 						<Button className="mb-4 h-12 w-full hover:border-2 hover:border-foreground hover:bg-background hover:text-foreground md:w-4/5">
 							OFFER
 						</Button>
-						<MessageBoxMobile
-							className="w-full md:hidden"
-							wsData={{ username, product_id, listingOwner: listingData?.data[0].seller_name }}
-							image={productData.primary_image}
-							listing_name={productData.name}
-							listing_designer={productData.designer}
-							date={productData.updated_at}
-						/>
+						{username !== listingData?.data[0].seller_name && (
+							<MessageBoxMobile
+								className="w-full md:hidden"
+								wsData={{ username, product_id, listingOwner: listingData?.data[0].seller_name }}
+								image={productData.primary_image}
+								listing_name={productData.name}
+								listing_designer={productData.designer}
+								date={productData.updated_at}
+							/>
+						)}
 						{isOpen && (
 							<MessageBoxDesktop
 								wsData={{ username, product_id, listingOwner: listingData?.data[0].seller_name }}

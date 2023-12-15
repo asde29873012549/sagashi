@@ -146,14 +146,14 @@ export default function MobileHeader() {
 				)}
 				<div className="text-md fixed bottom-0 right-0 z-8 flex w-full items-center justify-between bg-background px-5 py-3">
 					<div className="flex w-full items-center justify-around">
-						<Link className="inline-block hover:cursor-pointer" href="/sell/mobile/stageFirst">
+						<Link
+							className="inline-block text-base hover:cursor-pointer"
+							href="/sell/mobile/stageFirst"
+						>
 							SELL
 						</Link>
-						<Link className="inline-block hover:cursor-pointer" href="/shop">
-							SHOP
-						</Link>
 						<div
-							className="inline-block hover:cursor-pointer"
+							className="inline-block text-base hover:cursor-pointer"
 							onClick={session ? onLogout : onToggleRegisterForm}
 						>
 							{session ? "LOGOUT" : "LOGIN"}
@@ -163,6 +163,14 @@ export default function MobileHeader() {
 								<SearchIcon className="mx-1 h-7 w-7" />
 							</Search>
 						</div>
+						{session && (
+							<NotificationHeartIcon
+								onlineNotification={onlineNotification}
+								offlineNotification={notificationData?.data ?? []}
+								notificationActive={notificationActive}
+								onNotificationHeartIconClick={onNotificationHeartIconClick}
+							/>
+						)}
 						{session && <ShoppingCartIcon className="h-7 w-7 hover:cursor-pointer" />}
 						{session && (
 							<Link className="inline-block hover:cursor-pointer" href="/user/mobile">

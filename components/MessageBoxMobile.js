@@ -70,8 +70,7 @@ export default function MessageBoxMobile({
 				body: {
 					product_id: wsData.product_id,
 					seller_name: wsData.listingOwner,
-					buyer_name: wsData.username === wsData.listingOwner ? client : wsData.username,
-					isFirstMessage: flattenMessageData?.length === 0 ? true : false,
+					buyer_name: wsData.username,
 					image,
 					text: DOMPurify.sanitize(inputValue),
 					isRead: false,
@@ -201,7 +200,7 @@ export default function MessageBoxMobile({
 					MESSAGE SELLER
 				</SheetTrigger>
 				<SheetContent
-					onClick={onCloseSheet}
+					//onClick={onCloseSheet}
 					ref={messageBoxRef}
 					side="bottom"
 					className="h-[85vh] w-screen rounded-t-xl p-0"
@@ -230,11 +229,12 @@ export default function MessageBoxMobile({
 							{flattenMessageData?.length > 0 ? (
 								flattenMessageData.map((msg, index) => {
 									const ISOdate = msg.created_at;
-									const prevDate = flattenMessageData[index - 1]?.created_at;
+									const prevDate = flattenMessageData[index + 1]?.created_at;
 									const currDate = parseISODate(ISOdate || null);
 									return (
 										<div key={`${msg.text}-${index}`} className="w-full">
-											{(timeDifference(prevDate, ISOdate) > 5 || index === 0) && (
+											{(timeDifference(ISOdate, prevDate) > 5 ||
+												index === flattenMessageData.length - 1) && (
 												<div className="mb-1 mt-4 flex w-full justify-center text-xs text-info">
 													{currDate}
 												</div>
