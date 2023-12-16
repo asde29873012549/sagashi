@@ -136,7 +136,7 @@ export default function MessageBoxMobile({
 	useEffect(() => {
 		socketInitializer({
 			queryClient,
-			chatroom_id,
+			chatroom_id: `${wsData.product_id}-${wsData.listingOwner}-${wsData.username}`,
 			setId,
 			fetchQuery: async (message_id) =>
 				await readMessage({
@@ -157,7 +157,7 @@ export default function MessageBoxMobile({
 			socketEventCleaner(socket);
 			socket.disconnect();
 		};
-	}, [wsData.username, wsData.listingOwner, wsData.product_id]);
+	}, [wsData.username, wsData.listingOwner, wsData.product_id, queryClient]);
 
 	useEffect(() => {
 		if (open) {

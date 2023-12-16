@@ -114,7 +114,7 @@ export default function Header() {
 		}
 
 		return () => eventSource && eventSource.close();
-	}, [user, notificationRefetch, currentActiveChatroom]);
+	}, [user, notificationRefetch, currentActiveChatroom, dispatch]);
 
 	const onLogout = () => {
 		signOut({ callbackUrl: homepage });

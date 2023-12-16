@@ -131,7 +131,7 @@ export default function Messages({ user }) {
 			socketEventCleaner(socket);
 			socket.disconnect();
 		};
-	}, [currentActiveChatroom]);
+	}, [currentActiveChatroom, queryClient]);
 
 	useEffect(() => {
 		return () => dispatch(setCurrentActiveChatroom(null));
