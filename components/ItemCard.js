@@ -47,6 +47,8 @@ export default function ItemCard({
 		notification_id && dispatch(setNotificationReadStatus(`${notification_id}`));
 		user && dispatch(setCurrentTab((chatroom_id?.split("-")[1] ?? "") === user ? "sell" : "buy"));
 
+		console.log("message_id", message_id, "notification_id", notification_id);
+
 		if (message_id) {
 			readMessage({
 				uri: "/message",

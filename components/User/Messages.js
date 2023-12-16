@@ -45,7 +45,7 @@ export default function Messages({ user }) {
 	const currentTab = useSelector(messageSelector).currentTab;
 	const currentChatroom_avatar = useRef(null);
 	const sellContainer = useRef();
-	const maiContainer = useRef();
+	const buyContainer = useRef();
 	const lastMessageRef = useRef();
 	const childValStateRef = useRef("");
 
@@ -104,7 +104,6 @@ export default function Messages({ user }) {
 	// thus caused the useEffect to run and initiate the websocket connection
 
 	useEffect(() => {
-		console.log("executed")
 		if (currentActiveChatroom) {
 			const [product_id, listingOwner, client] = currentActiveChatroom.split("-");
 			socketInitializer({
@@ -123,31 +122,29 @@ export default function Messages({ user }) {
 			socket.io.opts.query.user = client;
 			socket.io.opts.query.listingOwner = listingOwner;
 			socket.io.opts.query.productId = product_id;
+
+			socket.connect();
 		}
 
 		return () => {
 			console.log("socket disconnectd");
 			socketEventCleaner(socket);
 			socket.disconnect();
-
-			dispatch(setCurrentActiveChatroom(null));
 		};
 	}, [currentActiveChatroom]);
 
 	useEffect(() => {
-		if (currentActiveChatroom) {
-			socket.connect();
-		}
-	}, [currentActiveChatroom]);
+		return () => dispatch(setCurrentActiveChatroom(null));
+	}, [dispatch]);
 
 	// scroll to bottom when switching charoom or tabs
 	useEffect(() => {
 		if (currentTab === "sell" && sellContainer.current) {
 			sellContainer.current.scrollTop =
 				sellContainer.current.scrollHeight - sellContainer.current.clientHeight;
-		} else if (currentTab === "buy" && maiContainer.current) {
-			maiContainer.current.scrollTop =
-				maiContainer.current.scrollHeight - maiContainer.current.clientHeight;
+		} else if (currentTab === "buy" && buyContainer.current) {
+			buyContainer.current.scrollTop =
+				buyContainer.current.scrollHeight - buyContainer.current.clientHeight;
 		}
 	}, [currentTab]);
 
@@ -270,6 +267,7 @@ export default function Messages({ user }) {
 									src={msg.chatroom_avatar}
 									setIsOpen={() => onOpenChatroom(msg.chatroom_avatar)}
 									read_at={!messageReadMap[msg.id] ? null : msg.read_at}
+									message_id={msg.last_message}
 									chatroom_id={msg.id}
 									chatroom_id_from_url={currentActiveChatroom}
 								>
@@ -358,6 +356,7 @@ export default function Messages({ user }) {
 									src={msg.chatroom_avatar}
 									setIsOpen={() => onOpenChatroom(msg.chatroom_avatar)}
 									read_at={!messageReadMap[msg.id] ? null : msg.read_at}
+									message_id={msg.last_message}
 									chatroom_id={msg.id}
 									chatroom_id_from_url={chatroom_id_from_url}
 								>
@@ -378,7 +377,7 @@ export default function Messages({ user }) {
 				>
 					<div
 						className="mb-14 flex h-fit w-full flex-col-reverse overflow-y-scroll px-3 py-2"
-						ref={maiContainer}
+						ref={buyContainer}
 					>
 						{isMessageDataLoading ? (
 							<MessageLoadingSkeleton />
