@@ -30,7 +30,6 @@ export default function Header() {
 	const [onlineNotification, setOnlineNotification] = useState([]);
 	const [chatroom, setChatroom] = useState([]);
 	const [notificationActive, setNotificationActive] = useState(false);
-	const [messageActive, setMessageActive] = useState(false);
 	const dispatch = useDispatch();
 	const { data: session, status } = useSession();
 	const onToggleRegisterForm = () => dispatch(toggleRegisterForm());
@@ -93,9 +92,6 @@ export default function Header() {
 							return c;
 						});
 					});
-
-					// show message red dot, symbolizing new message
-					setMessageActive(true);
 				} else {
 					setOnlineNotification((prev) => [newNotification, ...prev]);
 					setNotificationActive(true);
@@ -122,10 +118,6 @@ export default function Header() {
 
 	const onNotificationHeartIconClick = () => {
 		setNotificationActive(false);
-	};
-
-	const onMessageIconClick = () => {
-		setMessageActive(false);
 	};
 
 	return (
@@ -163,15 +155,7 @@ export default function Header() {
 							onNotificationHeartIconClick={onNotificationHeartIconClick}
 						/>
 					)}
-					{session && (
-						<MessageIcon
-							user={user}
-							chatroom={chatroom}
-							setChatroom={setChatroom}
-							messageActive={messageActive}
-							onMessageIconClick={onMessageIconClick}
-						/>
-					)}
+					{session && <MessageIcon user={user} chatroom={chatroom} setChatroom={setChatroom} />}
 					{session && <ShoppingCartIcon user={user} />}
 					{session && (
 						<Link className="inline-block hover:cursor-pointer" href="/user">

@@ -18,6 +18,8 @@ import { useRouter } from "next/router";
 import { useToast } from "@/components/ui/use-toast";
 import { genericError } from "@/lib/userMessage";
 import CheckSvg from "@/components/checkSvg";
+import { setMobileMessageBoxData, setMobileMessageBoxOpen } from "@/redux/messageSlice";
+import { useDispatch } from "react-redux";
 
 import { getToken } from "next-auth/jwt";
 
@@ -26,6 +28,7 @@ import { useState, useRef } from "react";
 const JWT_TOKEN_SECRET = process.env.JWT_TOKEN_SECRET;
 
 export default function ListingItem({ username, product_id }) {
+	const dispatch = useDispatch();
 	const queryClient = useQueryClient();
 	const router = useRouter();
 	const [isOpen, setIsOpen] = useState(false);
@@ -110,8 +113,25 @@ export default function ListingItem({ username, product_id }) {
 		refetchOnWindowFocus: false,
 	});
 
-	const onCloseMessageBox = () => {
+	const onCloseDesktopMessageBox = () => {
 		setIsOpen((o) => !o);
+	};
+
+	const productData = listingData?.data[0] ?? {};
+
+	const onOpenMobileMessageBox = () => {
+		dispatch(setMobileMessageBoxOpen(true));
+		dispatch(
+			setMobileMessageBoxData({
+				product_id,
+				listingOwner: productData.seller_name,
+				username,
+				image: productData.primary_image,
+				date: productData.updated_at,
+				listing_name: productData.name,
+				listing_designer: productData.designer,
+			}),
+		);
 	};
 
 	const onAddShoppingCart = async () => {
@@ -129,7 +149,6 @@ export default function ListingItem({ username, product_id }) {
 		}, 2000);
 	};
 
-	const productData = listingData?.data[0] ?? {};
 	const secondaryImages = productData.secondary_image
 		? JSON.parse(productData.secondary_image)
 		: {};
@@ -178,7 +197,7 @@ export default function ListingItem({ username, product_id }) {
 						<Button className="mb-4 h-12 w-full hover:border-2 hover:border-foreground hover:bg-background hover:text-foreground md:w-4/5">
 							OFFER
 						</Button>
-						{username !== listingData?.data[0].seller_name && (
+						{/*username !== listingData?.data[0].seller_name && (
 							<MessageBoxMobile
 								className="w-full md:hidden"
 								wsData={{ username, product_id, listingOwner: listingData?.data[0].seller_name }}
@@ -187,25 +206,33 @@ export default function ListingItem({ username, product_id }) {
 								listing_designer={productData.designer}
 								date={productData.updated_at}
 							/>
+						)*/}
+						{username !== listingData?.data[0].seller_name && (
+							<Button
+								className="h-12 w-full rounded-md bg-primary text-background transition-all duration-500 hover:border-2 hover:border-foreground hover:bg-background hover:text-foreground md:hidden md:w-4/5"
+								onClick={onOpenMobileMessageBox}
+							>
+								MESSAGE SELLER
+							</Button>
 						)}
 						{isOpen && (
 							<MessageBoxDesktop
 								wsData={{ username, product_id, listingOwner: listingData?.data[0].seller_name }}
-								onCloseMessageBox={onCloseMessageBox}
+								onCloseMessageBox={onCloseDesktopMessageBox}
 								image={productData.primary_image}
 								listing_name={productData.name}
 								listing_designer={productData.designer}
 								date={productData.updated_at}
 							/>
 						)}
-						{username !== listingData?.data[0].seller_name && (
+						{/*username !== listingData?.data[0].seller_name && (
 							<Button
 								className="hidden h-12 w-full hover:border-2 hover:border-foreground hover:bg-background hover:text-foreground md:block md:w-4/5"
 								onClick={onCloseMessageBox}
 							>
 								MESSAGE SELLER
 							</Button>
-						)}
+						)*/}
 					</div>
 				</div>
 			</div>

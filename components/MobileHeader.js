@@ -6,6 +6,7 @@ import { Fragment, useEffect, useState } from "react";
 import { User, Search as SearchIcon } from "lucide-react";
 import MenuBar from "./MenuBar";
 import Search from "./Search";
+import MessageBoxMobile from "./MessageBoxMobile";
 
 import { toggleRegisterForm } from "../redux/userSlice";
 
@@ -32,7 +33,6 @@ export default function MobileHeader() {
 	const [onlineNotification, setOnlineNotification] = useState([]);
 	const [chatroom, setChatroom] = useState([]);
 	const [notificationActive, setNotificationActive] = useState(false);
-	const [messageActive, setMessageActive] = useState(false);
 	const dispatch = useDispatch();
 	const { data: session, status } = useSession();
 	const onToggleRegisterForm = () => dispatch(toggleRegisterForm());
@@ -95,9 +95,6 @@ export default function MobileHeader() {
 							return c;
 						});
 					});
-
-					// show message red dot, symbolizing new message
-					setMessageActive(true);
 				} else {
 					setOnlineNotification((prev) => [newNotification, ...prev]);
 					setNotificationActive(true);
@@ -116,7 +113,7 @@ export default function MobileHeader() {
 		}
 
 		return () => eventSource && eventSource.close();
-	}, [user, notificationRefetch, currentActiveChatroom]);
+	}, [user, notificationRefetch, currentActiveChatroom, dispatch]);
 
 	const onLogout = () => {
 		signOut({ callbackUrl: homepage });
@@ -126,23 +123,13 @@ export default function MobileHeader() {
 		setNotificationActive(false);
 	};
 
-	const onMessageIconClick = () => {
-		setMessageActive(false);
-	};
-
 	return (
 		<Fragment>
 			<div className="relative top-0 z-[19] flex h-16 w-full items-center justify-between bg-background px-3 py-2 shadow-md sm:px-6 sm:py-4 md:hidden">
 				<MenuBar />
 				<Logo className="absolute m-auto w-[20vw]" />
 				{session && (
-					<MessageIcon
-						user={user}
-						chatroom={chatroom}
-						setChatroom={setChatroom}
-						messageActive={messageActive}
-						onMessageIconClick={onMessageIconClick}
-					/>
+					<MessageIcon user={user} chatroom={chatroom} setChatroom={setChatroom} isMobile={true} />
 				)}
 				<div className="text-md fixed bottom-0 right-0 z-8 flex w-full items-center justify-between bg-background px-5 py-3">
 					<div className="flex w-full items-center justify-around">
@@ -180,6 +167,7 @@ export default function MobileHeader() {
 					</div>
 				</div>
 			</div>
+			<MessageBoxMobile className="w-full md:hidden" user={user} />
 		</Fragment>
 	);
 }

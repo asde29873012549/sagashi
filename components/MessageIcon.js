@@ -7,19 +7,12 @@ import { useQuery } from "@tanstack/react-query";
 import getMessages from "@/lib/queries/fetchQuery";
 import { useDispatch } from "react-redux";
 import { setMessageReadStatus } from "@/redux/messageSlice";
-import { set } from "date-fns";
 
-export default function MessageIcon({
-	user,
-	messageActive,
-	onMessageIconClick,
-	chatroom,
-	setChatroom,
-}) {
+export default function MessageIcon({ user, chatroom, setChatroom, isMobile }) {
 	const dispatch = useDispatch();
 	const [isOpen, setIsOpen] = useState(false);
 
-	const { data: chatroomList, refetch: fetchChatroomList } = useQuery({
+	const { refetch: fetchChatroomList } = useQuery({
 		queryKey: ["chatroomList"],
 		queryFn: () =>
 			getMessages({
@@ -48,17 +41,26 @@ export default function MessageIcon({
 		setIsOpen((o) => !o);
 	};
 
+	const shouldShowMessageCircle = () => {
+		let yes = false;
+		chatroom?.forEach((msg) => {
+			if (!msg.read_at) yes = true;
+		});
+
+		return yes;
+	};
+
 	return (
 		<Popover open={isOpen} onOpenChange={onToggleMessageIcon}>
 			<PopoverTrigger className="relative flex" onClick={fetchChatroomList}>
 				{/* Notification Circle */}
 				<div
 					className={`absolute right-[1px] z-50 mb-3 h-2.5 w-2.5 rounded-full bg-red-700 
-					${!chatroom.length || !messageActive ? "md:hidden" : ""}`} // Hide on desktop if no new message
+					${shouldShowMessageCircle() ? "" : "hidden"}`} // Hide on desktop if no new message
 				></div>
 
 				{/* Message Icon */}
-				<MessageCircle className="h-7 w-7" onClick={onMessageIconClick} />
+				<MessageCircle className="h-7 w-7" />
 			</PopoverTrigger>
 
 			<PopoverContent
@@ -73,7 +75,7 @@ export default function MessageIcon({
 								user={user}
 								key={`${msg.updated_at || msg.created_at}-${index}-msg`}
 								src={msg.chatroom_avatar || msg.image}
-								link={msg.link}
+								link={isMobile ? "" : msg.link}
 								setIsOpen={onToggleMessageIcon}
 								read_at={msg.read_at}
 								message_id={msg.last_message || ""}

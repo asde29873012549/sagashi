@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { getDateDistance } from "@/lib/utils";
-import { useState, useRef } from "react";
+import { useState, useRef, Fragment } from "react";
 import { Dot } from "lucide-react";
 import readMessage from "@/lib/queries/fetchQuery";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,6 +11,8 @@ import {
 	setCurrentActiveChatroom,
 	setNotificationReadStatus,
 	setCurrentTab,
+	setMobileMessageBoxData,
+	setMobileMessageBoxOpen,
 } from "@/redux/messageSlice";
 
 import Link from "next/link";
@@ -20,7 +22,7 @@ export default function ItemCard({
 	src,
 	children,
 	timing, // only notificationIcon will have timing
-	link, // only itemCards in the header messageIcon or notificationIcon will have link
+	link, // only itemCards in the header messageIcon(only desktop) or notificationIcon will have link
 	setIsOpen,
 	read_at, // only messageIcon and Messages Section will have read_at
 	message_id, // only messageIcon and Messages Section will have message_id
@@ -47,8 +49,6 @@ export default function ItemCard({
 		notification_id && dispatch(setNotificationReadStatus(`${notification_id}`));
 		user && dispatch(setCurrentTab((chatroom_id?.split("-")[1] ?? "") === user ? "sell" : "buy"));
 
-		console.log("message_id", message_id, "notification_id", notification_id);
-
 		if (message_id) {
 			readMessage({
 				uri: "/message",
@@ -68,8 +68,15 @@ export default function ItemCard({
 		}
 	};
 
-	return (
-		<Link href={link || ""} onClick={onToggleSelect} scroll={false}>
+	const [product_id, listingOwner, username] = chatroom_id?.split("-") ?? [];
+
+	const onToggleMobileChatroomSheet = () => {
+		dispatch(setMobileMessageBoxOpen(true));
+		dispatch(setMobileMessageBoxData({ product_id, listingOwner, username, image: src }));
+	};
+
+	const AlertBody = () => {
+		return (
 			<Alert>
 				<AlertDescription
 					className={`flex w-[400px] cursor-pointer items-center justify-between rounded-md p-4 hover:bg-slate-100 ${
@@ -106,6 +113,16 @@ export default function ItemCard({
 					</div>
 				</AlertDescription>
 			</Alert>
+		);
+	};
+
+	return link ? (
+		<Link href={link || ""} onClick={onToggleSelect} scroll={false}>
+			<AlertBody />
 		</Link>
+	) : (
+		<div onClick={onToggleMobileChatroomSheet}>
+			<AlertBody />
+		</div>
 	);
 }

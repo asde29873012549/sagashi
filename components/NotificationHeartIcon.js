@@ -50,7 +50,7 @@ export default function MessageIcon({
 				{/* Notification Circle */}
 				<div
 					className={`absolute right-[-2px] top-[0px] z-50 mb-3 h-2.5 w-2.5 rounded-full bg-red-700 
-					${!onlineNotification?.length || !notificationActive ? "md:hidden" : ""}`} // Hide on desktop if no new message
+					${!onlineNotification?.length || !notificationActive ? "hidden" : ""}`} // Hide if no new message
 				></div>
 
 				{/* Message Icon */}

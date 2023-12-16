@@ -6,6 +6,8 @@ let initialState = {
 	lastMessage: {},
 	currentActiveChatroom: null,
 	currentTab: "sell",
+	isMobileMessageBoxOpen: false,
+	mobileMessageBoxData: {},
 };
 
 const messageSlice = createSlice({
@@ -88,6 +90,12 @@ const messageSlice = createSlice({
 		setCurrentTab: (state, action) => {
 			state.currentTab = action.payload;
 		},
+		setMobileMessageBoxOpen: (state, action) => {
+			state.isMobileMessageBoxOpen = action.payload;
+		},
+		setMobileMessageBoxData: (state, action) => {
+			state.mobileMessageBoxData = action.payload;
+		},
 	},
 });
 
@@ -97,6 +105,8 @@ export const {
 	setCurrentActiveChatroom,
 	setNotificationReadStatus,
 	setCurrentTab,
+	setMobileMessageBoxOpen,
+	setMobileMessageBoxData,
 } = messageSlice.actions;
 export const messageSelector = (state) => state.message;
 export default messageSlice.reducer;
