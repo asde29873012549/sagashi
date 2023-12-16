@@ -17,7 +17,7 @@ export default function DesignerCard({
 }) {
 	const [isFollow, setIsFollow] = useState(null);
 
-	const { mutate: followMutate } = useMutation({
+	const { mutate: followMutate, isLoading } = useMutation({
 		mutationFn: () =>
 			followDesigner({
 				uri: "/designer",
@@ -61,6 +61,7 @@ export default function DesignerCard({
 			) : (
 				<Button
 					onClick={onFollow}
+					disabled={isLoading}
 					// for initail load, check the isFollowed state from API, after that, check the state of the local isFollow state
 					variant={
 						isFollow === null

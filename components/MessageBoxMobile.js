@@ -1,16 +1,14 @@
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import Message from "./Message";
-import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import socketInitializer from "@/lib/socketio/socketInitializer";
 import socketEventCleaner from "@/lib/socketio/socketEventCleaner";
 import socket from "@/lib/socketio/client";
 import { useState, useEffect, useRef } from "react";
-import { useToast } from "@/components/ui/use-toast";
-import { genericError } from "@/lib/userMessage";
 import { useDispatch } from "react-redux";
 import { setLastMessage } from "@/redux/messageSlice";
 import useInterSectionObserver from "@/lib/hooks/useIntersectionObserver";
+import ChatboxInput from "./ChatboxInput";
 
 import { useInfiniteQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import getMessages from "@/lib/queries/fetchQuery";
@@ -31,11 +29,10 @@ export default function MessageBoxMobile({
 	const queryClient = useQueryClient();
 	const dispatch = useDispatch();
 	const [open, setOpen] = useState(false);
-	const [val, setVal] = useState("");
-	const { toast } = useToast();
 	const [id, setId] = useState([]);
 	const messageBoxContainer = useRef();
 	const messageBoxRef = useRef();
+	const childValStateRef = useRef("");
 
 	const chatroom_id = `${wsData.product_id}-${wsData.listingOwner}-${wsData.username}`;
 
@@ -72,7 +69,7 @@ export default function MessageBoxMobile({
 					seller_name: wsData.listingOwner,
 					buyer_name: wsData.username,
 					image,
-					text: DOMPurify.sanitize(inputValue),
+					text: DOMPurify.sanitize(inputValue.val),
 					isRead: false,
 				},
 			}),
@@ -81,14 +78,14 @@ export default function MessageBoxMobile({
 			const previousMessage = queryClient.getQueryData(["messages", chatroom_id]);
 
 			// clear input
-			setVal("");
+			childValStateRef.current.setVal("");
 
 			// Optimistically update to the new value
 			queryClient.setQueryData(["messages", chatroom_id], (oldData) => {
 				const newData = oldData;
 				newData.pages[0].data.unshift({
 					created_at: new Date().toISOString(),
-					text: val,
+					text: childValStateRef.current.val,
 					sender_name: wsData.username,
 				});
 				return newData;
@@ -101,21 +98,21 @@ export default function MessageBoxMobile({
 		onError: (err, newTodo, context) => {
 			queryClient.setQueryData(["messages", chatroom_id], context.previousMessage);
 		},
-		onSuccess: () => {
+		onSuccess: (msgData) => {
 			const client = id[0]?.split("-")[2];
 			// if the mutation succeeds, emit message to ws server and proceed
 			socket.emit("message", {
 				message: {
 					created_at: new Date().toISOString(),
-					text: val,
+					text: msgData?.data?.text,
 					sender_name: wsData.username,
-					message_id: Message.data?.id,
+					message_id: msgData?.data?.id,
 				},
 				client,
 			});
 
 			// set local user's last message state
-			dispatch(setLastMessage({ chatroom_id, text: val }));
+			dispatch(setLastMessage({ chatroom_id, text: msgData?.data?.text }));
 		},
 	});
 
@@ -133,28 +130,6 @@ export default function MessageBoxMobile({
 		if (messageBoxRef.current) {
 			messageBoxRef.current.style.height =
 				window.visualViewport.height < 400 ? `${window.visualViewport.height}px` : "85vh";
-		}
-	};
-
-	const onInput = (e) => {
-		setVal(e.target.value);
-	};
-
-	const onPressEnter = async (e) => {
-		if (e.keyCode === 13) {
-			// check who should be the client
-			let client = null;
-
-			client = id[0]?.split("-")[2];
-
-			if (!client)
-				return toast({
-					title: "Failed !",
-					description: genericError,
-					status: "fail",
-				});
-
-			messageMutate(val);
 		}
 	};
 
@@ -189,6 +164,10 @@ export default function MessageBoxMobile({
 			socket.connect();
 		}
 	}, [open]);
+
+	const updateMessageInput = (valStateFromChild) => {
+		childValStateRef.current = valStateFromChild;
+	};
 
 	return (
 		<div className={className}>
@@ -267,13 +246,11 @@ export default function MessageBoxMobile({
 					</main>
 
 					<footer className="sticky bottom-0 w-full bg-background p-2">
-						<Input
-							className="h-12 w-full rounded-full text-base placeholder:text-slate-400"
-							placeholder="Aa"
-							autoFocus={true}
-							onChange={onInput}
-							onKeyDown={onPressEnter}
-							value={val}
+						<ChatboxInput
+							updateMessageInput={updateMessageInput}
+							currentActiveChatroom={chatroom_id}
+							messageMutate={messageMutate}
+							isSmallMsgBox={true}
 						/>
 					</footer>
 				</SheetContent>

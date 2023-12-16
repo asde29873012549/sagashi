@@ -1,19 +1,17 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Message from "@/components/Message";
 import { useState, useRef, useEffect } from "react";
-import { useToast } from "@/components/ui/use-toast";
 import ItemCard from "../ItemCard";
 import { useQuery, useInfiniteQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import getChatrooms from "@/lib/queries/fetchQuery";
 import getMessages from "@/lib/queries/fetchQuery";
 import createMessage from "@/lib/queries/fetchQuery";
 import { received_message } from "@/lib/msg_template";
-import { genericError } from "@/lib/userMessage";
 import readMessage from "@/lib/queries/fetchQuery";
 import useInterSectionObserver from "@/lib/hooks/useIntersectionObserver";
+import ChatboxInput from "@/components/ChatboxInput";
 
 import socket from "@/lib/socketio/client";
 import socketInitializer from "@/lib/socketio/socketInitializer";
@@ -26,6 +24,7 @@ import {
 	setMessageReadStatus,
 	messageSelector,
 	setCurrentTab,
+	setCurrentActiveChatroom,
 } from "@/redux/messageSlice";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -35,8 +34,8 @@ export default function Messages({ user }) {
 	const queryClient = useQueryClient();
 	const dispatch = useDispatch();
 	const { chatroom_id: chatroom_id_from_url } = useRouter().query;
-	const [val, setVal] = useState("");
-	const { toast } = useToast();
+	// const [val, setVal] = useState("");
+	// const { toast } = useToast();
 	const [shouldBeInitialChatroomDisplay, setShouldBeInitialChatroomDisplay] = useState(
 		chatroom_id_from_url ? false : true,
 	);
@@ -48,6 +47,7 @@ export default function Messages({ user }) {
 	const sellContainer = useRef();
 	const maiContainer = useRef();
 	const lastMessageRef = useRef();
+	const childValStateRef = useRef("");
 
 	const { data: chatroomList } = useQuery({
 		queryKey: ["chatroomList", currentTab],
@@ -104,6 +104,7 @@ export default function Messages({ user }) {
 	// thus caused the useEffect to run and initiate the websocket connection
 
 	useEffect(() => {
+		console.log("executed")
 		if (currentActiveChatroom) {
 			const [product_id, listingOwner, client] = currentActiveChatroom.split("-");
 			socketInitializer({
@@ -128,6 +129,8 @@ export default function Messages({ user }) {
 			console.log("socket disconnectd");
 			socketEventCleaner(socket);
 			socket.disconnect();
+
+			dispatch(setCurrentActiveChatroom(null));
 		};
 	}, [currentActiveChatroom]);
 
@@ -162,10 +165,6 @@ export default function Messages({ user }) {
 		);
 	};
 
-	const onInput = (e) => {
-		setVal(e.target.value);
-	};
-
 	const onOpenChatroom = (chatroom_avatar) => {
 		currentChatroom_avatar.current = chatroom_avatar;
 		fetchMessageData();
@@ -192,14 +191,14 @@ export default function Messages({ user }) {
 			const previousMessage = queryClient.getQueryData(["messages", currentActiveChatroom]);
 
 			// clear input
-			setVal("");
+			childValStateRef.current.setVal("");
 
 			// Optimistically update to the new value
 			queryClient.setQueryData(["messages", currentActiveChatroom], (oldData) => {
 				const newData = oldData;
 				newData.pages[0].data.unshift({
 					created_at: new Date().toISOString(),
-					text: val,
+					text: childValStateRef.current.val,
 					sender_name: user,
 				});
 				return newData;
@@ -218,7 +217,7 @@ export default function Messages({ user }) {
 			socket.emit("message", {
 				message: {
 					created_at: new Date().toISOString(),
-					text: val,
+					text: messageData.data?.text,
 					sender_name: user,
 					message_id: messageData.data?.id,
 				},
@@ -226,29 +225,17 @@ export default function Messages({ user }) {
 			});
 
 			// set local user's last message state
-			dispatch(setLastMessage({ currentActiveChatroom, text: val }));
+			dispatch(setLastMessage({ currentActiveChatroom, text: messageData.data?.text }));
 		},
 	});
-
-	const onPressEnter = async (e) => {
-		if (e.keyCode === 13) {
-			// check who should be the recipient
-			const [product_id, listingOwner, recipient] = currentActiveChatroom?.split("-");
-
-			if (!recipient)
-				return toast({
-					title: "Failed !",
-					description: genericError,
-					status: "fail",
-				});
-
-			messageMutate({ val, product_id, listingOwner, recipient });
-		}
-	};
 
 	const onChangeTab = (tab) => {
 		dispatch(setCurrentTab(tab));
 		setShouldBeInitialChatroomDisplay(true);
+	};
+
+	const updateMessageInput = (valStateFromChild) => {
+		childValStateRef.current = valStateFromChild;
 	};
 
 	return (
@@ -347,12 +334,10 @@ export default function Messages({ user }) {
 					</div>
 					<span className="invisible opacity-0" ref={lastMessageRef}></span>
 					<footer className="absolute bottom-0 w-full rounded-lg bg-background p-2">
-						<Input
-							className="h-10 w-full rounded-lg border-slate-800 text-base placeholder:text-slate-400"
-							placeholder="Aa"
-							onChange={onInput}
-							onKeyDown={onPressEnter}
-							value={val}
+						<ChatboxInput
+							updateMessageInput={updateMessageInput}
+							currentActiveChatroom={currentActiveChatroom}
+							messageMutate={messageMutate}
 						/>
 					</footer>
 				</div>
@@ -438,12 +423,10 @@ export default function Messages({ user }) {
 					</div>
 					<span className="invisible opacity-0" ref={lastMessageRef}></span>
 					<footer className="absolute bottom-0 w-full rounded-lg bg-background p-2">
-						<Input
-							className="h-10 w-full rounded-lg border-slate-800 text-base placeholder:text-slate-400"
-							placeholder="Aa"
-							onChange={onInput}
-							onKeyDown={onPressEnter}
-							value={val}
+						<ChatboxInput
+							updateMessageInput={updateMessageInput}
+							currentActiveChatroom={currentActiveChatroom}
+							messageMutate={messageMutate}
 						/>
 					</footer>
 				</div>

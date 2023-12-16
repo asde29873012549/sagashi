@@ -1,18 +1,16 @@
 import * as dotenv from "dotenv";
 import Message from "./Message";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Input } from "@/components/ui/input";
 import { X as Xicon } from "lucide-react";
 import { motion } from "framer-motion";
 import socketInitializer from "@/lib/socketio/socketInitializer";
 import socketEventCleaner from "@/lib/socketio/socketEventCleaner";
 import socket from "@/lib/socketio/client";
 import { useState, useEffect, useRef } from "react";
-import { useToast } from "@/components/ui/use-toast";
-import { genericError } from "@/lib/userMessage";
 import { useDispatch } from "react-redux";
 import { setLastMessage } from "@/redux/messageSlice";
 import useInterSectionObserver from "@/lib/hooks/useIntersectionObserver";
+import ChatboxInput from "./ChatboxInput";
 
 import { useInfiniteQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import getMessages from "@/lib/queries/fetchQuery";
@@ -26,7 +24,6 @@ dotenv.config();
 
 export default function MessageBoxDesktop({
 	wsData,
-	isOpen,
 	onCloseMessageBox,
 	image,
 	listing_name,
@@ -35,10 +32,9 @@ export default function MessageBoxDesktop({
 }) {
 	const queryClient = useQueryClient();
 	const dispatch = useDispatch();
-	const [val, setVal] = useState("");
-	const { toast } = useToast();
 	const [id, setId] = useState([]);
 	const messageBoxContainer = useRef();
+	const childValStateRef = useRef("");
 
 	const chatroom_id = `${wsData.product_id}-${wsData.listingOwner}-${wsData.username}`;
 
@@ -65,10 +61,6 @@ export default function MessageBoxDesktop({
 		fetchNextPage,
 	});
 
-	const onInput = (e) => {
-		setVal(e.target.value);
-	};
-
 	const { mutate: messageMutate } = useMutation({
 		mutationFn: (inputValue) =>
 			createMessage({
@@ -79,7 +71,7 @@ export default function MessageBoxDesktop({
 					seller_name: wsData.listingOwner,
 					buyer_name: wsData.username,
 					image,
-					text: DOMPurify.sanitize(inputValue),
+					text: DOMPurify.sanitize(inputValue.val),
 					isRead: false,
 				},
 			}),
@@ -88,14 +80,14 @@ export default function MessageBoxDesktop({
 			const previousMessage = queryClient.getQueryData(["messages", chatroom_id]);
 
 			// clear input
-			setVal("");
+			childValStateRef.current.setVal("");
 
 			// Optimistically update to the new value
 			queryClient.setQueryData(["messages", chatroom_id], (oldData) => {
 				const newData = oldData;
 				newData.pages[0].data.unshift({
 					created_at: new Date().toISOString(),
-					text: val,
+					text: childValStateRef.current.val,
 					sender_name: wsData.username,
 				});
 				return newData;
@@ -108,41 +100,23 @@ export default function MessageBoxDesktop({
 		onError: (err, newTodo, context) => {
 			queryClient.setQueryData(["messages", chatroom_id], context.previousMessage);
 		},
-		onSuccess: () => {
+		onSuccess: (msgData) => {
 			const client = id[0]?.split("-")[2];
 			// if the mutation succeeds, emit message to ws server and proceed
 			socket.emit("message", {
 				message: {
 					created_at: new Date().toISOString(),
-					text: val,
+					text: msgData?.data?.text,
 					sender_name: wsData.username,
-					message_id: Message.data?.id,
+					message_id: msgData?.data?.id,
 				},
 				client,
 			});
 
 			// set local user's last message state
-			dispatch(setLastMessage({ chatroom_id, text: val }));
+			dispatch(setLastMessage({ chatroom_id, text: msgData?.data?.text }));
 		},
 	});
-
-	const onPressEnter = async (e) => {
-		if (e.keyCode === 13) {
-			// check who should be the client
-			let client = null;
-
-			client = id[0]?.split("-")[2];
-
-			if (!client)
-				return toast({
-					title: "Failed !",
-					description: genericError,
-					status: "fail",
-				});
-
-			messageMutate(val);
-		}
-	};
 
 	useEffect(() => {
 		socketInitializer({
@@ -163,6 +137,8 @@ export default function MessageBoxDesktop({
 		socket.io.opts.query.listingOwner = wsData.listingOwner;
 		socket.io.opts.query.productId = wsData.product_id;
 
+		socket.connect();
+
 		return () => {
 			console.log("socket disconnectd");
 			socketEventCleaner(socket);
@@ -170,11 +146,15 @@ export default function MessageBoxDesktop({
 		};
 	}, [wsData.username, wsData.listingOwner, wsData.product_id]);
 
-	useEffect(() => {
+	/*useEffect(() => {
 		if (isOpen) {
 			socket.connect();
 		}
-	}, [isOpen]);
+	}, [isOpen]);*/
+
+	const updateMessageInput = (valStateFromChild) => {
+		childValStateRef.current = valStateFromChild;
+	};
 
 	return (
 		<motion.div
@@ -244,12 +224,11 @@ export default function MessageBoxDesktop({
 				</div>
 			</main>
 			<footer className="fixed bottom-0 w-80 bg-background p-2">
-				<Input
-					className="h-8 w-full rounded-full text-base placeholder:text-slate-400"
-					placeholder="Aa"
-					onChange={onInput}
-					onKeyDown={onPressEnter}
-					value={val}
+				<ChatboxInput
+					updateMessageInput={updateMessageInput}
+					currentActiveChatroom={chatroom_id}
+					messageMutate={messageMutate}
+					isSmallMsgBox={true}
 				/>
 			</footer>
 		</motion.div>

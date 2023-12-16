@@ -52,7 +52,7 @@ export default function ListingItem({ username, product_id }) {
 			250,
 		);
 
-	const { mutate: addShoppingCartMutate, isError } = useMutation({
+	const { mutate: addShoppingCartMutate, isLoading } = useMutation({
 		mutationFn: () =>
 			addToShoppingCart({
 				uri: `/user/${username}/shoppingCart`,
@@ -67,11 +67,6 @@ export default function ListingItem({ username, product_id }) {
 				setAddToCart(<CheckSvg />);
 				delayShowCartItem();
 			}
-			/* toast({
-				title: addShoppingCartSuccess.title,
-				description: addShoppingCartSuccess.desc,
-				status: addShoppingCartSuccess.status,
-			}); */
 		},
 		onError: (err) => {
 			setAddToCart("ADD TO CART");
@@ -176,6 +171,7 @@ export default function ListingItem({ username, product_id }) {
 						<Button
 							className="mb-4 h-12 w-full hover:border-2 hover:border-foreground hover:bg-background hover:text-foreground md:w-4/5"
 							onClick={onAddShoppingCart}
+							disabled={isLoading}
 						>
 							{addToCart}
 						</Button>
@@ -195,7 +191,6 @@ export default function ListingItem({ username, product_id }) {
 						{isOpen && (
 							<MessageBoxDesktop
 								wsData={{ username, product_id, listingOwner: listingData?.data[0].seller_name }}
-								isOpen={isOpen}
 								onCloseMessageBox={onCloseMessageBox}
 								image={productData.primary_image}
 								listing_name={productData.name}
