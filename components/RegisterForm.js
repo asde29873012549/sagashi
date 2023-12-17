@@ -26,7 +26,7 @@ export default function RegisterForm() {
 	const [loading, setLoading] = useState(false);
 	const [isChecked, setIsChecked] = useState(true);
 	const [formInput, setFormInput] = useState({
-		username: typeof window !== "undefined" ? localStorage?.getItem("username") : "",
+		username: typeof window !== "undefined" ? localStorage.getItem("username") ?? "" : "",
 		password: "",
 	});
 
@@ -72,13 +72,12 @@ export default function RegisterForm() {
 				setFormInput({ username: "", password: "" });
 			}
 		} catch (error) {
-			console.log(error)
+			console.log(error);
 			setError(error.message);
 		} finally {
 			setLoginBtnText("LOGIN");
 			setLoading(false);
 		}
-
 	};
 
 	const onGoogleSignIn = async () => {
@@ -101,7 +100,11 @@ export default function RegisterForm() {
 		setLoading(true);
 		setRegisterBtnText(<SmallSpinner />);
 		try {
-			const result = await register({ uri: "/user/register", method: "POST", body: registerFormInput });
+			const result = await register({
+				uri: "/user/register",
+				method: "POST",
+				body: registerFormInput,
+			});
 
 			if (result.error) {
 				throw new Error(result.error);
@@ -149,7 +152,9 @@ export default function RegisterForm() {
 					<Card className="h-4/6 max-h-max w-9/12 min-w-fit max-w-max">
 						<CardHeader className="mb-2 flex items-center justify-center">
 							<CardTitle>LOGIN</CardTitle>
-							<div className={`text-xs ${error ? "text-red-700" : "text-emerald-500"}`}>{error || info}</div>
+							<div className={`text-xs ${error ? "text-red-700" : "text-emerald-500"}`}>
+								{error || info}
+							</div>
 						</CardHeader>
 						<CardContent>
 							<div className="mb-2 space-y-1 md:mb-6">
@@ -176,8 +181,18 @@ export default function RegisterForm() {
 							<Button className="mb-2 w-full" onClick={onSignIn} disabled={loading}>
 								{loginBtnText}
 							</Button>
-							<div className="mb-3 text-xs w-full flex justify-between">
-								<span className="flex items-center"><Checkbox className="mr-2" id="rememberMe" checked={isChecked} onCheckedChange={onCheckedChange}/><label htmlFor="rememberMe" className="cursor-pointer">REMEMBER ME</label></span>
+							<div className="mb-3 flex w-full justify-between text-xs">
+								<span className="flex items-center">
+									<Checkbox
+										className="mr-2"
+										id="rememberMe"
+										checked={isChecked}
+										onCheckedChange={onCheckedChange}
+									/>
+									<label htmlFor="rememberMe" className="cursor-pointer">
+										REMEMBER ME
+									</label>
+								</span>
 								<span className="ml-1 cursor-pointer hover:underline">FORGOT PASSWORD ?</span>
 							</div>
 							<div className="flex items-center justify-center">
@@ -233,7 +248,9 @@ export default function RegisterForm() {
 							</div>
 						</CardContent>
 						<CardFooter>
-							<Button className="w-full" onClick={onRegister} disabled={loading}>{registerBtnText}</Button>
+							<Button className="w-full" onClick={onRegister} disabled={loading}>
+								{registerBtnText}
+							</Button>
 						</CardFooter>
 					</Card>
 				</TabsContent>

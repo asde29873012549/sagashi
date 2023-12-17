@@ -1,4 +1,5 @@
 import * as dotenv from "dotenv";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -6,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import DesignerCard from "@/components/DesignerCard";
 import Shop from "../shop/index";
 import { dehydrate, QueryClient, useQuery, useMutation } from "@tanstack/react-query";
+import { toggleRegisterForm } from "@/redux/userSlice";
 import getSingleDesigner from "@/lib/queries/fetchQuery";
 import getRelatedDesigner from "@/lib/queries/fetchQuery";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -15,6 +17,7 @@ import getIsFollowDesigner from "@/lib/queries/fetchQuery";
 import { useToast } from "@/components/ui/use-toast";
 import { genericError } from "@/lib/userMessage";
 import { getToken } from "next-auth/jwt";
+import { useDispatch } from "react-redux";
 
 import { useRouter } from "next/router";
 
@@ -23,7 +26,9 @@ dotenv.config();
 const JWT_TOKEN_SECRET = process.env.JWT_TOKEN_SECRET;
 
 export default function SingleDesignerPage() {
+	const dispatch = useDispatch();
 	const [designerIntroSecExpand, setDesignerIntroSecExpand] = useState(false);
+	const { data: session } = useSession();
 	const router = useRouter();
 	const { toast } = useToast();
 
@@ -43,6 +48,7 @@ export default function SingleDesignerPage() {
 		queryKey: ["designer", "follow", { id: router.query.designers }],
 		queryFn: ({ queryKey }) => getIsFollowDesigner({ uri: `/designer/isFollow/${queryKey[2].id}` }),
 		refetchOnWindowFocus: false,
+		enabled: session ? true : false,
 		onError: (err) => {
 			console.log(err);
 		},
@@ -83,6 +89,9 @@ export default function SingleDesignerPage() {
 	});
 
 	const onFollowDesigner = () => {
+		if (!session) {
+			return dispatch(toggleRegisterForm());
+		}
 		setIsFollow((prev) => !prev);
 		followMutate();
 	};
