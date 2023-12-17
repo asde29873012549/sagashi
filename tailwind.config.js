@@ -102,6 +102,15 @@ module.exports = {
 						animationTimingFunction: "cubic-bezier(0, 0, 0.2, 1)",
 					},
 				},
+				delaySkeleton: {
+					"0%": { opacity: 0 },
+					"50%": { opacity: 0 },
+					"100%": { opacity: 1 },
+				},
+				imageEaseIn: {
+					from: { opacity: 0 },
+					to: { opacity: 1 },
+				},
 			},
 			animation: {
 				"accordion-down": "accordion-down 0.2s ease-out",
@@ -110,6 +119,8 @@ module.exports = {
 				svg: "drawLine 1s forwards",
 				opacityTransition: "opacityTransition 0.8s forwards",
 				horizontalBounce: "horizontalBounce 0.8s infinite",
+				delaySkeleton: "delaySkeleton 1s forwards ease-in-out",
+				imageEaseIn: "imageEaseIn 1s forwards ease-in-out",
 			},
 		},
 	},

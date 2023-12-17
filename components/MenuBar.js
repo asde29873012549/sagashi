@@ -40,12 +40,13 @@ export default function MenuBar() {
 	const category = treeData?.data.Category[currentTab] ?? {};
 
 	const onTouchStart = (e) => {
+		e.preventDefault();
 		isTouchActiveRef.current = true;
 		initialTouchRef.current = e.touches[0].screenY;
 	};
 	const onTouchMove = (e) => {
 		endingTouchRef.current = e.touches[0].screenY;
-		const movement = endingTouchRef.current - initialTouchRef.current;
+		let movement = endingTouchRef.current - initialTouchRef.current;
 		menuRef.current.style.transform = `translateY(${movement}px)`;
 	};
 
@@ -53,7 +54,7 @@ export default function MenuBar() {
 		isTouchActiveRef.current = false;
 		const distance = endingTouchRef.current - initialTouchRef.current;
 		menuRef.current.style.transform =
-			Math.abs(distance) > 180 ? "translateY(100vh)" : "translateY(0)";
+			Math.abs(distance) > 200 ? "translateY(100vh)" : "translateY(0)";
 	};
 
 	const onTransitionEnd = (e) => {
@@ -137,7 +138,7 @@ export default function MenuBar() {
 							</div>
 						</SheetHeader>
 						<Separator />
-						<div className="relative h-full w-screen overflow-y-scroll font-light">
+						<div className="relative h-full w-full overflow-x-hidden overflow-y-scroll font-light">
 							<ListDrawerItem
 								onNavigatePage={() => onNavigatePage(`/shop/${currentTab.toLowerCase()}`)}
 							>
@@ -150,6 +151,7 @@ export default function MenuBar() {
 								data={designerData?.data}
 								currentCategory={currentCategory}
 								setCurrentCategory={setCurrentCategory}
+								setOpen={setOpen}
 							>
 								Designers
 							</ListDrawer>
@@ -159,6 +161,8 @@ export default function MenuBar() {
 									data={category[key].sub}
 									currentCategory={currentCategory}
 									setCurrentCategory={setCurrentCategory}
+									setOpen={setOpen}
+									currentTab={currentTab}
 								>
 									{key}
 								</ListDrawer>

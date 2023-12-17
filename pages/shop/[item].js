@@ -154,7 +154,7 @@ export default function ListingItem({ username, product_id }) {
 		: {};
 
 	return (
-		<div className="mt-10 w-screen md:mt-0 md:px-[6%]" key={router.asPath}>
+		<div className="w-screen md:mt-0 md:px-[6%]" key={router.asPath}>
 			<div className="relative flex flex-col items-center justify-between md:flex-row">
 				<Carousel
 					className="md:z-2 md:mx-auto"
@@ -215,6 +215,14 @@ export default function ListingItem({ username, product_id }) {
 								MESSAGE SELLER
 							</Button>
 						)}
+						{username !== listingData?.data[0].seller_name && (
+							<Button
+								className="hidden h-12 w-full hover:border-2 hover:border-foreground hover:bg-background hover:text-foreground md:block md:w-4/5"
+								onClick={onCloseDesktopMessageBox}
+							>
+								MESSAGE SELLER
+							</Button>
+						)}
 						{isOpen && (
 							<MessageBoxDesktop
 								wsData={{ username, product_id, listingOwner: listingData?.data[0].seller_name }}
@@ -225,14 +233,6 @@ export default function ListingItem({ username, product_id }) {
 								date={productData.updated_at}
 							/>
 						)}
-						{/*username !== listingData?.data[0].seller_name && (
-							<Button
-								className="hidden h-12 w-full hover:border-2 hover:border-foreground hover:bg-background hover:text-foreground md:block md:w-4/5"
-								onClick={onCloseMessageBox}
-							>
-								MESSAGE SELLER
-							</Button>
-						)*/}
 					</div>
 				</div>
 			</div>

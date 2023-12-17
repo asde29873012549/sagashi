@@ -194,7 +194,7 @@ export default function MessageBoxMobile({ className, user }) {
 							</header>
 
 							<main
-								className={`relative flex h-[calc(100%-6.5rem)] w-full flex-col px-3 ${
+								className={`relative flex h-[calc(100%-7rem)] w-full flex-col px-3 ${
 									flattenMessageData?.length
 										? "items-end justify-start"
 										: "items-center justify-center"

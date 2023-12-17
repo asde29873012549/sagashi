@@ -16,6 +16,7 @@ export default function DesignerCard({
 	isLoadingFeaturedDesigner,
 }) {
 	const [isFollow, setIsFollow] = useState(null);
+	const [loaded, setLoaded] = useState(false);
 
 	const { mutate: followMutate, isLoading } = useMutation({
 		mutationFn: () =>
@@ -41,13 +42,22 @@ export default function DesignerCard({
 		followMutate();
 	};
 
+	const onImageLoad = () => {
+		console.log("loaded");
+		setLoaded(true);
+	};
+
 	return (
 		<div
 			className={`flex h-fit flex-col justify-center rounded-md border pb-4 drop-shadow-lg ${className}`}
 		>
 			<Link href={`/designers/${designer_id}`}>
-				<div className="relative aspect-[4/5] w-full rounded-md ">
-					<Image src={src} fill={true} alt="pic" />
+				<div
+					className={`relative aspect-[4/5] w-full rounded-md opacity-0 ${
+						loaded ? "animate-imageEaseIn" : ""
+					}`}
+				>
+					<Image src={src} fill={true} alt="pic" onLoad={onImageLoad} />
 				</div>
 			</Link>
 			<div className="flex flex-col items-center justify-center">

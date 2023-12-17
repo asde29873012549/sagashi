@@ -15,6 +15,7 @@ import { useState, useEffect } from "react";
 export default function ListingCard({ src, prod_id, product_data, lastProductElement, className }) {
 	const userLikedListing = safeParse(localStorage.getItem("likedListing")) || [];
 	const [liked, setLiked] = useState(userLikedListing);
+	const [loaded, setLoaded] = useState(false);
 	const { toast } = useToast();
 	const { data: session } = useSession();
 
@@ -112,11 +113,26 @@ export default function ListingCard({ src, prod_id, product_data, lastProductEle
 		return res;
 	}
 
+	const onImageLoad = () => {
+		console.log("loaded");
+		setLoaded(true);
+	};
+
 	return (
 		<div className={`mb-5 h-fit ${className}`} ref={lastProductElement ? lastProductElement : null}>
 			<Link href={`/shop/${prod_id}`}>
-				<div className="relative aspect-[4/5] w-full">
-					<Image src={src} fill={true} alt="pic" sizes="(max-width: 768px) 50vw, 33vw" />
+				<div
+					className={`relative aspect-[4/5] w-full opacity-0 ${
+						loaded ? "animate-imageEaseIn" : ""
+					}`}
+				>
+					<Image
+						src={src}
+						fill={true}
+						alt="pic"
+						sizes="(max-width: 768px) 50vw, 33vw"
+						onLoad={onImageLoad}
+					/>
 				</div>
 			</Link>
 			<div className="text-sm text-gray-500">{getDateDistance(product_data.created_at)}</div>

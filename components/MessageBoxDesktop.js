@@ -176,7 +176,7 @@ export default function MessageBoxDesktop({
 				</div>
 			</header>
 			<main
-				className={`relative flex h-[calc(100%-6.5rem)] w-full flex-col overflow-scroll ${
+				className={`relative flex h-[calc(100%-7rem)] w-full flex-col overflow-scroll ${
 					flattenMessageData?.length > 0 ? "items-end justify-start" : "items-center justify-center"
 				}`}
 			>

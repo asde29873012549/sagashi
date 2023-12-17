@@ -125,9 +125,9 @@ export default function MobileHeader() {
 
 	return (
 		<Fragment>
-			<div className="relative top-0 z-[19] flex h-16 w-full items-center justify-between bg-background px-3 py-2 shadow-md sm:px-6 sm:py-4 md:hidden">
+			<div className="sticky top-0 z-[19] flex h-16 w-full items-center justify-between bg-background px-3 py-2 shadow-md sm:px-6 sm:py-4 md:hidden">
 				<MenuBar />
-				<Logo className="absolute m-auto w-[20vw]" />
+				<Logo className="absolute m-auto w-[19vw]" />
 				{session && (
 					<MessageIcon user={user} chatroom={chatroom} setChatroom={setChatroom} isMobile={true} />
 				)}

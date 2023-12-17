@@ -48,6 +48,7 @@ export default function Carousel({ primary_image, secondary_images, className })
 	};
 
 	const onTouchStart = (e) => {
+		e.preventDefault();
 		isTouchActiveRef.current = true;
 		initialTouchRef.current = e.touches[0].screenX;
 	};

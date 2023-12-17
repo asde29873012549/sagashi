@@ -36,7 +36,7 @@ export default function ChatboxInput({
 	return (
 		<Input
 			className={`${
-				isSmallMsgBox ? "h-8 rounded-full" : "h-10 rounded-lg border-slate-800"
+				isSmallMsgBox ? "h-10 rounded-full" : "h-10 rounded-lg border-slate-800"
 			} w-full text-base placeholder:text-slate-400`}
 			placeholder="Aa"
 			onChange={onInput}

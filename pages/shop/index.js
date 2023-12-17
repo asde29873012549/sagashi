@@ -176,8 +176,8 @@ export default function Shop({ isMenswear, isWomenswear, isNewArrival, designer,
 						));
 					})}
 					{isFetchingNextPage &&
-						[...Array(8)].map((_, index) => (
-							<div className="mb-5 w-full space-y-3" key={index}>
+						[...Array(4)].map((_, index) => (
+							<div className="mb-5 w-full animate-delaySkeleton space-y-3" key={index}>
 								<Skeleton className="h-80" />
 								<div className="space-y-2">
 									<span className="flex justify-between">
