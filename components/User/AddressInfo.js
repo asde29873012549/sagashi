@@ -10,7 +10,7 @@ import { personalInfoUpdateSuccess, genericError } from "@/lib/userMessage";
 export default function AddressInfo({ sheet = "", userData, setFeature, setAddressData, setOpen }) {
 	const queryClient = useQueryClient();
 	const { toast } = useToast();
-	const username = userData.data.username;
+	const username = userData?.data.username;
 	const { data: addressData } = useQuery({
 		queryKey: ["addressData"],
 		queryFn: () => getAddress({ uri: `/user/${username}/shippingAddress` }),

@@ -4,58 +4,136 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import SmallSpinner from "./SmallSpinner";
+import { Checkbox } from "./ui/checkbox";
 
 import { userSelector, toggleRegisterForm } from "../redux/userSlice";
 import { useSelector, useDispatch } from "react-redux";
+import register from "@/lib/queries/fetchQuery";
 
 import { useState } from "react";
 import * as DOMPurify from "dompurify";
+import CheckSvg from "./checkSvg";
 
 export default function RegisterForm() {
 	const dispatch = useDispatch();
 	const registerFormStatus = useSelector(userSelector).isRegisterFormActive;
+	const [currentTab, setCurrentTab] = useState("login");
+	const [loginBtnText, setLoginBtnText] = useState("SIGN IN");
+	const [registerBtnText, setRegisterBtnText] = useState("REGISTER");
 	const [error, setError] = useState("");
+	const [info, setInfo] = useState("");
+	const [loading, setLoading] = useState(false);
+	const [isChecked, setIsChecked] = useState(true);
 	const [formInput, setFormInput] = useState({
+		username: typeof window !== "undefined" ? localStorage?.getItem("username") : "",
+		password: "",
+	});
+
+	const [registerFormInput, setRegisterFormInput] = useState({
 		username: "",
 		password: "",
+		email: "",
 	});
 
 	const onToggleRegisterForm = () => dispatch(toggleRegisterForm());
 
 	const onFormInput = (e, form) => {
 		setFormInput({ ...formInput, [form]: e.target.value });
-		if (error) setError("");
+		if (error || info) {
+			setError("");
+			setInfo("");
+		}
+	};
+
+	const onRegisterFormInput = (e, form) => {
+		setRegisterFormInput({ ...registerFormInput, [form]: e.target.value });
+		if (error || info) {
+			setError("");
+			setInfo("");
+		}
 	};
 
 	const onSignIn = async () => {
-		const result = await signIn("credentials", {
-			username: DOMPurify.sanitize(formInput.username),
-			password: formInput.password,
-			redirect: false,
-		});
+		setLoading(true);
+		setLoginBtnText(<SmallSpinner />);
+		if (isChecked) localStorage.setItem("username", formInput.username);
+		try {
+			const result = await signIn("credentials", {
+				username: DOMPurify.sanitize(formInput.username),
+				password: formInput.password,
+				redirect: false,
+			});
 
-		if (result.error) {
-			setError(result.error);
-		} else {
-			dispatch(toggleRegisterForm());
-			setFormInput({ username: "", password: "" });
+			if (result.error) {
+				throw new Error(result.error);
+			} else {
+				dispatch(toggleRegisterForm());
+				setFormInput({ username: "", password: "" });
+			}
+		} catch (error) {
+			console.log(error)
+			setError(error.message);
+		} finally {
+			setLoginBtnText("LOGIN");
+			setLoading(false);
 		}
+
 	};
 
 	const onGoogleSignIn = async () => {
-		const result = await signIn("google");
+		try {
+			const result = await signIn("google", {
+				redirect: false,
+			});
 
-		if (result && result.error) {
-			setError(result.error);
-		} else {
-			dispatch(toggleRegisterForm());
+			if (result.error) {
+				throw new Error(result.error);
+			} else {
+				dispatch(toggleRegisterForm());
+			}
+		} catch (error) {
+			setError(error.message);
 		}
+	};
+
+	const onRegister = async () => {
+		setLoading(true);
+		setRegisterBtnText(<SmallSpinner />);
+		try {
+			const result = await register({ uri: "/user/register", method: "POST", body: registerFormInput });
+
+			if (result.error) {
+				throw new Error(result.error);
+			} else {
+				// dispatch(toggleRegisterForm());
+				setRegisterFormInput({ username: "", password: "", email: "" });
+				setTimeout(() => {
+					setRegisterBtnText(<CheckSvg />);
+					setLoading(false);
+					setTimeout(() => {
+						setCurrentTab("login");
+						setInfo("WELCOME ! PLEASE LOGIN !");
+						setRegisterBtnText("REGISTER");
+					}, 750);
+				}, 1000);
+			}
+		} catch (error) {
+			setError(error.name);
+			setRegisterBtnText("REGISTER");
+		}
+	};
+
+	const onCheckedChange = () => {
+		setIsChecked((c) => !c);
+		localStorage.removeItem("username");
 	};
 
 	return (
 		<div>
 			<Tabs
-				defaultValue="login"
+				value={currentTab}
+				onValueChange={setCurrentTab}
 				className={
 					"opacity-1 visible fixed inset-0 z-30 m-auto h-4/6 max-h-max w-9/12 min-w-fit max-w-max transition-opacity duration-1000 " +
 					(!registerFormStatus && "invisible opacity-0")
@@ -71,7 +149,7 @@ export default function RegisterForm() {
 					<Card className="h-4/6 max-h-max w-9/12 min-w-fit max-w-max">
 						<CardHeader className="mb-2 flex items-center justify-center">
 							<CardTitle>LOGIN</CardTitle>
-							<div className="text-xs text-red-700">{error}</div>
+							<div className={`text-xs ${error ? "text-red-700" : "text-emerald-500"}`}>{error || info}</div>
 						</CardHeader>
 						<CardContent>
 							<div className="mb-2 space-y-1 md:mb-6">
@@ -95,9 +173,13 @@ export default function RegisterForm() {
 									onChange={(e) => onFormInput(e, "password")}
 								/>
 							</div>
-							<Button className="mb-2 w-full md:mb-4" onClick={onSignIn}>
-								SIGN IN
+							<Button className="mb-2 w-full" onClick={onSignIn} disabled={loading}>
+								{loginBtnText}
 							</Button>
+							<div className="mb-3 text-xs w-full flex justify-between">
+								<span className="flex items-center"><Checkbox className="mr-2" id="rememberMe" checked={isChecked} onCheckedChange={onCheckedChange}/><label htmlFor="rememberMe" className="cursor-pointer">REMEMBER ME</label></span>
+								<span className="ml-1 cursor-pointer hover:underline">FORGOT PASSWORD ?</span>
+							</div>
 							<div className="flex items-center justify-center">
 								<div className="space-y-1">OR</div>
 							</div>
@@ -119,25 +201,39 @@ export default function RegisterForm() {
 						</CardHeader>
 						<CardContent>
 							<div className="space-y-1 md:mb-6">
-								<Label htmlFor="username">USERNAME</Label>
-								<Input id="username" placeholder="username" className="w-80 text-base" />
-							</div>
-							<div className="space-y-1 md:mb-6">
-								<Label htmlFor="password">PASSWORD</Label>
+								<Label htmlFor="rg_username">USERNAME</Label>
 								<Input
-									id="password"
-									placeholder="password"
-									className="w-80 text-base"
-									type="password"
+									id="rg_username"
+									placeholder="username"
+									className="w-80 text-base placeholder:text-gray-500"
+									value={registerFormInput.username}
+									onChange={(e) => onRegisterFormInput(e, "username")}
 								/>
 							</div>
 							<div className="space-y-1 md:mb-6">
-								<Label htmlFor="email">EMAIL</Label>
-								<Input id="email" placeholder="yourEmail@example.com" className="w-80 text-base" />
+								<Label htmlFor="rg_password">PASSWORD</Label>
+								<Input
+									id="rg_password"
+									placeholder="password"
+									className="w-80 text-base placeholder:text-gray-500"
+									value={registerFormInput.password}
+									type="password"
+									onChange={(e) => onRegisterFormInput(e, "password")}
+								/>
+							</div>
+							<div className="space-y-1 md:mb-6">
+								<Label htmlFor="rg_email">EMAIL</Label>
+								<Input
+									id="rg_email"
+									placeholder="yourEmail@example.com"
+									className="w-80 text-base placeholder:text-gray-500"
+									value={registerFormInput.email}
+									onChange={(e) => onRegisterFormInput(e, "email")}
+								/>
 							</div>
 						</CardContent>
 						<CardFooter>
-							<Button className="w-full">SIGN IN</Button>
+							<Button className="w-full" onClick={onRegister} disabled={loading}>{registerBtnText}</Button>
 						</CardFooter>
 					</Card>
 				</TabsContent>

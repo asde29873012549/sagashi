@@ -118,7 +118,7 @@ export default function SingleDesignerPage() {
 					</div>
 				</div>
 				<div className="relative h-fit w-full px-8 py-4 md:w-6/12 md:px-0">
-					<p className={`${designerIntroSecExpand ? "h-fit" : "h-40"} overflow-hidden `}>
+					<p className={`${designerIntroSecExpand ? "" : "line-clamp-6"} h-fit overflow-hidden `}>
 						{designerData?.data[0].story}
 					</p>
 					<Button
@@ -128,11 +128,6 @@ export default function SingleDesignerPage() {
 					>
 						{designerIntroSecExpand ? "Collapse..." : "Read More..."}
 					</Button>
-					<div
-						className={`${
-							designerIntroSecExpand ? "hidden" : "absolute"
-						} bottom-0 h-24 w-full bg-gradient-to-t from-white`}
-					></div>
 				</div>
 				<div className="flex w-full translate-y-14 justify-end px-8 md:w-3/12 md:translate-y-0 md:justify-end md:px-0">
 					<Button

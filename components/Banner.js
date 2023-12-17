@@ -11,7 +11,7 @@ export default function Banner() {
 							buttonVariants({ variant: "outline" }) +
 							" w-full border-2 border-foreground hover:bg-foreground hover:text-background"
 						}
-						href="/menswear"
+						href="/shop/menswear"
 					>
 						Mens
 					</Link>
@@ -20,7 +20,7 @@ export default function Banner() {
 							buttonVariants({ variant: "outline" }) +
 							" w-full border-2 border-foreground hover:bg-foreground hover:text-background"
 						}
-						href="/womenswear"
+						href="/shop/womenswear"
 					>
 						Womens
 					</Link>
@@ -29,7 +29,7 @@ export default function Banner() {
 							buttonVariants({ variant: "outline" }) +
 							" w-full border-2 border-foreground hover:bg-foreground hover:text-background"
 						}
-						href="/menswear"
+						href="/shop/newArrivals"
 					>
 						New In
 					</Link>

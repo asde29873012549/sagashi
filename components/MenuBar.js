@@ -11,8 +11,10 @@ import ListDrawer from "./ListDrawer";
 import { useRef, useState } from "react";
 import { ChevronLeft } from "lucide-react";
 import Spinner from "./Spinner";
+import { useRouter } from "next/router";
 
 export default function MenuBar() {
+	const router = useRouter();
 	const menuRef = useRef();
 	const initialTouchRef = useRef();
 	const endingTouchRef = useRef();
@@ -51,7 +53,7 @@ export default function MenuBar() {
 		isTouchActiveRef.current = false;
 		const distance = endingTouchRef.current - initialTouchRef.current;
 		menuRef.current.style.transform =
-			Math.abs(distance) > 70 ? "translateY(100vh)" : "translateY(0)";
+			Math.abs(distance) > 180 ? "translateY(100vh)" : "translateY(0)";
 	};
 
 	const onTransitionEnd = (e) => {
@@ -70,6 +72,11 @@ export default function MenuBar() {
 
 	const onGoBack = () => {
 		setCurrentCategory("All");
+	};
+
+	const onNavigatePage = (page) => {
+		setOpen(false);
+		router.push(page);
 	};
 
 	return (
@@ -131,8 +138,14 @@ export default function MenuBar() {
 						</SheetHeader>
 						<Separator />
 						<div className="relative h-full w-screen overflow-y-scroll font-light">
-							<ListDrawerItem>{currentTab} Homepage</ListDrawerItem>
-							<ListDrawerItem>New Arrivals</ListDrawerItem>
+							<ListDrawerItem
+								onNavigatePage={() => onNavigatePage(`/shop/${currentTab.toLowerCase()}`)}
+							>
+								{currentTab} Homepage
+							</ListDrawerItem>
+							<ListDrawerItem onNavigatePage={() => onNavigatePage(`/shop/newArrivals`)}>
+								New Arrivals
+							</ListDrawerItem>
 							<ListDrawer
 								data={designerData?.data}
 								currentCategory={currentCategory}

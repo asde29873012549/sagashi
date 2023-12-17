@@ -1,4 +1,4 @@
-import { Fragment, useState, useRef } from "react";
+import { Fragment, useState, useRef, useMemo } from "react";
 
 import Image from "next/image";
 import { ChevronRight, ChevronLeft } from "lucide-react";
@@ -6,7 +6,10 @@ import { ChevronRight, ChevronLeft } from "lucide-react";
 import CarouselDots from "./CarouselDots.js";
 
 export default function Carousel({ primary_image, secondary_images, className }) {
-	const slides = [primary_image, ...Object.values(secondary_images)];
+	const slides = useMemo(
+		() => [primary_image, ...Object.values(secondary_images)],
+		[primary_image, secondary_images],
+	);
 
 	const [direction, setDirection] = useState(1);
 	const carouselRef = useRef();
