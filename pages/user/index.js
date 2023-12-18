@@ -2,15 +2,17 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 
-import MyItem from "../../components/User/Sheets/MyItemSheet";
+//import MyItem from "../../components/User/Sheets/MyItemSheet";
 import ContactUs from "../../components/User/Sheets/ContactUsForm";
 
 import ProfileInfo from "../../components/User/ProfileInfo";
 import Messages from "../../components/User/Messages";
+import MyItem from "../../components/User/MyItem";
 import AddressInfo from "../../components/User/AddressInfo";
 import LanguageInfo from "../../components/User/LanguageInfo";
 import CountryInfo from "../../components/User/CountryInfo";
 import About from "../../components/User/About";
+import Drafts from "../../components/User/Drafts";
 import SheetWrapper from "@/components/User/Sheets/SheetWrapper";
 import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
 import getUser from "@/lib/queries/fetchQuery";
@@ -61,8 +63,15 @@ export default function User({ user }) {
 	};
 
 	const onMyItemsClick = () => {
-		setDisplayFeature(<MyItem />);
+		setDisplayFeature(<MyItem user={user} />);
 		setFeature("My Items");
+
+		chatroom_id && router.replace("/user");
+	};
+
+	const onDraftsClick = () => {
+		setDisplayFeature(<Drafts />);
+		setFeature("Drafts");
 
 		chatroom_id && router.replace("/user");
 	};
@@ -145,6 +154,10 @@ export default function User({ user }) {
 					</Button>
 					<Button variant="link" onClick={onMyItemsClick} className="group flex w-fit flex-col">
 						<p>My Items</p>
+						<hr className="h-px w-0 border-foreground transition-all duration-300 ease-in-out group-hover:w-full" />
+					</Button>
+					<Button variant="link" onClick={onDraftsClick} className="group flex w-fit flex-col">
+						<p>Drafts</p>
 						<hr className="h-px w-0 border-foreground transition-all duration-300 ease-in-out group-hover:w-full" />
 					</Button>
 					<Button variant="link" onClick={onMyAddressClick} className="group flex w-fit flex-col">

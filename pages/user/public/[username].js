@@ -120,7 +120,7 @@ export default function PublicUserProfile({ user, avatar }) {
 				)}
 			</header>
 			<Separator />
-			<Shop isUserListing={true} treeData={OriginTreeData?.data} user={username} />
+			<Shop treeData={OriginTreeData?.data} user={username} />
 		</div>
 	);
 }
