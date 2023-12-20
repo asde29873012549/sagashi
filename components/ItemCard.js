@@ -16,6 +16,7 @@ import {
 } from "@/redux/messageSlice";
 
 import Link from "next/link";
+import Image from "next/image";
 
 export default function ItemCard({
 	user, // only Messages section will have user
@@ -88,9 +89,9 @@ export default function ItemCard({
 				>
 					<div className="flex w-full">
 						<div className="mr-2 w-2/12 items-center">
-							<Avatar className="aspect-square w-full">
-								<AvatarImage src={src} />
-								<AvatarFallback>CN</AvatarFallback>
+							<Avatar>
+								<AvatarImage src={src} className="animate-imageEaseIn" />
+								<AvatarFallback delayMs={750}>CN</AvatarFallback>
 							</Avatar>
 						</div>
 						<div style={{ width: "77%" }}>

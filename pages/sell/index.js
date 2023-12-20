@@ -48,6 +48,7 @@ export default function Sell() {
 		queryKey: ["category"],
 		queryFn: () => getAllCategories({ uri: "/category" }),
 		refetchOnWindowFocus: false,
+		staleTime: 1000 * 60 * 30,
 	});
 
 	const { data: sizeData, refetch: fetchSize } = useQuery({
@@ -61,12 +62,14 @@ export default function Sell() {
 		queryKey: ["color"],
 		queryFn: () => getAllColor({ uri: "/listing/color" }),
 		refetchOnWindowFocus: false,
+		staleTime: 1000 * 60 * 60 * 24,
 	});
 
 	const { data: conditionData } = useQuery({
 		queryKey: ["condition"],
 		queryFn: () => getAllCondition({ uri: "/listing/condition" }),
 		refetchOnWindowFocus: false,
+		staleTime: 1000 * 60 * 60 * 24,
 	});
 
 	const { mutateAsync: draftMutate } = useMutation({
@@ -182,7 +185,14 @@ export default function Sell() {
 
 		Object.keys(formInput).forEach((key) => {
 			if (key === "photos") {
-				Object.values(formInput[key]).forEach((photo) => formData.append("photo", photo));
+				Object.keys(formInput.photos).forEach((photo_key) => {
+					if (String(photo_key) === "1") {
+						formData.append("primary_image", formInput.photos[photo_key]);
+					} else {
+						// start from `image_0` to `image_5`
+						formData.append(`image_${Number(photo_key) - 2}`, formInput.photos[photo_key]);
+					}
+				});
 			} else if (key === "tags" && tags.length > 0) {
 				formData.append("tags", DOMPurify.sanitize(tags.map((obj) => obj.value).join("&")));
 			} else {
@@ -204,7 +214,14 @@ export default function Sell() {
 
 		Object.keys(formInput).forEach((key) => {
 			if (key === "photos") {
-				Object.values(formInput[key]).forEach((photo) => formData.append("photo", photo));
+				Object.keys(formInput.photos).forEach((photo_key) => {
+					if (String(photo_key) === "1") {
+						formData.append("primary_image", formInput.photos[photo_key]);
+					} else {
+						// start from `image_0` to `image_5`
+						formData.append(`image_${Number(photo_key) - 2}`, formInput.photos[photo_key]);
+					}
+				});
 			} else if (key === "tags" && tags.length > 0) {
 				formData.append("tags", DOMPurify.sanitize(tags.map((obj) => obj.value).join("&")));
 			} else {

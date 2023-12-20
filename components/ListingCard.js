@@ -114,7 +114,6 @@ export default function ListingCard({ src, prod_id, product_data, lastProductEle
 	}
 
 	const onImageLoad = () => {
-		console.log("loaded");
 		setLoaded(true);
 	};
 

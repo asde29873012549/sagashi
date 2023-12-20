@@ -12,6 +12,7 @@ export default function PhotoCrop({
 	onFinishCrop,
 	onCancelCrop,
 	cropAspet,
+	noBackDrop,
 }) {
 	const onImageLoad = (e) => {
 		const { width, height } = e.currentTarget;
@@ -39,7 +40,7 @@ export default function PhotoCrop({
 							</Button>
 						</div>
 					</div>
-					<BlackCanvas />
+					{!noBackDrop && <BlackCanvas />}
 				</Fragment>
 			)}
 		</Fragment>

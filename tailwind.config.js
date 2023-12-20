@@ -120,7 +120,7 @@ module.exports = {
 				opacityTransition: "opacityTransition 0.8s forwards",
 				horizontalBounce: "horizontalBounce 0.8s infinite",
 				delaySkeleton: "delaySkeleton 1s forwards ease-in-out",
-				imageEaseIn: "imageEaseIn 1s forwards ease-in-out",
+				imageEaseIn: "imageEaseIn 0.5s forwards ease-in-out",
 			},
 		},
 	},

@@ -43,7 +43,6 @@ export default function DesignerCard({
 	};
 
 	const onImageLoad = () => {
-		console.log("loaded");
 		setLoaded(true);
 	};
 

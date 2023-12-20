@@ -2,23 +2,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import useInterSectionObserver from "@/lib/hooks/useIntersectionObserver";
 import getProducts from "@/lib/queries/fetchQuery";
+
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Dot } from "lucide-react";
-import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-} from "@/components/ui/dialog";
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import EditProductDialog from "../EditProductDialog";
 
 export default function MyItems({ user }) {
-	const [isOpen, setIsOpen] = useState(false);
 	const {
 		data: productData,
 		fetchNextPage,
@@ -57,7 +48,6 @@ export default function MyItems({ user }) {
 						<MyItemCard
 							key={`${pageIndex}-${productIndex}`}
 							productData={product}
-							setIsOpen={setIsOpen}
 							lastProductElement={
 								productData?.pages?.[0]?.data?.result.length === pageIndex + 1
 									? lastProductElement
@@ -71,51 +61,14 @@ export default function MyItems({ user }) {
 				<Dot size={32} />
 				SOLD
 			</h1>
-			<Dialog open={isOpen} onOpenChange={setIsOpen}>
-				<DialogContent className="p-6 sm:max-w-[425px]">
-					<DialogHeader>
-						<DialogTitle>Edit Product</DialogTitle>
-						<DialogDescription>
-							Make changes to your product here. Click save when you&apos;re done.
-						</DialogDescription>
-					</DialogHeader>
-					<div className="grid gap-4 py-4">
-						<div className="grid grid-cols-4 items-center gap-4">
-							<Label htmlFor="name" className="text-right">
-								Item Name
-							</Label>
-							<Input id="name" defaultValue="Pedro Duarte" className="col-span-3" />
-						</div>
-						<div className="grid grid-cols-4 items-center gap-4">
-							<Label htmlFor="condition" className="text-right">
-								Condition
-							</Label>
-							<Input id="condition" defaultValue="Pedro Duarte" className="col-span-3" />
-						</div>
-						<div className="grid grid-cols-4 items-center gap-4">
-							<Label htmlFor="description" className="text-right">
-								Description
-							</Label>
-							<Input id="description" defaultValue="Pedro Duarte" className="col-span-3" />
-						</div>
-						<div className="grid grid-cols-4 items-center gap-4">
-							<Label htmlFor="tags" className="text-right">
-								Tags
-							</Label>
-							<Input id="tags" defaultValue="Pedro Duarte" className="col-span-3" />
-						</div>
-					</div>
-					<DialogFooter>
-						<Button type="submit">Save changes</Button>
-					</DialogFooter>
-				</DialogContent>
-			</Dialog>
 		</div>
 	);
 }
 
-function MyItemCard({ productData, lastProductElement, setIsOpen }) {
-	const onEditProduct = () => {
+function MyItemCard({ productData, lastProductElement }) {
+	const [isOpen, setIsOpen] = useState(false);
+
+	const onEditProduct = (id) => {
 		setIsOpen(true);
 	};
 	return (
@@ -140,7 +93,7 @@ function MyItemCard({ productData, lastProductElement, setIsOpen }) {
 						<Button
 							variant="secondary"
 							className="mt-3 h-8 hover:bg-sky-900 hover:text-background"
-							onClick={onEditProduct}
+							onClick={() => onEditProduct(productData?.prod_id)}
 						>
 							Edit
 						</Button>
@@ -148,6 +101,14 @@ function MyItemCard({ productData, lastProductElement, setIsOpen }) {
 				</div>
 			</div>
 			<Separator />
+			{isOpen && (
+				<EditProductDialog
+					isOpen={isOpen}
+					setIsOpen={setIsOpen}
+					productData={productData}
+					user={user}
+				/>
+			)}
 		</>
 	);
 }

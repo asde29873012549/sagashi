@@ -6,7 +6,14 @@ import { useDispatch } from "react-redux";
 const cropAspet = 4 / 5;
 const NEXT_PUBLIC_SERVER_DOMAIN = process.env.NEXT_PUBLIC_SERVER_DOMAIN;
 
-export default function ImageUploadCard({ id, formInput, setFormInput, dispatchFormInput }) {
+export default function ImageUploadCard({
+	id,
+	formInput,
+	setFormInput,
+	dispatchFormInput,
+	initialBgImage,
+	noBackDrop,
+}) {
 	const [imgSrc, setImgSrc] = useState();
 	const [crop, setCrop] = useState();
 	const [bufferImage, setBufferImage] = useState();
@@ -69,7 +76,7 @@ export default function ImageUploadCard({ id, formInput, setFormInput, dispatchF
 			}
 
 			imageCardNode.style.backgroundImage = `url(${imageURL})`;
-			imageCardNode.style.backgroundSize = "contain";
+			// imageCardNode.style.backgroundSize = "contain";
 			cameraIconNode.style.display = "none";
 			cancelIconNode.style.display = "block";
 		}
@@ -110,12 +117,14 @@ export default function ImageUploadCard({ id, formInput, setFormInput, dispatchF
 				onFinishCrop={onFinishCrop}
 				onCancelCrop={onCancelCrop}
 				cropAspet={cropAspet}
+				noBackDrop={noBackDrop}
 			/>
 			<div className="relative">
 				<div
 					ref={cancelIconRef}
 					onClick={() => onCancelIconClick()}
 					className="absolute right-2 top-2 z-1 hidden"
+					style={{ display: `${initialBgImage ? "block" : "none"}` }}
 				>
 					<FilledCancel className="h-6 w-6 fill-foreground hover:cursor-pointer hover:fill-destructive " />
 				</div>
@@ -124,8 +133,9 @@ export default function ImageUploadCard({ id, formInput, setFormInput, dispatchF
 					className={
 						"relative flex aspect-[4/5] items-center justify-center rounded-md bg-gray-100 transition-transform duration-700 hover:scale-105 hover:cursor-pointer"
 					}
+					style={{ backgroundImage: `url(${initialBgImage || ""})`, backgroundSize: "contain" }}
 				>
-					<div ref={cameraIconRef}>
+					<div ref={cameraIconRef} style={{ display: `${initialBgImage ? "none" : "block"}` }}>
 						<FilledCamera className="h-6 w-6" />
 					</div>
 					<input
@@ -165,7 +175,7 @@ function FilledCancel() {
 			xmlns="http://www.w3.org/2000/svg"
 			viewBox="0 0 24 24"
 			fill="currentColor"
-			className="h-6 w-6"
+			className="h-6 w-6 cursor-pointer hover:text-rose-800"
 		>
 			<path
 				fillRule="evenodd"
