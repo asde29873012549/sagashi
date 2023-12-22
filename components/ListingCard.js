@@ -3,23 +3,25 @@ import Link from "next/link";
 import { Separator } from "./ui/separator";
 import { Heart } from "lucide-react";
 import { getDateDistance } from "@/lib/utils";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import createLike from "@/lib/queries/fetchQuery";
 import { useToast } from "@/components/ui/use-toast";
 import { genericError } from "@/lib/userMessage";
-import getUserLikedListing from "@/lib/queries/fetchQuery";
-import { useSession } from "next-auth/react";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
-export default function ListingCard({ src, prod_id, product_data, lastProductElement, className }) {
-	const userLikedListing = safeParse(localStorage.getItem("likedListing")) || [];
-	const [liked, setLiked] = useState(userLikedListing);
+export default function ListingCard({
+	src,
+	prod_id,
+	product_data,
+	lastProductElement,
+	likedListing,
+	className,
+	priority,
+}) {
+	const queryClient = useQueryClient();
 	const [loaded, setLoaded] = useState(false);
 	const { toast } = useToast();
-	const { data: session } = useSession();
-
-	const user = session?.user?.username ?? "";
 
 	const { mutate: likeMutate } = useMutation({
 		mutationFn: () =>
@@ -33,8 +35,23 @@ export default function ListingCard({ src, prod_id, product_data, lastProductEle
 					listing_image: src,
 				},
 			}),
-		onError: (error) => {
-			setLiked((prev) => prev.filter((id) => id !== prod_id));
+		onMutate: () => {
+			// snapshot previous value
+			const previousLiked = queryClient.getQueryData(["listing", "liked"]);
+
+			// optimistically update
+			queryClient.setQueryData(["listing", "liked"], (old) => ({
+				...old,
+				data: [...old.data, { product_id: prod_id }],
+			}));
+
+			// return rollback snapshot
+			return previousLiked;
+		},
+		onError: (error, newLikes, context) => {
+			// rollback to previous value
+			queryClient.setQueryData(["listing", "liked"], context);
+
 			toast({
 				title: "Failed !",
 				description: genericError,
@@ -43,75 +60,13 @@ export default function ListingCard({ src, prod_id, product_data, lastProductEle
 		},
 	});
 
-	const { data: likedListing, refetch } = useQuery({
-		queryKey: ["listing", "liked"],
-		queryFn: () => getUserLikedListing({ uri: `/listing/like` }),
-		refetchOnWindowFocus: false,
-		enabled: false,
-	});
-
-	// if local Storage is empty, fetch from server of current user liked listing
-	useEffect(() => {
-		if (user) {
-			const localLikedListingData = safeParse(localStorage.getItem("likedListing"));
-			const fetchLikedListing = async () => {
-				return await refetch();
-			};
-
-			!localLikedListingData && fetchLikedListing();
-		}
-	}, [refetch, user]);
-
-	// This useEffect handles setting to local storage
-	useEffect(() => {
-		if (user) {
-			const setLikedListing = () => {
-				if (!likedListing?.data) return;
-				const likedListingId = likedListing.data.map((obj) => obj.product_id);
-
-				// const currentLikedListing = localStorage.getItem("likedListing");
-				// Check if the lists are different to prevent unnecessary updates
-				setLiked(likedListingId); // Remove this to prevent setting state here
-				localStorage.setItem("likedListing", JSON.stringify(likedListingId));
-			};
-			setLikedListing();
-		}
-	}, [likedListing, user]);
-
 	const onLike = async () => {
-		// modify the liked state
-		setLiked((prev) =>
-			prev.includes(prod_id) ? prev.filter((id) => id !== prod_id) : [...prev, prod_id],
-		);
-		const currLikedListing = safeParse(localStorage.getItem("likedListing"));
-
-		// set local storage data according to the current listing has been liked or not
-		localStorage.setItem(
-			"likedListing",
-			JSON.stringify(
-				currLikedListing.includes(prod_id)
-					? currLikedListing.filter((id) => id !== prod_id)
-					: [...currLikedListing, prod_id],
-			),
-		);
-
 		try {
 			likeMutate();
 		} catch (err) {
 			console.log(err);
 		}
 	};
-
-	function safeParse(json) {
-		let res = null;
-		try {
-			res = JSON.parse(json);
-		} catch (err) {
-			console.log(err);
-		}
-
-		return res;
-	}
 
 	const onImageLoad = () => {
 		setLoaded(true);
@@ -129,8 +84,9 @@ export default function ListingCard({ src, prod_id, product_data, lastProductEle
 						src={src}
 						fill={true}
 						alt="pic"
-						sizes="(max-width: 768px) 50vw, 33vw"
+						sizes="(max-width: 768px) 50vw, 20vw"
 						onLoad={onImageLoad}
+						priority={priority}
 					/>
 				</div>
 			</Link>
@@ -149,7 +105,7 @@ export default function ListingCard({ src, prod_id, product_data, lastProductEle
 			<div className="truncate text-xs text-foreground">{product_data.designer}</div>
 			<div className="flex items-center justify-between text-sm text-foreground">
 				<div className="before:content-['$']">{product_data.price}</div>
-				{liked.includes(prod_id) ? (
+				{likedListing?.includes(prod_id) ? (
 					<FilledHeart onClick={onLike} className="h-5 w-5 fill-red-700 hover:cursor-pointer" />
 				) : (
 					<Heart onClick={onLike} className="h-5 w-5 hover:cursor-pointer" />

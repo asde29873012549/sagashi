@@ -64,7 +64,9 @@ export default function MessageIcon({ user, chatroom, setChatroom, isMobile }) {
 			</PopoverTrigger>
 
 			<PopoverContent
-				className={`mr-4 max-h-[70dvh] ${chatroom.length > 0 ? "" : "mr-1"} overflow-y-scroll`}
+				className={`mr-4 max-h-[70dvh] md:mr-8 ${
+					chatroom.length > 0 ? "" : "mr-1"
+				} overflow-y-scroll`}
 			>
 				{chatroom &&
 					chatroom.length > 0 &&

@@ -3,6 +3,7 @@ import Tree from "@/components/Tree";
 import { dehydrate, QueryClient, useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import getTree from "@/lib/queries/fetchQuery";
 import getProducts from "@/lib/queries/fetchQuery";
+import getUserLikedListing from "@/lib/queries/fetchQuery";
 import reformTree from "@/lib/tree/reformTree";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -99,6 +100,14 @@ export default function ShopSearch({ treeData }) {
 		setTree(reformedTree);
 	};
 
+	const { data: likedListing } = useQuery({
+		queryKey: ["listing", "liked"],
+		queryFn: () => getUserLikedListing({ uri: `/listing/like` }),
+		refetchOnWindowFocus: false,
+	});
+
+	const liked = likedListing?.data?.map((obj) => obj.product_id);
+
 	return (
 		<>
 			<h6 className="my-4 p-2 text-sm font-semibold md:px-6">
@@ -127,6 +136,7 @@ export default function ShopSearch({ treeData }) {
 								src={obj.primary_image}
 								prod_id={obj.prod_id}
 								product_data={obj}
+								likedListing={liked}
 								className="w-full"
 								lastProductElement={
 									searchResult?.pages?.[0]?.data?.result.length === index + 1
@@ -163,6 +173,11 @@ export async function getServerSideProps({ query }) {
 		queryKey: ["tree"],
 		queryFn: () => getTree({ uri: "/tree", server: true }),
 	});
+
+	/*await queryClient.prefetchQuery({
+		queryKey: ["listing", "liked"],
+		queryFn: () => getUserLikedListing({ uri: `/listing/like` }),
+	});*/
 
 	return {
 		props: {

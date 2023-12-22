@@ -214,6 +214,5 @@ export async function getServerSideProps({ req, query }) {
 		props: {
 			dehydratedState: dehydrate(queryClient),
 		},
-		//revalidate: 60 * 10,
 	};
 }

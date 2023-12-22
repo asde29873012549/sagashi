@@ -56,7 +56,13 @@ export default function DesignerCard({
 						loaded ? "animate-imageEaseIn" : ""
 					}`}
 				>
-					<Image src={src} fill={true} alt="pic" onLoad={onImageLoad} />
+					<Image
+						src={src}
+						fill={true}
+						alt="pic"
+						onLoad={onImageLoad}
+						sizes="(max-width: 620px) 80vw, 20vw"
+					/>
 				</div>
 			</Link>
 			<div className="flex flex-col items-center justify-center">

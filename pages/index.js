@@ -9,6 +9,7 @@ import { dehydrate, QueryClient, useQuery } from "@tanstack/react-query";
 import getFeaturedDesigners from "@/lib/queries/fetchQuery";
 import getCurations from "@/lib/queries/fetchQuery";
 import getNewArrivalsProducts from "@/lib/queries/fetchQuery";
+import getUserLikedListing from "@/lib/queries/fetchQuery";
 
 export default function Home() {
 	const { data: designerData, isFetching: isLoadingFeaturedDesigner } = useQuery({
@@ -27,6 +28,14 @@ export default function Home() {
 			getNewArrivalsProducts({ uri: "/listing", method: "POST", body: { newArrivals: true } }),
 	});
 
+	const { data: likedListing } = useQuery({
+		queryKey: ["listing", "liked"],
+		queryFn: () => getUserLikedListing({ uri: `/listing/like` }),
+		refetchOnWindowFocus: false,
+	});
+
+	const liked = likedListing?.data?.map((obj) => obj.product_id);
+
 	return (
 		<Fragment>
 			<Banner />
@@ -34,12 +43,14 @@ export default function Home() {
 				<h1 className="mt-10 text-2xl font-bold md:text-3xl">New In</h1>
 				<p className="mb-6">Explore the Latest and Greatest in Contemporary Chic.</p>
 				<main className="no-scrollbar flex  w-full items-center overflow-scroll">
-					{newArrivalsProductData?.data?.result.map((obj) => (
+					{newArrivalsProductData?.data?.result.map((obj, index) => (
 						<ListingCard
+							priority={index > 3 ? false : true}
 							key={obj.prod_id}
 							src={obj.primary_image}
 							prod_id={obj.prod_id}
 							product_data={obj}
+							likedListing={liked}
 							className="mb-4 mr-2 w-[65%] shrink-0 md:mr-4 md:w-1/5"
 						/>
 					))}
@@ -124,6 +135,11 @@ export async function getStaticProps() {
 		queryKey: ["curations"],
 		queryFn: () => getCurations({ uri: "/listing/curation", server: true }),
 	});
+
+	/*await queryClient.prefetchQuery({
+		queryKey: ["listing", "liked"],
+		queryFn: () => getUserLikedListing({ uri: `/listing/like`, server: true }),
+	});*/
 
 	return {
 		props: {

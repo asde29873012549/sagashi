@@ -158,6 +158,5 @@ export async function getServerSideProps({ req, query }) {
 			user: token?.username ?? null,
 			avatar: token?.avatar ?? null,
 		},
-		//revalidate: 60 * 10,
 	};
 }

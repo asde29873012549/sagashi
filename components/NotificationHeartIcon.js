@@ -58,7 +58,7 @@ export default function MessageIcon({
 			</PopoverTrigger>
 
 			<PopoverContent
-				className={`mr-4 max-h-[70dvh] ${
+				className={`mr-4 max-h-[70dvh] md:mr-8 ${
 					onlineNotification?.length > 0 ? "" : "mr-1"
 				} overflow-y-scroll`}
 			>
@@ -105,32 +105,3 @@ export default function MessageIcon({
 		</Popover>
 	);
 }
-
-/*
-<Popover>
-			<PopoverTrigger className="relative">
-				<div className="absolute right-[2px] z-50 mb-3 h-2.5 w-2.5 rounded-full bg-red-700 md:hidden"></div>
-				<MessageCircle className="h-7 w-7 md:hidden" />
-			</PopoverTrigger>
-			<PopoverContent className="mr-1 max-h-[80%]">
-				{message.length > 0 ? (
-					message.map((msg, index) => {
-						mes_type_helper(message);
-						return (
-							<ItemCard
-								key={`${msg.username}-${index}`}
-								src={"https://github.com/shadcn.png"}
-								postTime={"3 min"}
-							>
-								{msg.content}
-							</ItemCard>
-						);
-					})
-				) : (
-					<div className="flex h-6 w-60 items-center justify-center text-gray-500">
-						No new message
-					</div>
-				)}
-			</PopoverContent>
-		</Popover>
-*/

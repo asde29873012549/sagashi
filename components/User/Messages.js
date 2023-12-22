@@ -201,12 +201,12 @@ export default function Messages({ user }) {
 				return newData;
 			});
 			// Return a context object with the snapshotted value
-			return { previousMessage };
+			return previousMessage;
 		},
 		// If the mutation fails,
 		// use the context returned from onMutate to roll back
 		onError: (err, newTodo, context) => {
-			queryClient.setQueryData(["messages", currentActiveChatroom], context.previousMessage);
+			queryClient.setQueryData(["messages", currentActiveChatroom], context);
 		},
 		onSuccess: (messageData) => {
 			const client = currentActiveChatroom?.split("-")[2];
@@ -270,6 +270,7 @@ export default function Messages({ user }) {
 									message_id={msg.last_message}
 									chatroom_id={msg.id}
 									chatroom_id_from_url={currentActiveChatroom}
+									isDesktop={true}
 								>
 									{content}
 								</ItemCard>
@@ -359,6 +360,7 @@ export default function Messages({ user }) {
 									message_id={msg.last_message}
 									chatroom_id={msg.id}
 									chatroom_id_from_url={chatroom_id_from_url}
+									isDesktop={true}
 								>
 									{content}
 								</ItemCard>

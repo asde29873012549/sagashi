@@ -29,6 +29,7 @@ export default function ItemCard({
 	message_id, // only messageIcon and Messages Section will have message_id
 	chatroom_id, // only messageIcon and Messages Section will have chatroom_id
 	notification_id, // only notificationIcon will have notification_id
+	isDesktop, // only Mesages Section on Desktop will have isDesktop to true
 }) {
 	const dispatch = useDispatch();
 	const messageReadMap = useSelector(messageSelector).isMessageReadMap;
@@ -76,8 +77,8 @@ export default function ItemCard({
 		dispatch(setMobileMessageBoxData({ product_id, listingOwner, username, image: src }));
 	};
 
-	const AlertBody = () => {
-		return (
+	return link ? (
+		<Link href={link || ""} onClick={onToggleSelect} scroll={false}>
 			<Alert>
 				<AlertDescription
 					className={`flex w-[400px] cursor-pointer items-center justify-between rounded-md p-4 hover:bg-slate-100 ${
@@ -114,16 +115,45 @@ export default function ItemCard({
 					</div>
 				</AlertDescription>
 			</Alert>
-		);
-	};
-
-	return link ? (
-		<Link href={link || ""} onClick={onToggleSelect} scroll={false}>
-			<AlertBody />
 		</Link>
 	) : (
-		<div onClick={onToggleMobileChatroomSheet}>
-			<AlertBody />
+		<div onClick={isDesktop ? onToggleSelect : onToggleMobileChatroomSheet}>
+			<Alert>
+				<AlertDescription
+					className={`flex w-[400px] cursor-pointer items-center justify-between rounded-md p-4 hover:bg-slate-100 ${
+						currentActiveChatroom === chatroom_id && !link ? "bg-slate-200 hover:bg-slate-200" : ""
+						// use chatroom_id_from_url to check if this itemCard is in the User's page Message section
+						// because although hasMsgSeen will turn off the gray background and the dot in the Header MessageIcon part
+						// I still want the background to be gray if the user navigate to the User Message section to show which itemCard is currently selected
+					} ${hasMsgSeen ? "" : hasNotiSeen ? "" : "bg-slate-100"}`}
+				>
+					<div className="flex w-full">
+						<div className="mr-2 w-2/12 items-center">
+							<Avatar>
+								<AvatarImage src={src} />
+								<AvatarFallback delayMs={750}>CN</AvatarFallback>
+							</Avatar>
+						</div>
+						<div style={{ width: "77%" }}>
+							<div className="ml-1 line-clamp-2 w-full whitespace-break-spaces px-2">
+								{children}
+							</div>
+							{timing && (
+								<div className="ml-1 shrink-0 px-2 text-xs text-info">
+									{getDateDistance(timing)}
+								</div>
+							)}
+						</div>
+						{isNotificationItemCard.current
+							? isItemCardActiveNotiVersion && (
+									<Dot strokeWidth={5} color="#4932f5" className="h-full shrink-0 self-center" />
+							  )
+							: isItemCardActiveMsgVersion && (
+									<Dot strokeWidth={5} color="#4932f5" className="h-full shrink-0 self-center" />
+							  )}
+					</div>
+				</AlertDescription>
+			</Alert>
 		</div>
 	);
 }

@@ -49,7 +49,7 @@ export default function Banner() {
 					width="2000"
 					height="2500"
 					className="h-auto object-cover md:hidden"
-					priority
+					priority={true}
 				/>
 			</div>
 			<div className="hidden md:relative md:flex md:h-auto md:justify-center">
@@ -83,7 +83,9 @@ export default function Banner() {
 					playsInline
 					loop
 					width="100%"
+					height="576px"
 					className="hidden md:block md:w-full"
+					poster="/poster.webp"
 				>
 					<source src="/prada.mp4" type="video/mp4" />
 				</video>

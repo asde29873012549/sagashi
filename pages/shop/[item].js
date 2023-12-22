@@ -13,6 +13,7 @@ import {
 import getSingleListing from "@/lib/queries/fetchQuery";
 import getRecentlyViwed from "@/lib/queries/fetchQuery";
 import addToShoppingCart from "@/lib/queries/fetchQuery";
+import getUserLikedListing from "@/lib/queries/fetchQuery";
 import { ShoppingCart } from "lucide-react";
 import { useRouter } from "next/router";
 import { useToast } from "@/components/ui/use-toast";
@@ -112,6 +113,14 @@ export default function ListingItem({ username, product_id }) {
 		queryFn: () => getRecentlyViwed({ uri: `/listing/recentlyViewed` }),
 		refetchOnWindowFocus: false,
 	});
+
+	const { data: likedListing } = useQuery({
+		queryKey: ["listing", "liked"],
+		queryFn: () => getUserLikedListing({ uri: `/listing/like` }),
+		refetchOnWindowFocus: false,
+	});
+
+	const liked = likedListing?.data?.map((obj) => obj.product_id);
 
 	const onCloseDesktopMessageBox = () => {
 		setIsOpen((o) => !o);
@@ -246,6 +255,7 @@ export default function ListingItem({ username, product_id }) {
 							src={obj.primary_image}
 							prod_id={obj.prod_id}
 							product_data={obj}
+							likedListing={liked}
 							className="mb-4 w-[48%] shrink-0 md:w-1/6"
 						/>
 					))}
@@ -261,6 +271,7 @@ export default function ListingItem({ username, product_id }) {
 							src={obj.Product.primary_image}
 							prod_id={obj.product_id}
 							product_data={obj.Product}
+							likedListing={liked}
 							className="mb-4 w-[48%] shrink-0 md:w-1/5"
 						/>
 					))}
@@ -282,12 +293,16 @@ export async function getServerSideProps({ req, query }) {
 			getSingleListing({ uri: `/listing/${queryKey[1].id}`, server: true }),
 	});
 
+	/*await queryClient.prefetchQuery({
+		queryKey: ["listing", "liked"],
+		queryFn: () => getUserLikedListing({ uri: `/listing/like` }),
+	});*/
+
 	return {
 		props: {
 			dehydratedState: dehydrate(queryClient),
 			username,
 			product_id,
 		},
-		//revalidate: 60 * 10,
 	};
 }

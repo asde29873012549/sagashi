@@ -35,7 +35,7 @@ export default function Tree({
 		queryKey: ["designer", { keyword: searchInput }],
 		queryFn: (obj) =>
 			getAllDesigners({
-				uri: `/designer?keyword=${obj.queryKey[1].keyword}}`,
+				uri: `/designer?keyword=${obj.queryKey[1].keyword}}&limit=10`,
 			}),
 		enabled: false,
 		refetchOnWindowFocus: false,
@@ -362,101 +362,3 @@ export default function Tree({
 		</Accordion>
 	);
 }
-
-/*
-if (key === "category") {
-			if (!newFilter[department] || !newFilter[department][value]) {
-				newFilter[department] = {
-					...newFilter[department],
-					[value]: {
-						...newFilter[department]?.[value],
-						subCategory: treeData.Category[department][value].sub.map((obj) => obj.name),
-					},
-				};
-			} else {
-				const isValueExist = newFilter[department][value].subCategory ?? false;
-				if (isValueExist) {
-					delete newFilter[department][value].subCategory;
-				} else {
-					newFilter[department][value].subCategory = treeData.Category[department][value].sub.map(
-						(obj) => obj.name,
-					);
-				}
-
-				if (Object.keys(newFilter[department][value]).length === 0) {
-					delete newFilter[department][value];
-				}
-			}
-		} else if (key === "sizes") {
-			if (
-				!newFilter[department] ||
-				!newFilter[department][category] ||
-				!newFilter[department][category].sizes
-			) {
-				newFilter[department] = {
-					...newFilter[department],
-					[category]: { ...newFilter[department]?.[category], sizes: [value] },
-				};
-			} else {
-				const isValueExist = newFilter[department][category].sizes.includes(value);
-				if (isValueExist) {
-					newFilter[department][category].sizes = newFilter[department][category].sizes.filter(
-						(item) => item !== value,
-					);
-					newFilter[department][category].sizes.length < 1 &&
-						delete newFilter[department][category].sizes;
-				} else {
-					newFilter[department][category].sizes.push(value);
-				}
-
-				if (Object.keys(newFilter[department][category]).length === 0) {
-					delete newFilter[department];
-				}
-			}
-		} else if (key === "subCategory") {
-			if (
-				!newFilter[department] ||
-				!newFilter[department][category] ||
-				!newFilter[department][category].subCategory
-			) {
-				newFilter[department] = {
-					...newFilter[department],
-					[category]: { ...newFilter[department]?.[category], subCategory: [value] },
-				};
-			} else {
-				const isValueExist = newFilter[department][category].subCategory.includes(value);
-				if (isValueExist) {
-					newFilter[department][category].subCategory = newFilter[department][
-						category
-					].subCategory.filter((item) => item !== value);
-					newFilter[department][category].subCategory.length < 1 &&
-						delete newFilter[department][category].subCategory;
-				} else {
-					newFilter[department][category].subCategory.push(value);
-				}
-				if (Object.keys(newFilter[department][category]).length === 0) {
-					delete newFilter[department][category];
-				}
-			}
-		} else {
-			if (!newFilter[key]) {
-				newFilter[key] = [value];
-			} else {
-				const isValueExist = newFilter[key].includes(value);
-				if (isValueExist) {
-					newFilter[key] = newFilter[key].filter((item) => item !== value);
-				} else {
-					newFilter[key].push(value);
-				}
-
-				if (newFilter[key].length === 0) {
-					delete newFilter[key];
-				}
-			}
-		}
-
-		if (newFilter[department] && Object.keys(newFilter[department]).length === 0) {
-			delete newFilter[department];
-		}
-
-*/

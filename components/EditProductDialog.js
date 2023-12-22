@@ -117,7 +117,7 @@ export default function EditProductDialog({
 		queryKey: ["designer", "infinite"],
 		queryFn: ({ pageParam = "" }) =>
 			getAllDesigners({
-				uri: `/designer?cursor=${pageParam && encodeURI(JSON.stringify(pageParam))}`,
+				uri: `/designer?cursor=${pageParam && encodeURI(JSON.stringify(pageParam))}&limit=10`,
 			}),
 		getNextPageParam: (lastPage, pages) => lastPage?.data[lastPage.data.length - 1]?.sort,
 		refetchOnWindowFocus: false,
