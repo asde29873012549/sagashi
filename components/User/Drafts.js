@@ -18,13 +18,17 @@ export default function MyDraft({ user }) {
 		refetchOnWindowFocus: false,
 	});
 
-	console.log(draftData);
-
 	return (
 		<div>
-			{draftData?.data?.map((draft, index) => {
-				return <MyItemCard key={`${index}-draft`} draftData={draft} user={user} />;
-			})}
+			{draftData &&
+				draftData.data &&
+				(draftData.data.length === 0 ? (
+					<div className="text-center text-info">Currently No Drafts Available.</div>
+				) : (
+					draftData.data.map((draft, index) => {
+						return <MyItemCard key={`${index}-draft`} draftData={draft} user={user} />;
+					})
+				))}
 		</div>
 	);
 }

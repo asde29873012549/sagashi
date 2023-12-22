@@ -145,7 +145,7 @@ export default function EditProductDialog({
 	const { mutate: editMutate } = useMutation({
 		mutationFn: (product) =>
 			editProductData({
-				uri: `/listing/${productData?.prod_id}`,
+				uri: `/listing/${isDraft ? productData?.id : productData?.prod_id}`,
 				method: "PUT",
 				body: product,
 				isFormData: true,
@@ -207,6 +207,8 @@ export default function EditProductDialog({
 				formData.append(key, DOMPurify.sanitize(formInput[key]));
 			}
 		});
+
+		formData.append("isDraft", isDraft);
 
 		try {
 			editMutate(formData);
@@ -469,30 +471,10 @@ export default function EditProductDialog({
 				</section>
 				<DialogFooter>
 					<Button type="submit" className="mt-2 h-10 text-sm" onClick={onEditProductData}>
-						Save changes
+						{isDraft ? "Publish" : "Save changes"}
 					</Button>
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>
 	);
 }
-
-/*const { data: sizeData, refetch: fetchSize } = useQuery({
-		queryKey: ["size", categoryData?.data?.[productData?.department]?.[productData?.category]?.id],
-		queryFn: (obj) => getAllSizes({ uri: `/category/size/${obj.queryKey[1]}` }),
-		enabled: isOpen && categoryData && productData ? true : false,
-		refetchOnWindowFocus: false,
-		onSuccess: (sizeData) => {
-			const subCategoryData =
-				categoryData.data?.[productData?.department]?.[productData?.category]?.sub || [];
-			const subCategory = subCategoryData.find(
-				(subCat) => subCat.name === productData?.subCategory,
-			);
-			setFormInput({
-				...formInput,
-				subCategory_id: subCategory?.id,
-				size_id: sizeData?.data?.find((sizeObj) => sizeObj.Size.name === productData?.size)?.Size
-					.id,
-			});
-		},
-	});*/

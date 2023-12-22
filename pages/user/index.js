@@ -40,7 +40,7 @@ export default function User({ user }) {
 		}
 	}, [chatroom_id, user]);
 
-	const hasNotEditButtonFeature = ["My Items", "Contact Us", "About", "Messages"];
+	const hasNotEditButtonFeature = ["My Items", "Contact Us", "About", "Messages", "Drafts"];
 
 	const [displayFeature, setDisplayFeature] = useState(
 		dept ? <Messages user={user} /> : <ProfileInfo userData={userData} />,

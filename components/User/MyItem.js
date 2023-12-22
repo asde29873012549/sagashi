@@ -35,33 +35,40 @@ export default function MyItems({ user }) {
 		fetchNextPage,
 	});
 
+	const product = productData?.pages ?? [];
+
 	return (
 		<div>
 			<h1 className="mb-8 flex text-xl font-medium text-foreground">
 				<Dot size={32} />
 				FOR SELL
 			</h1>
-			{(productData?.pages ?? []).map((page, pageIndex) => {
-				const pageData = page.data.result || [];
-				return pageData.map((product, productIndex) => {
-					return (
-						<MyItemCard
-							key={`${pageIndex}-${productIndex}`}
-							productData={product}
-							lastProductElement={
-								productData?.pages?.[0]?.data?.result.length === pageIndex + 1
-									? lastProductElement
-									: null
-							}
-							user={user}
-						/>
-					);
-				});
-			})}
+			{product.length > 0 ? (
+				product.map((page, pageIndex) => {
+					const pageData = page.data.result || [];
+					return pageData.map((product, productIndex) => {
+						return (
+							<MyItemCard
+								key={`${pageIndex}-${productIndex}`}
+								productData={product}
+								lastProductElement={
+									productData?.pages?.[0]?.data?.result.length === pageIndex + 1
+										? lastProductElement
+										: null
+								}
+								user={user}
+							/>
+						);
+					});
+				})
+			) : (
+				<div className="text-center text-info">Currently No Products Available.</div>
+			)}
 			<h1 className="my-8 flex text-xl font-medium text-foreground">
 				<Dot size={32} />
 				SOLD
 			</h1>
+			<div className="text-center text-info">Currently No Sold Listings.</div>
 		</div>
 	);
 }
