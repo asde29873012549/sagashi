@@ -53,6 +53,7 @@ export default function MyItems({ user }) {
 									? lastProductElement
 									: null
 							}
+							user={user}
 						/>
 					);
 				});
@@ -65,7 +66,7 @@ export default function MyItems({ user }) {
 	);
 }
 
-function MyItemCard({ productData, lastProductElement }) {
+function MyItemCard({ productData, lastProductElement, user }) {
 	const [isOpen, setIsOpen] = useState(false);
 
 	const onEditProduct = (id) => {

@@ -70,7 +70,7 @@ export default function User({ user }) {
 	};
 
 	const onDraftsClick = () => {
-		setDisplayFeature(<Drafts />);
+		setDisplayFeature(<Drafts user={user} />);
 		setFeature("Drafts");
 
 		chatroom_id && router.replace("/user");

@@ -29,6 +29,8 @@ export default function MobilePreInfo() {
 		queryKey: ["category"],
 		queryFn: () => getAllCategories({ uri: "/category" }),
 		refetchOnWindowFocus: false,
+		staleTime: 1000 * 60 * 30,
+		cacheTime: 1000 * 60 * 35,
 	});
 
 	const onBtnSelect = (e, catId) => {

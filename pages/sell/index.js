@@ -49,6 +49,7 @@ export default function Sell() {
 		queryFn: () => getAllCategories({ uri: "/category" }),
 		refetchOnWindowFocus: false,
 		staleTime: 1000 * 60 * 30,
+		cacheTime: 1000 * 60 * 35,
 	});
 
 	const { data: sizeData, refetch: fetchSize } = useQuery({
@@ -62,14 +63,16 @@ export default function Sell() {
 		queryKey: ["color"],
 		queryFn: () => getAllColor({ uri: "/listing/color" }),
 		refetchOnWindowFocus: false,
-		staleTime: 1000 * 60 * 60 * 24,
+		staleTime: 1000 * 60 * 30,
+		cacheTime: 1000 * 60 * 35,
 	});
 
 	const { data: conditionData } = useQuery({
 		queryKey: ["condition"],
 		queryFn: () => getAllCondition({ uri: "/listing/condition" }),
 		refetchOnWindowFocus: false,
-		staleTime: 1000 * 60 * 60 * 24,
+		staleTime: 1000 * 60 * 30,
+		cacheTime: 1000 * 60 * 35,
 	});
 
 	const { mutateAsync: draftMutate } = useMutation({

@@ -37,12 +37,16 @@ export default function MobileMidInfo() {
 		queryKey: ["color"],
 		queryFn: () => getAllColor({ uri: "/listing/color" }),
 		refetchOnWindowFocus: false,
+		staleTime: 1000 * 60 * 30,
+		cacheTime: 1000 * 60 * 35,
 	});
 
 	const { data: conditionData } = useQuery({
 		queryKey: ["condition"],
 		queryFn: () => getAllCondition({ uri: "/listing/condition" }),
 		refetchOnWindowFocus: false,
+		staleTime: 1000 * 60 * 30,
+		cacheTime: 1000 * 60 * 35,
 	});
 
 	const onPriceInput = (e) => {

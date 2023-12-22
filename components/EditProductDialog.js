@@ -9,6 +9,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import DesignerComboBox from "@/components/DesignerComboBox";
 import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
 import { activate } from "@/redux/loadingSlice";
 import getAllCondition from "@/lib/queries/fetchQuery";
@@ -16,8 +17,9 @@ import editProductData from "@/lib/queries/fetchQuery";
 import getAllCategories from "@/lib/queries/fetchQuery";
 import getAllSizes from "@/lib/queries/fetchQuery";
 import getAllColor from "@/lib/queries/fetchQuery";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import getAllDesigners from "@/lib/queries/fetchQuery";
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { genericError } from "@/lib/userMessage";
 import { useToast } from "@/components/ui/use-toast";
@@ -25,9 +27,16 @@ import DOMPurify from "dompurify";
 import { useDispatch } from "react-redux";
 import { uploadSuccess } from "@/lib/userMessage";
 
-export default function EditProductDialog({ isOpen, setIsOpen, productData, user }) {
+export default function EditProductDialog({
+	isOpen,
+	setIsOpen,
+	productData,
+	user,
+	isDraft = false,
+}) {
 	const queryClient = useQueryClient();
 	const { toast } = useToast();
+	const childStateRef = useRef();
 	const dispatch = useDispatch();
 
 	const generatePhotoObj = (productData) => {
@@ -35,14 +44,24 @@ export default function EditProductDialog({ isOpen, setIsOpen, productData, user
 		if (productData) {
 			photoObj[1] = productData?.primary_image || "";
 			const secondary_image = JSON.parse(productData?.secondary_image);
-			Object.keys(secondary_image).forEach((key, index) => {
-				if (key.startsWith("image_")) {
-					photoObj[Number(index) + 2] = secondary_image[key];
-				}
-			});
+			secondary_image &&
+				Object.keys(secondary_image).forEach((key, index) => {
+					if (key.startsWith("image_")) {
+						photoObj[Number(index) + 2] = secondary_image[key];
+					}
+				});
 		}
 		return photoObj;
 	};
+
+	const cachedCategoryData = queryClient.getQueryData(["category"]);
+
+	const category_id =
+		cachedCategoryData.data?.[productData?.department]?.[productData?.category]?.id || "";
+	const subCategory_id =
+		cachedCategoryData.data?.[productData?.department]?.[productData?.category]?.sub?.find(
+			(subCat) => subCat.name === productData?.subCategory,
+		)?.id || "";
 
 	const [formInput, setFormInput] = useState({
 		item_name: productData?.name || "",
@@ -53,10 +72,11 @@ export default function EditProductDialog({ isOpen, setIsOpen, productData, user
 		price: productData?.price || "",
 		department: productData?.department || "",
 		category: productData?.category || "",
+		category_id,
 		condition: productData?.condition || "",
 		subCategory: productData?.subCategory || "",
 		designer: productData?.designer || "",
-		subCategory_id: "",
+		subCategory_id,
 		size_id: "",
 		photos: generatePhotoObj(productData),
 	});
@@ -66,7 +86,8 @@ export default function EditProductDialog({ isOpen, setIsOpen, productData, user
 		queryFn: () => getAllCondition({ uri: "/listing/condition" }),
 		enabled: isOpen,
 		refetchOnWindowFocus: false,
-		staleTime: 1000 * 60 * 60 * 24,
+		staleTime: 1000 * 60 * 30,
+		cacheTime: 1000 * 60 * 35,
 	});
 
 	const { data: categoryData } = useQuery({
@@ -75,28 +96,41 @@ export default function EditProductDialog({ isOpen, setIsOpen, productData, user
 		enabled: isOpen && productData ? true : false,
 		refetchOnWindowFocus: false,
 		staleTime: 1000 * 60 * 30,
-	});
-
-	const subCategoryData =
-		categoryData?.data?.[productData?.department]?.[productData?.category]?.sub || [];
-
-	const { data: sizeData } = useQuery({
-		queryKey: ["size", categoryData?.data?.[productData?.department]?.[productData?.category]?.id],
-		queryFn: (obj) => getAllSizes({ uri: `/category/size/${obj.queryKey[1]}` }),
-		enabled: isOpen && categoryData && productData ? true : false,
-		refetchOnWindowFocus: false,
-		onSuccess: (sizeData) => {
-			const subCategoryData =
-				categoryData.data?.[productData?.department]?.[productData?.category]?.sub || [];
-			const subCategory = subCategoryData.find(
-				(subCat) => subCat.name === productData?.subCategory,
-			);
+		cacheTime: 1000 * 60 * 35,
+		onSuccess: (categoryData) => {
 			setFormInput({
 				...formInput,
-				subCategory_id: subCategory?.id,
-				size_id: sizeData?.data?.find((sizeObj) => sizeObj.Size.name === productData?.size)?.Size
-					.id,
+				category_id: categoryData.data?.[productData?.department]?.[productData?.category]?.id,
+				subCategory_id: categoryData.data?.[productData?.department]?.[
+					productData?.category
+				]?.sub?.find((subCat) => subCat.name === productData?.subCategory)?.id,
 			});
+		},
+	});
+
+	const {
+		data: designerData,
+		fetchNextPage,
+		hasNextPage,
+		isFetchingNextPage,
+	} = useInfiniteQuery({
+		queryKey: ["designer", "infinite"],
+		queryFn: ({ pageParam = "" }) =>
+			getAllDesigners({
+				uri: `/designer?cursor=${pageParam && encodeURI(JSON.stringify(pageParam))}`,
+			}),
+		getNextPageParam: (lastPage, pages) => lastPage?.data[lastPage.data.length - 1]?.sort,
+		refetchOnWindowFocus: false,
+	});
+
+	const { data: sizeData, refetch: fetchSize } = useQuery({
+		queryKey: ["size", formInput.category_id && formInput.category_id],
+		queryFn: (obj) => getAllSizes({ uri: `/category/size/${obj.queryKey[1]}` }),
+		enabled: formInput.category_id ? true : false,
+		refetchOnWindowFocus: false,
+		onSuccess: (sizeData) => {
+			const sizeObj = sizeData?.data?.find((sizeObj) => sizeObj.Size.name === productData?.size);
+			setFormInput({ ...formInput, size_id: sizeObj?.Size.id });
 		},
 	});
 
@@ -104,10 +138,9 @@ export default function EditProductDialog({ isOpen, setIsOpen, productData, user
 		queryKey: ["color"],
 		queryFn: () => getAllColor({ uri: "/listing/color" }),
 		refetchOnWindowFocus: false,
-		staleTime: 1000 * 60 * 60 * 24,
+		staleTime: 1000 * 60 * 30,
+		cacheTime: 1000 * 60 * 35,
 	});
-
-	const size = sizeData?.data.map((sizeData) => sizeData.Size.name) || [];
 
 	const { mutate: editMutate } = useMutation({
 		mutationFn: (product) =>
@@ -139,8 +172,14 @@ export default function EditProductDialog({ isOpen, setIsOpen, productData, user
 		},
 	});
 
-	const onSelect = (e, form) => {
-		setFormInput({ ...formInput, [form]: e });
+	const onSelect = (e, category, shouldFetchSize) => {
+		const [cat_id, cat_name] = String(e)?.split("_");
+
+		shouldFetchSize && fetchSize();
+
+		return category !== "department" && category !== "color" && category !== "condition"
+			? setFormInput({ ...formInput, [category]: cat_name, [`${category}_id`]: cat_id })
+			: setFormInput({ ...formInput, [category]: e });
 	};
 
 	const onFormInput = (e, form) => {
@@ -196,33 +235,38 @@ export default function EditProductDialog({ isOpen, setIsOpen, productData, user
 						<Label htmlFor="designer" className="text-right">
 							Designer
 						</Label>
-						<Select value={productData?.designer} disabled={true}>
-							<SelectTrigger className="col-span-2 h-10 w-full bg-slate-200 text-sm placeholder:font-light placeholder:text-gray-400">
-								<SelectValue placeholder="Designer" />
-							</SelectTrigger>
-							<SelectContent>
-								{[productData?.designer].map((designer) => (
-									<SelectItem key={designer} value={designer}>
-										{designer}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
+						<DesignerComboBox
+							ref={childStateRef}
+							data={designerData?.pages ?? []}
+							fetchNextPage={fetchNextPage}
+							isFetchingNextPage={isFetchingNextPage}
+							hasNextPage={hasNextPage}
+							setFormInput={setFormInput}
+							cacheValue={formInput.designer}
+							className="col-span-2 mt-0 w-full text-sm placeholder:font-light placeholder:text-gray-400 hover:bg-background md:h-10"
+							popoverWidth="md:w-[224px]"
+							disabled={!isDraft}
+						/>
 					</div>
 					<div className="col-span-3 items-center">
 						<Label htmlFor="department" className="text-right">
 							Department
 						</Label>
-						<Select value={productData?.department} disabled={true}>
-							<SelectTrigger className="col-span-2 h-10 w-full bg-slate-200 text-sm placeholder:font-light placeholder:text-gray-400">
+						<Select
+							value={formInput.department || undefined}
+							onValueChange={(e) => onSelect(e, "department")}
+							disabled={!isDraft}
+						>
+							<SelectTrigger className="col-span-2 h-10 w-full text-sm placeholder:font-light placeholder:text-gray-400">
 								<SelectValue placeholder="Department" />
 							</SelectTrigger>
 							<SelectContent>
-								{[productData?.department].map((dept) => (
-									<SelectItem key={dept} value={dept}>
-										{dept}
-									</SelectItem>
-								))}
+								{categoryData?.data &&
+									Object.keys(categoryData.data).map((department) => (
+										<SelectItem key={department} value={department}>
+											{department}
+										</SelectItem>
+									))}
 							</SelectContent>
 						</Select>
 					</div>
@@ -230,16 +274,35 @@ export default function EditProductDialog({ isOpen, setIsOpen, productData, user
 						<Label htmlFor="category" className="text-right">
 							Category
 						</Label>
-						<Select value={productData?.category} disabled={true}>
-							<SelectTrigger className="col-span-2 h-10 w-full bg-slate-200 text-sm placeholder:font-light placeholder:text-gray-400">
+						<Select
+							value={
+								formInput.category ? `${formInput.category_id}_${formInput.category}` : undefined
+							}
+							onValueChange={(e) => onSelect(e, "category")}
+							disabled={!isDraft}
+						>
+							<SelectTrigger className="col-span-2 h-10 w-full text-sm placeholder:font-light placeholder:text-gray-400">
 								<SelectValue placeholder="Category" />
 							</SelectTrigger>
 							<SelectContent>
-								{[productData?.category].map((category) => (
-									<SelectItem key={category} value={category}>
-										{category}
+								{formInput.department ? (
+									Object.keys(categoryData.data[formInput.department]).map((category) => {
+										const cat_id = categoryData.data[formInput.department][category]?.id;
+										return (
+											<SelectItem key={cat_id} value={`${cat_id}_${category}`}>
+												{category}
+											</SelectItem>
+										);
+									})
+								) : (
+									<SelectItem
+										value="Please Select Department First"
+										className="pl-2 text-cyan-900"
+										disabled
+									>
+										Please Select Department First
 									</SelectItem>
-								))}
+								)}
 							</SelectContent>
 						</Select>
 					</div>
@@ -247,16 +310,38 @@ export default function EditProductDialog({ isOpen, setIsOpen, productData, user
 						<Label htmlFor="subCategory" className="text-right">
 							SubCategory
 						</Label>
-						<Select value={formInput.subCategory} onValueChange={(e) => onSelect(e, "subCategory")}>
+						<Select
+							value={
+								formInput.subCategory
+									? `${formInput.subCategory_id}_${formInput.subCategory}`
+									: undefined
+							}
+							onValueChange={(e) => onSelect(e, "subCategory", true)}
+						>
 							<SelectTrigger className="col-span-2 h-10 w-full text-sm placeholder:font-light placeholder:text-gray-400">
 								<SelectValue placeholder="SubCategory" />
 							</SelectTrigger>
 							<SelectContent>
-								{subCategoryData?.map((subCat) => (
-									<SelectItem key={subCat.name} value={subCat.name}>
-										{subCat.name}
+								{formInput.category_id ? (
+									Object.values(categoryData.data[formInput.department])
+										.filter((obj) => String(obj.id) === String(formInput.category_id))[0]
+										?.sub.map((subCategory) => {
+											const subCat_id = subCategory.id;
+											return (
+												<SelectItem key={subCat_id} value={`${subCat_id}_${subCategory.name}`}>
+													{subCategory.name}
+												</SelectItem>
+											);
+										})
+								) : (
+									<SelectItem
+										value="Please Select Category First"
+										className="pl-2 text-cyan-900"
+										disabled
+									>
+										Please Select Category First
 									</SelectItem>
-								))}
+								)}
 							</SelectContent>
 						</Select>
 					</div>
@@ -264,16 +349,32 @@ export default function EditProductDialog({ isOpen, setIsOpen, productData, user
 						<Label htmlFor="size" className="text-right">
 							Size
 						</Label>
-						<Select value={formInput.size} onValueChange={(e) => onSelect(e, "size")}>
+						<Select
+							value={formInput.size ? `${formInput.size_id}_${formInput.size}` : undefined}
+							onValueChange={(e) => onSelect(e, "size")}
+						>
 							<SelectTrigger className="col-span-2 h-10 w-full text-sm placeholder:font-light placeholder:text-gray-400">
 								<SelectValue placeholder="size" />
 							</SelectTrigger>
 							<SelectContent>
-								{size.map((size) => (
-									<SelectItem key={size} value={size}>
-										{size}
+								{formInput.subCategory_id ? (
+									sizeData?.data.map((obj, index) => (
+										<SelectItem
+											key={`${obj.Size.name}_${index}`}
+											value={`${obj.Size.id}_${obj.Size.name}`}
+										>
+											{obj.Size.name}
+										</SelectItem>
+									))
+								) : (
+									<SelectItem
+										value="Please Select SubCategory First"
+										className="text-cyan-900"
+										disabled
+									>
+										Please Select Category First
 									</SelectItem>
-								))}
+								)}
 							</SelectContent>
 						</Select>
 					</div>
@@ -359,7 +460,8 @@ export default function EditProductDialog({ isOpen, setIsOpen, productData, user
 							initialBgImage={
 								id === "1"
 									? productData?.primary_image
-									: JSON.parse(productData?.secondary_image)[`image_${Number(id) - 2}`]
+									: productData?.secondary_image &&
+									  JSON.parse(productData?.secondary_image)[`image_${Number(id) - 2}`]
 							}
 							setFormInput={setFormInput}
 						/>
@@ -374,3 +476,23 @@ export default function EditProductDialog({ isOpen, setIsOpen, productData, user
 		</Dialog>
 	);
 }
+
+/*const { data: sizeData, refetch: fetchSize } = useQuery({
+		queryKey: ["size", categoryData?.data?.[productData?.department]?.[productData?.category]?.id],
+		queryFn: (obj) => getAllSizes({ uri: `/category/size/${obj.queryKey[1]}` }),
+		enabled: isOpen && categoryData && productData ? true : false,
+		refetchOnWindowFocus: false,
+		onSuccess: (sizeData) => {
+			const subCategoryData =
+				categoryData.data?.[productData?.department]?.[productData?.category]?.sub || [];
+			const subCategory = subCategoryData.find(
+				(subCat) => subCat.name === productData?.subCategory,
+			);
+			setFormInput({
+				...formInput,
+				subCategory_id: subCategory?.id,
+				size_id: sizeData?.data?.find((sizeObj) => sizeObj.Size.name === productData?.size)?.Size
+					.id,
+			});
+		},
+	});*/
