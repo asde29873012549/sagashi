@@ -26,6 +26,7 @@ import { useToast } from "@/components/ui/use-toast";
 import DOMPurify from "dompurify";
 import { useDispatch } from "react-redux";
 import { uploadSuccess } from "@/lib/userMessage";
+import { XCircle } from "lucide-react";
 
 export default function EditProductDialog({
 	isOpen,
@@ -65,7 +66,7 @@ export default function EditProductDialog({
 
 	const [formInput, setFormInput] = useState({
 		item_name: productData?.name || "",
-		tags: productData?.tags || "",
+		tags: productData?.tags?.split("&") || "",
 		desc: productData?.desc || "",
 		size: productData?.size || "",
 		color: productData?.color || "",
@@ -80,6 +81,8 @@ export default function EditProductDialog({
 		size_id: "",
 		photos: generatePhotoObj(productData),
 	});
+
+	const [tagInput, setTagInput] = useState("");
 
 	const { data: conditionData } = useQuery({
 		queryKey: ["condition"],
@@ -184,6 +187,21 @@ export default function EditProductDialog({
 
 	const onFormInput = (e, form) => {
 		setFormInput({ ...formInput, ...{ [form]: e.target.value } });
+	};
+
+	const onTagInputKeyDown = (e) => {
+		if (e.keyCode === 32 || e.keyCode === 13) {
+			setFormInput({ ...formInput, tags: [...formInput.tags, e.target.value] });
+			setTagInput("");
+		}
+	};
+
+	const onTagInput = (e) => {
+		setTagInput(e.target.value);
+	};
+
+	const onRemoveTag = (tag) => {
+		setFormInput({ ...formInput, tags: formInput.tags?.filter((arr) => arr !== tag) });
 	};
 
 	const onEditProductData = () => {
@@ -430,13 +448,33 @@ export default function EditProductDialog({
 						<Label htmlFor="tags" className="text-right">
 							Tags
 						</Label>
-						<Input
-							id="tags"
-							placeholder="#Tags"
-							className="col-span-2 h-10 w-full text-sm font-light placeholder:font-light placeholder:text-gray-400"
-							value={formInput.tags || ""}
-							onChange={(e) => onFormInput(e, "tags")}
-						/>
+						<div className="col-span-2 flex h-fit flex-wrap rounded-md border border-gray-500 px-1">
+							{formInput.tags?.map((tag, index) => {
+								if (tag)
+									return (
+										<div
+											key={`${tag}-${index}-tags`}
+											className="mx-0.5 my-1 flex h-8 items-center justify-center space-x-1 rounded-sm bg-sky-900 px-2 py-1 text-sm font-light text-white"
+										>
+											<span>#{tag}</span>
+											<XCircle
+												size={16}
+												strokeWidth={2}
+												className="cursor-pointer hover:text-rose-800"
+												onClick={() => onRemoveTag(tag)}
+											/>
+										</div>
+									);
+							})}
+							<Input
+								id="tags"
+								placeholder="Press Enter or Space to add #Tags"
+								className="my-1 h-8 min-w-[10px] grow border-none px-0.5 py-1 text-sm font-light outline-none placeholder:font-light placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0"
+								value={tagInput}
+								onChange={(e) => onTagInput(e)}
+								onKeyDown={(e) => onTagInputKeyDown(e)}
+							/>
+						</div>
 					</div>
 					<div className="col-span-6 items-center gap-2">
 						<Label htmlFor="description" className="text-right">

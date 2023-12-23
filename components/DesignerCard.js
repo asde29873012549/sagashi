@@ -65,9 +65,11 @@ export default function DesignerCard({
 					/>
 				</div>
 			</Link>
-			<div className="flex flex-col items-center justify-center">
+			<div className="flex w-full flex-col items-center justify-center">
 				<Link href={`/designers/${designer_id}`}>
-					<div className="mb-1 mt-2 text-xl font-bold text-foreground">{name}</div>
+					<div className="mb-1 mt-2 truncate text-xl font-bold text-foreground md:text-base lg:text-xl">
+						{name}
+					</div>
 				</Link>
 			</div>
 			<span className="m-auto mb-2 text-sm underline">1.3k listings</span>

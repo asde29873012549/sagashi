@@ -123,7 +123,7 @@ export default function Header() {
 	return (
 		<div className="top-0 z-[19] hidden w-full bg-background md:sticky md:flex md:h-20 md:items-center md:justify-between md:px-9 md:py-1 md:shadow-none">
 			<MenuBar />
-			<div className="flex w-1/6 justify-between">
+			<div className="flex w-1/6 justify-between md:w-1/5 md:text-sm lg:w-1/6 lg:text-base">
 				<Link className="mr-2 inline-block w-1/4 hover:cursor-pointer" href="/sell">
 					SELL
 				</Link>
@@ -139,7 +139,7 @@ export default function Header() {
 					{session ? "LOGOUT" : "LOGIN"}
 				</div>
 			</div>
-			<Logo className="absolute m-auto w-[7vw]" />
+			<Logo className="absolute m-auto w-[7vw] md:w-[10vw] lg:w-[7vw]" />
 			<div className="text-md flex w-1/6 justify-end">
 				<div className="flex w-fit space-x-6">
 					<div className="inline-block" style={{ height: "28px" }}>

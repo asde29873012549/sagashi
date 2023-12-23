@@ -4,11 +4,12 @@ import { dehydrate, QueryClient, useQuery, useInfiniteQuery } from "@tanstack/re
 import getTree from "@/lib/queries/fetchQuery";
 import getProducts from "@/lib/queries/fetchQuery";
 import getUserLikedListing from "@/lib/queries/fetchQuery";
+import useInterSectionObserver from "@/lib/hooks/useIntersectionObserver";
 import reformTree from "@/lib/tree/reformTree";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import FilterSection from "@/components/FilterSection";
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 
 export default function Shop({ isMenswear, isWomenswear, isNewArrival, designer, user, treeData }) {
@@ -84,24 +85,11 @@ export default function Shop({ isMenswear, isWomenswear, isNewArrival, designer,
 		refetchOnWindowFocus: false,
 	});
 
-	const observer = useRef();
-
-	const lastProductElement = useCallback(
-		(node) => {
-			if (isFetchingNextPage) return;
-			if (observer.current) {
-				observer.current.disconnect();
-			}
-			observer.current = new IntersectionObserver((entries) => {
-				if (entries[0].isIntersecting && hasNextPage) {
-					fetchNextPage();
-				}
-			});
-
-			if (node) observer.current.observe(node);
-		},
-		[isFetchingNextPage, hasNextPage],
-	);
+	const lastProductElement = useInterSectionObserver({
+		isFetchingNextPage,
+		hasNextPage,
+		fetchNextPage,
+	});
 
 	const onChangeFilter = (filter) => {
 		setFilter(filter);

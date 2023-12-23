@@ -1,7 +1,6 @@
 import ShopPage from "./index";
 import getTree from "@/lib/queries/fetchQuery";
-import getProducts from "@/lib/queries/fetchQuery";
-import { useQuery, QueryClient, dehydratedState, dehydrate } from "@tanstack/react-query";
+import { useQuery, QueryClient, dehydrate } from "@tanstack/react-query";
 
 export default function Menswear() {
 	const { data: OriginTreeData } = useQuery({

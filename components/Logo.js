@@ -8,7 +8,7 @@ export default function Logo({ className = "" }) {
 				src="/sagashi_logo.webp"
 				alt="Sagashi_logo"
 				fill={true}
-				sizes="(max-width: 768px) 35vw, (max-width: 1200px) 15vw, 15vw"
+				sizes="(max-width: 768px) 35vw, (max-width: 1200px) 20vw, 15vw"
 				priority={true}
 			/>
 		</Link>

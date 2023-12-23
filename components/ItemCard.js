@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { getDateDistance } from "@/lib/utils";
-import { useState, useRef, Fragment } from "react";
+import { useRef } from "react";
 import { Dot } from "lucide-react";
 import readMessage from "@/lib/queries/fetchQuery";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,7 +16,6 @@ import {
 } from "@/redux/messageSlice";
 
 import Link from "next/link";
-import Image from "next/image";
 
 export default function ItemCard({
 	user, // only Messages section will have user

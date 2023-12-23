@@ -16,6 +16,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { mobileFormInput } from "@/redux/sellSlice";
 import { useDispatch } from "react-redux";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import useInterSectionObserver from "@/lib/hooks/useIntersectionObserver";
 
 const DesignerComboBox = forwardRef(
 	(
@@ -46,23 +47,11 @@ const DesignerComboBox = forwardRef(
 			[value],
 		);
 
-		const observer = useRef();
-		const lastDesignerElement = useCallback(
-			(node) => {
-				if (isFetchingNextPage) return;
-				if (observer.current) {
-					observer.current.disconnect();
-				}
-				observer.current = new IntersectionObserver((entries) => {
-					if (entries[0].isIntersecting && hasNextPage) {
-						fetchNextPage();
-					}
-				});
-
-				if (node) observer.current.observe(node);
-			},
-			[isFetchingNextPage, hasNextPage],
-		);
+		const lastDesignerElement = useInterSectionObserver({
+			isFetchingNextPage,
+			hasNextPage,
+			fetchNextPage,
+		});
 
 		return (
 			<Popover open={open} onOpenChange={setOpen}>
@@ -97,7 +86,7 @@ const DesignerComboBox = forwardRef(
 											return (
 												<CommandItem
 													key={data.name}
-													onSelect={(currentValue) => {
+													onSelect={() => {
 														onMakeProgress && onMakeProgress(85);
 														setValue(data.name);
 
@@ -131,7 +120,7 @@ const DesignerComboBox = forwardRef(
 											return (
 												<CommandItem
 													key={data.name}
-													onSelect={(currentValue) => {
+													onSelect={() => {
 														onMakeProgress && onMakeProgress(85);
 														setValue(data.name);
 														if (dispatchFormInput) {
