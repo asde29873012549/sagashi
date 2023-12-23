@@ -76,12 +76,6 @@ export default function Info() {
 			<section className="m-auto w-full md:w-4/6">
 				<h1 className="my-2 text-2xl font-semibold md:my-4">Information</h1>
 				<Accordion type="single" value={routes} onValueChange={setRoutes} collapsible>
-					<AccordionItem value="about">
-						<AccordionTrigger ref={(node) => getNode(node, "about", infoSecRef)}>
-							ABOUT
-						</AccordionTrigger>
-						<AccordionContent>Yes. It adheres to the WAI-ARIA design pattern.</AccordionContent>
-					</AccordionItem>
 					<AccordionItem value="faqs">
 						<AccordionTrigger ref={(node) => getNode(node, "faqs", infoSecRef)}>
 							FAQs

@@ -2,6 +2,7 @@ import Logo from "@/components/Logo";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 export default function Footer() {
 	const router = useRouter();
@@ -56,13 +57,14 @@ export default function Footer() {
 
 			<div className="mt-5 flex w-full flex-col md:mt-0 md:w-1/5 ">
 				<h1 className="mb-2 space-y-2 text-lg font-bold md:text-xl">Information</h1>
-				<Button
-					variant="ghost"
-					className="h-fit w-fit p-0 py-1 font-normal hover:bg-transparent hover:underline focus:bg-transparent"
-					onClick={onInfoClick}
-				>
-					ABOUT
-				</Button>
+				<Link href="/about">
+					<Button
+						variant="ghost"
+						className="h-fit w-fit p-0 py-1 font-normal hover:bg-transparent hover:underline focus:bg-transparent"
+					>
+						ABOUT
+					</Button>
+				</Link>
 				<Button
 					variant="ghost"
 					className="h-fit w-fit p-0 py-1 font-normal hover:bg-transparent hover:underline focus:bg-transparent"

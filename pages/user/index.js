@@ -11,7 +11,6 @@ import MyItem from "../../components/User/MyItem";
 import AddressInfo from "../../components/User/AddressInfo";
 import LanguageInfo from "../../components/User/LanguageInfo";
 import CountryInfo from "../../components/User/CountryInfo";
-import About from "../../components/User/About";
 import Drafts from "../../components/User/Drafts";
 import SheetWrapper from "@/components/User/Sheets/SheetWrapper";
 import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
@@ -40,10 +39,10 @@ export default function User({ user }) {
 		}
 	}, [chatroom_id, user]);
 
-	const hasNotEditButtonFeature = ["My Items", "Contact Us", "About", "Messages", "Drafts"];
+	const hasNotEditButtonFeature = ["My Items", "Contact Us", "Messages", "Drafts"];
 
 	const [displayFeature, setDisplayFeature] = useState(
-		dept ? <Messages user={user} /> : <ProfileInfo userData={userData} />,
+		dept ? <Messages user={user} /> : <ProfileInfo user={user} />,
 	);
 	const [feature, setFeature] = useState(dept ? dept : "My Profile");
 	const [open, setOpen] = useState(false);
@@ -51,7 +50,7 @@ export default function User({ user }) {
 	const [addressData, setAddressData] = useState(null);
 
 	const onProfileClick = () => {
-		setDisplayFeature(<ProfileInfo userData={userData} />);
+		setDisplayFeature(<ProfileInfo user={user} />);
 		setFeature("My Profile");
 
 		chatroom_id && router.replace("/user");
@@ -107,13 +106,6 @@ export default function User({ user }) {
 	const onContactUsClick = () => {
 		setDisplayFeature(<ContactUs rows="10" />);
 		setFeature("Contact Us");
-
-		chatroom_id && router.replace("/user");
-	};
-
-	const onAboutClick = () => {
-		setDisplayFeature(<About />);
-		setFeature("About");
 
 		chatroom_id && router.replace("/user");
 	};
@@ -176,10 +168,6 @@ export default function User({ user }) {
 						<p>Contact Us</p>
 						<hr className="h-px w-0 border-foreground transition-all duration-300 ease-in-out group-hover:w-full" />
 					</Button>
-					<Button variant="link" onClick={onAboutClick} className="group flex w-fit flex-col">
-						<p>About</p>
-						<hr className="h-px w-0 border-foreground transition-all duration-300 ease-in-out group-hover:w-full" />
-					</Button>
 					<Link href="/info/terms&conditions">
 						<Button variant="link" className="group flex w-fit flex-col">
 							<p>Terms & Conditions</p>
@@ -194,10 +182,7 @@ export default function User({ user }) {
 					</Link>
 					<SheetWrapper
 						trigger={
-							<div
-								onClick={onAboutClick}
-								className="group inline-flex w-fit flex-col items-center justify-center px-4 py-2 text-sm font-medium text-primary"
-							>
+							<div className="group inline-flex w-fit flex-col items-center justify-center px-4 py-2 text-sm font-medium text-primary">
 								<p>Change Password</p>
 								<hr className="h-px w-0 border-foreground transition-all duration-300 ease-in-out group-hover:w-full" />
 							</div>

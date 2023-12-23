@@ -1,4 +1,13 @@
-export default function ProfileInfo({ sheet = "", userData }) {
+import { useQuery } from "@tanstack/react-query";
+import getUser from "@/lib/queries/fetchQuery";
+
+export default function ProfileInfo({ sheet = "", user }) {
+	const { data: userData } = useQuery({
+		queryKey: ["userData"],
+		queryFn: () => getUser({ uri: `/user/${user}/info` }),
+		refetchOnWindowFocus: false,
+	});
+
 	return (
 		<div className="flex items-center justify-between">
 			<div className="flex w-5/6 flex-col md:w-2/5">
